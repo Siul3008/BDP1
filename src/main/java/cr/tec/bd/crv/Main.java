@@ -3,6 +3,7 @@ package cr.tec.bd.crv;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -21,6 +22,11 @@ public class Main extends Application {
         stage.setTitle("BDP1 - Sistema de Mascotas");
         stage.setScene(scene);
         stage.setResizable(true);
+
+        if (Main.class.getResourceAsStream("/images/logo.png") != null) {
+            stage.getIcons().add(new Image(Main.class.getResourceAsStream("/images/logo.png")));
+        }
+
         stage.show();
     }
 

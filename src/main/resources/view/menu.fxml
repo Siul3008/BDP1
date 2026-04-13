@@ -26,6 +26,10 @@
                 onAction="#abrirBuscarMascota"
                 maxWidth="260"/>
 
+        <Button text="Lista de Mascotas"
+                onAction="#abrirListaMascotas"
+                maxWidth="260"/>
+
         <Button text="Probar conexión BD"
                 onAction="#probarConexion"
                 maxWidth="260"

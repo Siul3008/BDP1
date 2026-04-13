@@ -49,6 +49,10 @@ public class MenuController {
         }
     }
 
+    public void abrirListaMascotas(ActionEvent event) throws IOException {
+        cambiarVentana(event, "/view/lista_mascotas.fxml", "Lista de Mascotas");
+    }
+
     public void salirSistema(ActionEvent event) {
         Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
         stage.close();
