@@ -1,18 +1,14 @@
 package cr.tec.bd.crv.controller;
 
-import cr.tec.bd.crv.Main;
 import cr.tec.bd.crv.model.Mascota;
+import cr.tec.bd.crv.util.NavigationUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 
@@ -60,12 +56,17 @@ public class ListaMascotasController {
 
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
-        Parent root = FXMLLoader.load(Main.class.getResource("/view/menu.fxml"));
-        Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root, 900, 600);
-        scene.getStylesheets().add(Main.class.getResource("/styles/style.css").toExternalForm());
-        stage.setTitle("BDP1 - Sistema de Mascotas");
-        stage.setScene(scene);
-        stage.show();
+        NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+    }
+
+    @FXML
+    public void abrirRegistro(ActionEvent event) throws IOException {
+        NavigationUtil.openWindow(event, "/view/registrar_mascota.fxml", "Registrar Mascota");
+    }
+
+    @FXML
+    public void abrirEstadisticas(ActionEvent event) throws IOException {
+        NavigationUtil.openWindow(event, "/view/estadisticas.fxml", "Estadísticas");
     }
 }
+

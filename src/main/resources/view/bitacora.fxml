@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cr.tec.bd.crv.controller.ModuloPlantillaController"
+            styleClass="screen">
+    <top>
+        <HBox alignment="CENTER_LEFT" styleClass="top-bar">
+            <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
+            <ImageView fitHeight="52" fitWidth="52" preserveRatio="true"><image><Image url="@/images/logo.png"/></image></ImageView>
+            <VBox spacing="2.0"><Label text="Bitácora" styleClass="brand-title"/><Label text="Auditoría de cambios sensibles" styleClass="brand-subtitle"/></VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Volver al menú" onAction="#volverMenu" styleClass="ghost-button"/>
+        </HBox>
+    </top>
+    <center>
+        <VBox spacing="18.0">
+            <padding><Insets top="10" right="24" bottom="24" left="24"/></padding>
+            <VBox spacing="12.0" styleClass="card form-card">
+                <Label text="Filtros de bitácora" styleClass="title-lg"/>
+                <GridPane hgap="14.0" vgap="14.0">
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0"><Label text="Tabla o módulo" styleClass="field-label"/><TextField promptText="Mascotas, donaciones, adopciones"/></VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0"><Label text="Usuario" styleClass="field-label"/><TextField promptText="Usuario que realizó el cambio"/></VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0"><Label text="Campo afectado" styleClass="field-label"/><TextField promptText="Estado, monto, calificación"/></VBox>
+                </GridPane>
+                <HBox spacing="10.0"><Button text="Consultar cambios" onAction="#mostrarAviso" styleClass="primary-button"/><Button text="Exportar reporte" onAction="#mostrarAviso" styleClass="secondary-button"/></HBox>
+            </VBox>
+            <VBox spacing="12.0" styleClass="card result-card">
+                <Label text="Registro de auditoría" styleClass="section-title"/>
+                <TableView prefHeight="360"><columns><TableColumn text="Fecha" prefWidth="140"/><TableColumn text="Usuario" prefWidth="120"/><TableColumn text="Cambio" prefWidth="220"/><TableColumn text="Valor nuevo" prefWidth="220"/></columns></TableView>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>
+

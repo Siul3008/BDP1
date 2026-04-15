@@ -1,11 +1,8 @@
 package cr.tec.bd.crv.controller;
 
-import cr.tec.bd.crv.Main;
 import cr.tec.bd.crv.database.ConexionBD;
+import cr.tec.bd.crv.util.NavigationUtil;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
@@ -15,42 +12,69 @@ import java.sql.SQLException;
 
 public class MenuController {
 
-    private void cambiarVentana(ActionEvent event, String rutaFXML, String titulo) throws IOException {
-        Parent root = FXMLLoader.load(Main.class.getResource(rutaFXML));
-        Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(Main.class.getResource("/styles/style.css").toExternalForm());
-        stage.setTitle(titulo);
-        stage.setScene(scene);
-        stage.show();
+    // Centralizes view changes so every screen uses the same window size and stylesheet.
+    private void openModule(ActionEvent event, String fxmlPath, String title) throws IOException {
+        NavigationUtil.openWindow(event, fxmlPath, title);
     }
 
     public void abrirRegistrarMascota(ActionEvent event) throws IOException {
-        cambiarVentana(event, "/view/registrar_mascota.fxml", "Registrar Mascota");
+        openModule(event, "/view/registrar_mascota.fxml", "Registrar Mascota");
     }
 
     public void abrirBuscarMascota(ActionEvent event) throws IOException {
-        cambiarVentana(event, "/view/buscar_mascota.fxml", "Buscar Mascota");
-    }
-
-    public void probarConexion() {
-        try (Connection conexion = ConexionBD.conectar()) {
-            Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-            alerta.setTitle("Conexión");
-            alerta.setHeaderText(null);
-            alerta.setContentText("Conexión exitosa con Oracle");
-            alerta.showAndWait();
-        } catch (SQLException e) {
-            Alert alerta = new Alert(Alert.AlertType.ERROR);
-            alerta.setTitle("Error de conexión");
-            alerta.setHeaderText("No se pudo conectar a la base de datos");
-            alerta.setContentText(e.getMessage());
-            alerta.showAndWait();
-        }
+        openModule(event, "/view/buscar_mascota.fxml", "Buscar Mascota");
     }
 
     public void abrirListaMascotas(ActionEvent event) throws IOException {
-        cambiarVentana(event, "/view/lista_mascotas.fxml", "Lista de Mascotas");
+        openModule(event, "/view/lista_mascotas.fxml", "Lista de Mascotas");
+    }
+
+    public void abrirPersonas(ActionEvent event) throws IOException {
+        openModule(event, "/view/personas.fxml", "Personas");
+    }
+
+    public void abrirCasasCuna(ActionEvent event) throws IOException {
+        openModule(event, "/view/casas_cuna.fxml", "Casas Cuna");
+    }
+
+    public void abrirAdopciones(ActionEvent event) throws IOException {
+        openModule(event, "/view/adopciones.fxml", "Adopciones");
+    }
+
+    public void abrirDonaciones(ActionEvent event) throws IOException {
+        openModule(event, "/view/donaciones.fxml", "Donaciones");
+    }
+
+    public void abrirAsociaciones(ActionEvent event) throws IOException {
+        openModule(event, "/view/asociaciones.fxml", "Asociaciones");
+    }
+
+    public void abrirBitacora(ActionEvent event) throws IOException {
+        openModule(event, "/view/bitacora.fxml", "Bitácora");
+    }
+
+    public void abrirEstadisticas(ActionEvent event) throws IOException {
+        openModule(event, "/view/estadisticas.fxml", "Estadísticas");
+    }
+
+    public void abrirReportes(ActionEvent event) throws IOException {
+        openModule(event, "/view/reportes.fxml", "Consultas y Reportes");
+    }
+
+    public void probarConexion() {
+        try (Connection connection = ConexionBD.conectar()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Conexión");
+            alert.setHeaderText(null);
+            alert.setContentText("Conexión exitosa con Oracle");
+            alert.showAndWait();
+        } catch (SQLException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error de conexión");
+            alert.setHeaderText("No se pudo conectar a la base de datos");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     public void salirSistema(ActionEvent event) {
@@ -58,3 +82,4 @@ public class MenuController {
         stage.close();
     }
 }
+

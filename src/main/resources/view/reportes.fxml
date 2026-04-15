@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cr.tec.bd.crv.controller.ModuloPlantillaController"
+            styleClass="screen">
+    <top>
+        <HBox alignment="CENTER_LEFT" styleClass="top-bar">
+            <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
+            <ImageView fitHeight="52" fitWidth="52" preserveRatio="true"><image><Image url="@/images/logo.png"/></image></ImageView>
+            <VBox spacing="2.0"><Label text="Consultas y reportes" styleClass="brand-title"/><Label text="Filtros, matches y salida consolidada" styleClass="brand-subtitle"/></VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Volver al menú" onAction="#volverMenu" styleClass="ghost-button"/>
+        </HBox>
+    </top>
+    <center>
+        <VBox spacing="18.0">
+            <padding><Insets top="10" right="24" bottom="24" left="24"/></padding>
+            <VBox spacing="12.0" styleClass="card form-card">
+                <Label text="Parámetros del reporte" styleClass="title-lg"/>
+                <GridPane hgap="14.0" vgap="14.0">
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0"><Label text="Consulta principal" styleClass="field-label"/><TextField promptText="Mascotas, donaciones, match, lista negra"/></VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0"><Label text="Filtro secundario" styleClass="field-label"/><TextField promptText="Raza, estado, asociación, fechas"/></VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0"><Label text="Orden" styleClass="field-label"/><TextField promptText="Fecha descendente"/></VBox>
+                </GridPane>
+                <HBox spacing="10.0"><Button text="Generar reporte" onAction="#mostrarAviso" styleClass="primary-button"/><Button text="Reporte de matches" onAction="#mostrarAviso" styleClass="secondary-button"/><Button text="Lista negra" onAction="#mostrarAviso" styleClass="ghost-button"/></HBox>
+            </VBox>
+            <VBox spacing="12.0" styleClass="card result-card">
+                <Label text="Resultados y totalizadores" styleClass="section-title"/>
+                <TableView prefHeight="360"><columns><TableColumn text="Campo 1" prefWidth="180"/><TableColumn text="Campo 2" prefWidth="180"/><TableColumn text="Campo 3" prefWidth="180"/><TableColumn text="Campo 4" prefWidth="180"/></columns></TableView>
+                <Label text="Total de registros: 0 | Total de montos: 0.00" styleClass="message-label"/>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>
+

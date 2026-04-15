@@ -14,12 +14,12 @@ public class Main extends Application {
                 Main.class.getResource("/view/menu.fxml")
         );
 
-        Scene scene = new Scene(loader.load(), 900, 600);
+        Scene scene = new Scene(loader.load(), 1200, 780);
         scene.getStylesheets().add(
                 Main.class.getResource("/styles/style.css").toExternalForm()
         );
 
-        stage.setTitle("BDP1 - Sistema de Mascotas");
+        stage.setTitle("BDP1 - Bienestar Animal");
         stage.setScene(scene);
         stage.setResizable(true);
 
@@ -34,3 +34,4 @@ public class Main extends Application {
         launch(args);
     }
 }
+

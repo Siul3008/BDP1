@@ -1,15 +1,11 @@
 package cr.tec.bd.crv.controller;
 
-import cr.tec.bd.crv.Main;
+import cr.tec.bd.crv.util.NavigationUtil;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
-import javafx.event.ActionEvent;
 
 import java.io.IOException;
 
@@ -17,6 +13,15 @@ public class RegistrarMascotaController {
 
     @FXML
     private ComboBox<String> cbTipo;
+
+    @FXML
+    private ComboBox<String> cbEstado;
+
+    @FXML
+    private ComboBox<String> cbMoneda;
+
+    @FXML
+    private ComboBox<String> cbEnergia;
 
     @FXML
     private Label lblMensaje;
@@ -30,21 +35,47 @@ public class RegistrarMascotaController {
                 "Conejo",
                 "Otro"
         ));
+
+        cbEstado.setItems(FXCollections.observableArrayList(
+                "Perdido",
+                "Encontrado",
+                "En adopción",
+                "Adoptado",
+                "En observación"
+        ));
+
+        cbMoneda.setItems(FXCollections.observableArrayList(
+                "CRC",
+                "USD"
+        ));
+
+        cbEnergia.setItems(FXCollections.observableArrayList(
+                "Atlético",
+                "Corredor",
+                "Caminador",
+                "Tranquilo",
+                "Para ver TV"
+        ));
     }
 
     @FXML
     public void guardarMascota() {
-        lblMensaje.setText("Mascota registrada correctamente (modo prueba)");
+        lblMensaje.setText("Formulario visual preparado para registrar la mascota.");
+    }
+
+    @FXML
+    public void limpiarFormulario() {
+        lblMensaje.setText("");
     }
 
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
-        Parent root = FXMLLoader.load(Main.class.getResource("/view/menu.fxml"));
-        Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(Main.class.getResource("/styles/style.css").toExternalForm());
-        stage.setTitle("BDP1 - Sistema de Mascotas");
-        stage.setScene(scene);
-        stage.show();
+        NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+    }
+
+    @FXML
+    public void abrirListaMascotas(ActionEvent event) throws IOException {
+        NavigationUtil.openWindow(event, "/view/lista_mascotas.fxml", "Lista de Mascotas");
     }
 }
+

@@ -1,30 +1,51 @@
 package cr.tec.bd.crv.controller;
 
-import cr.tec.bd.crv.Main;
+import cr.tec.bd.crv.util.NavigationUtil;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
+import javafx.scene.control.TextField;
 
 import java.io.IOException;
 
 public class BuscarMascotaController {
 
-    public Label lblResultado;
+    @FXML
+    private TextField txtBusqueda;
 
+    @FXML
+    private Label lblResultado;
+
+    @FXML
     public void buscarMascota() {
-        lblResultado.setText("Búsqueda realizada (modo prueba)");
+        String criterio = txtBusqueda.getText().trim();
+        if (criterio.isEmpty()) {
+            lblResultado.setText("Escriba un criterio para mostrar resultados en esta plantilla.");
+            return;
+        }
+
+        lblResultado.setText("Consulta lista para filtrar por: " + criterio);
     }
 
+    @FXML
+    public void limpiarBusqueda() {
+        txtBusqueda.clear();
+        lblResultado.setText("");
+    }
+
+    @FXML
     public void volverMenu(ActionEvent event) throws IOException {
-        Parent root = FXMLLoader.load(Main.class.getResource("/view/menu.fxml"));
-        Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(Main.class.getResource("/styles/style.css").toExternalForm());
-        stage.setTitle("BDP1 - Sistema de Mascotas");
-        stage.setScene(scene);
-        stage.show();
+        NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+    }
+
+    @FXML
+    public void abrirListaMascotas(ActionEvent event) throws IOException {
+        NavigationUtil.openWindow(event, "/view/lista_mascotas.fxml", "Lista de Mascotas");
+    }
+
+    @FXML
+    public void abrirReportes(ActionEvent event) throws IOException {
+        NavigationUtil.openWindow(event, "/view/reportes.fxml", "Consultas y Reportes");
     }
 }
+

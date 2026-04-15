@@ -5,23 +5,59 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="12.0"
-      xmlns="http://javafx.com/javafx/17"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="cr.tec.bd.crv.controller.LoginController">
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cr.tec.bd.crv.controller.LoginController"
+            styleClass="screen">
+    <top>
+        <HBox alignment="CENTER_LEFT" styleClass="top-bar">
+            <padding>
+                <Insets top="18" right="24" bottom="12" left="24"/>
+            </padding>
+            <ImageView fitHeight="52" fitWidth="52" pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@/images/logo.png"/>
+                </image>
+            </ImageView>
+            <Label text="Bienestar Animal" styleClass="brand-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Acceso" styleClass="chip"/>
+        </HBox>
+    </top>
+    <center>
+        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="10" right="30" bottom="30" left="30"/>
+            </padding>
+            <VBox alignment="CENTER_LEFT" maxWidth="420" prefWidth="420" spacing="16.0" styleClass="card form-card">
+                <Label text="Inicio de sesión" styleClass="title-lg"/>
+                <VBox spacing="8.0">
+                    <Label text="Usuario" styleClass="field-label"/>
+                    <TextField fx:id="txtUsuario" promptText="Usuario"/>
+                </VBox>
+                <VBox spacing="8.0">
+                    <Label text="Contraseña" styleClass="field-label"/>
+                    <PasswordField fx:id="txtContrasena" promptText="Contraseña"/>
+                </VBox>
+                <HBox spacing="10.0">
+                    <Button text="Ingresar" onAction="#iniciarSesion" styleClass="primary-button">
+                        <tooltip><Tooltip text="Ingresa al sistema."/></tooltip>
+                    </Button>
+                    <Button text="Limpiar" onAction="#limpiarCampos" styleClass="secondary-button">
+                        <tooltip><Tooltip text="Borra los datos ingresados."/></tooltip>
+                    </Button>
+                </HBox>
+                <Label fx:id="lblMensaje" text="" wrapText="true" styleClass="message-label"/>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>
 
-    <padding>
-        <Insets top="25" right="25" bottom="25" left="25"/>
-    </padding>
-
-    <Label text="Inicio de Sesión" styleClass="titulo"/>
-
-    <TextField fx:id="txtUsuario" promptText="Usuario" maxWidth="250"/>
-    <PasswordField fx:id="txtContrasena" promptText="Contraseña" maxWidth="250"/>
-
-    <Button text="Ingresar" onAction="#iniciarSesion" maxWidth="250"/>
-
-    <Label fx:id="lblMensaje" text=""/>
-</VBox>
