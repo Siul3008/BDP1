@@ -12,32 +12,73 @@ import java.io.IOException;
 public class LoginController {
 
     @FXML
-    private TextField txtUsuario;
+    private TextField txtCorreoLoginUsuario;
 
     @FXML
-    private PasswordField txtContrasena;
+    private PasswordField txtContrasenaLoginUsuario;
 
     @FXML
-    private Label lblMensaje;
+    private TextField txtCorreoLoginAsociacion;
 
     @FXML
-    public void iniciarSesion(ActionEvent event) throws IOException {
-        String usuario = txtUsuario.getText();
-        String contrasena = txtContrasena.getText();
+    private PasswordField txtContrasenaLoginAsociacion;
 
-        if (usuario.equals("admin") && contrasena.equals("1234")) {
-            lblMensaje.setText("Inicio de sesión correcto");
+    @FXML
+    private Label lblMensajeUsuario;
+
+    @FXML
+    private Label lblMensajeAsociacion;
+
+    @FXML
+    public void iniciarSesionUsuario(ActionEvent event) throws IOException {
+        String email = txtCorreoLoginUsuario.getText().trim();
+        String password = txtContrasenaLoginUsuario.getText();
+
+        if (!email.isEmpty() && !password.isEmpty()) {
+            lblMensajeUsuario.setText("");
             NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
-        } else {
-            lblMensaje.setText("Usuario o contraseña incorrectos");
+            return;
         }
+
+        lblMensajeUsuario.setText("Complete correo y contraseña.");
     }
 
     @FXML
-    public void limpiarCampos() {
-        txtUsuario.clear();
-        txtContrasena.clear();
-        lblMensaje.setText("");
+    public void iniciarSesionAsociacion(ActionEvent event) throws IOException {
+        String email = txtCorreoLoginAsociacion.getText().trim();
+        String password = txtContrasenaLoginAsociacion.getText();
+
+        if (!email.isEmpty() && !password.isEmpty()) {
+            lblMensajeAsociacion.setText("");
+            NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+            return;
+        }
+
+        lblMensajeAsociacion.setText("Complete correo y contraseña.");
+    }
+
+    @FXML
+    public void registrarUsuario() {
+        lblMensajeUsuario.setText("Formulario listo para crear cuenta de usuario.");
+    }
+
+    @FXML
+    public void registrarAsociacion() {
+        lblMensajeAsociacion.setText("Formulario listo para crear cuenta de asociación.");
+    }
+
+    @FXML
+    public void limpiarUsuario() {
+        txtCorreoLoginUsuario.clear();
+        txtContrasenaLoginUsuario.clear();
+        lblMensajeUsuario.setText("");
+    }
+
+    @FXML
+    public void limpiarAsociacion() {
+        txtCorreoLoginAsociacion.clear();
+        txtContrasenaLoginAsociacion.clear();
+        lblMensajeAsociacion.setText("");
     }
 }
 

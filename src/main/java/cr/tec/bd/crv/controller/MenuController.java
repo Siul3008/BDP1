@@ -12,7 +12,6 @@ import java.sql.SQLException;
 
 public class MenuController {
 
-    // Centralizes view changes so every screen uses the same window size and stylesheet.
     private void openModule(ActionEvent event, String fxmlPath, String title) throws IOException {
         NavigationUtil.openWindow(event, fxmlPath, title);
     }
@@ -29,8 +28,8 @@ public class MenuController {
         openModule(event, "/view/lista_mascotas.fxml", "Lista de Mascotas");
     }
 
-    public void abrirPersonas(ActionEvent event) throws IOException {
-        openModule(event, "/view/personas.fxml", "Personas");
+    public void abrirPerfil(ActionEvent event) throws IOException {
+        openModule(event, "/view/perfil_usuario.fxml", "Mi Perfil");
     }
 
     public void abrirCasasCuna(ActionEvent event) throws IOException {

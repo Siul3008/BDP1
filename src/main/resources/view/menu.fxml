@@ -46,7 +46,7 @@
             <Label text="Módulos del sistema" styleClass="title-lg"/>
             <FlowPane hgap="16.0" vgap="16.0" prefWrapLength="1000">
                 <Button text="Mascotas" onAction="#abrirRegistrarMascota" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Abre el formulario principal para registrar o editar datos de mascotas."/></tooltip>
+                    <tooltip><Tooltip text="Abre el formulario principal para registrar publicaciones de mascotas."/></tooltip>
                 </Button>
                 <Button text="Búsqueda" onAction="#abrirBuscarMascota" styleClass="menu-tile">
                     <tooltip><Tooltip text="Permite buscar mascotas por filtros como nombre, estado o ubicación."/></tooltip>
@@ -54,8 +54,8 @@
                 <Button text="Listado de mascotas" onAction="#abrirListaMascotas" styleClass="menu-tile">
                     <tooltip><Tooltip text="Muestra una tabla general con los registros de mascotas."/></tooltip>
                 </Button>
-                <Button text="Personas" onAction="#abrirPersonas" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Gestiona personas relacionadas como adoptantes, rescatistas y contactos."/></tooltip>
+                <Button text="Mi perfil" onAction="#abrirPerfil" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Administra datos del usuario y activa opciones como casa cuna o rescatista."/></tooltip>
                 </Button>
                 <Button text="Adopciones" onAction="#abrirAdopciones" styleClass="menu-tile">
                     <tooltip><Tooltip text="Abre la solicitud y el seguimiento de adopciones."/></tooltip>
@@ -70,7 +70,7 @@
                     <tooltip><Tooltip text="Muestra información de asociaciones de bienestar animal."/></tooltip>
                 </Button>
                 <Button text="Consultas y reportes" onAction="#abrirReportes" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Genera consultas, reportes y resultados de matches."/></tooltip>
+                    <tooltip><Tooltip text="Genera consultas, reportes y resultados de coincidencias."/></tooltip>
                 </Button>
                 <Button text="Bitácora" onAction="#abrirBitacora" styleClass="menu-tile">
                     <tooltip><Tooltip text="Consulta cambios y auditoría de información sensible."/></tooltip>

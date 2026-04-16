@@ -66,7 +66,9 @@
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                     <Label text="Estado" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbEstado" promptText="Estado actual"/>
+                                    <ComboBox fx:id="cbEstado" promptText="Estado actual">
+                                        <tooltip><Tooltip text="El cambio de estados sensibles debe quedar permitido solo al autor de la publicación y a la casa cuna asociada."/></tooltip>
+                                    </ComboBox>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
                                     <Label text="Color" styleClass="field-label"/>
@@ -90,7 +92,7 @@
                             <Label text="Ubicación y contacto" styleClass="section-title"/>
                             <GridPane hgap="14.0" vgap="14.0">
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                    <Label text="Lugar del hallazgo o extravío" styleClass="field-label"/>
+                                    <Label text="Lugar del evento" styleClass="field-label"/>
                                     <TextField promptText="Distrito, cantón o referencia"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
