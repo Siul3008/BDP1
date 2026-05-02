@@ -2,6 +2,7 @@ package cr.tec.bd.crv.controller;
 
 import cr.tec.bd.crv.database.ConexionBD;
 import cr.tec.bd.crv.util.NavigationUtil;
+import cr.tec.bd.crv.util.SessionContext;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
@@ -66,6 +67,7 @@ public class MenuController {
 
     // Returns to the first login screen without closing the desktop application.
     public void cerrarSesion(ActionEvent event) throws IOException {
+        SessionContext.clear();
         NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
     }
 
@@ -88,6 +90,7 @@ public class MenuController {
 
     // This is the only action that closes the JavaFX Stage completely.
     public void salirSistema(ActionEvent event) {
+        SessionContext.clear();
         Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
         stage.close();
     }

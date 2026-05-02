@@ -1,6 +1,7 @@
 package cr.tec.bd.crv.controller;
 
 import cr.tec.bd.crv.util.NavigationUtil;
+import cr.tec.bd.crv.util.SessionContext;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
@@ -13,6 +14,11 @@ public class ModuloPlantillaController {
 
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
+        if (SessionContext.isAdmin()) {
+            NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
+            return;
+        }
+
         NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
     }
 

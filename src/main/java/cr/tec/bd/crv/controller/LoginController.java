@@ -2,9 +2,9 @@ package cr.tec.bd.crv.controller;
 
 import cr.tec.bd.crv.database.AuthRepository;
 import cr.tec.bd.crv.database.ConexionBD;
-import cr.tec.bd.crv.model.AssociationRegistrationData;
 import cr.tec.bd.crv.model.UserRegistrationData;
 import cr.tec.bd.crv.util.NavigationUtil;
+import cr.tec.bd.crv.util.SessionContext;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -57,22 +57,16 @@ public class LoginController {
     private TextField txtCorreoSecundarioUsuario;
 
     @FXML
-    private TextField txtCorreoLoginAsociacion;
+    private TextField txtCorreoLoginAdmin;
 
     @FXML
-    private PasswordField txtContrasenaLoginAsociacion;
-
-    @FXML
-    private TextField txtNombreAsociacion;
-
-    @FXML
-    private TextField txtIdentificacionAsociacion;
+    private PasswordField txtContrasenaLoginAdmin;
 
     @FXML
     private Label lblMensajeUsuario;
 
     @FXML
-    private Label lblMensajeAsociacion;
+    private Label lblMensajeAdmin;
 
     // Navigation between the separated authentication screens.
     @FXML
@@ -81,18 +75,13 @@ public class LoginController {
     }
 
     @FXML
-    public void abrirLoginAsociacion(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/login_asociacion.fxml", "Inicio de sesion - Asociacion");
+    public void abrirLoginAdmin(ActionEvent event) throws IOException {
+        NavigationUtil.openWindow(event, "/view/login_admin.fxml", "Inicio de sesion - Admin");
     }
 
     @FXML
     public void abrirRegistroUsuario(ActionEvent event) throws IOException {
         NavigationUtil.openWindow(event, "/view/registro_usuario.fxml", "Crear cuenta - Usuario");
-    }
-
-    @FXML
-    public void abrirRegistroAsociacion(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/registro_asociacion.fxml", "Crear cuenta - Asociacion");
     }
 
     @FXML
@@ -110,7 +99,7 @@ public class LoginController {
         }
     }
 
-    // Login only asks for the credentials needed to identify an existing user.
+    // User login routes to the regular application menu.
     @FXML
     public void iniciarSesionUsuario(ActionEvent event) throws IOException {
         try {
@@ -120,7 +109,8 @@ public class LoginController {
             );
 
             if (authenticated) {
-                lblMensajeUsuario.setText("");
+                clearMessage(lblMensajeUsuario);
+                SessionContext.setRole("USER");
                 NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
                 return;
             }
@@ -131,24 +121,25 @@ public class LoginController {
         }
     }
 
-    // Association login is separated because associations are stored with a different account type.
+    // Admin login routes to a restricted menu for system management tasks.
     @FXML
-    public void iniciarSesionAsociacion(ActionEvent event) throws IOException {
+    public void iniciarSesionAdmin(ActionEvent event) throws IOException {
         try {
-            boolean authenticated = authRepository.loginAssociation(
-                    txtCorreoLoginAsociacion.getText(),
-                    txtContrasenaLoginAsociacion.getText()
+            boolean authenticated = authRepository.loginAdmin(
+                    txtCorreoLoginAdmin.getText(),
+                    txtContrasenaLoginAdmin.getText()
             );
 
             if (authenticated) {
-                lblMensajeAsociacion.setText("");
-                NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+                clearMessage(lblMensajeAdmin);
+                SessionContext.setRole("ADMIN");
+                NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
                 return;
             }
 
-            lblMensajeAsociacion.setText("Correo o contrasena incorrectos.");
+            lblMensajeAdmin.setText("Correo o contrasena incorrectos.");
         } catch (SQLException e) {
-            lblMensajeAsociacion.setText("No se pudo iniciar sesion: " + e.getMessage());
+            lblMensajeAdmin.setText("No se pudo iniciar sesion: " + e.getMessage());
         }
     }
 
@@ -168,31 +159,13 @@ public class LoginController {
                     txtTelefonoSecundarioUsuario.getText(),
                     txtContrasenaLoginUsuario.getText()
             ));
-            lblMensajeUsuario.setText("");
+            clearMessage(lblMensajeUsuario);
+            SessionContext.setRole("USER");
             NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
         } catch (IllegalArgumentException e) {
             lblMensajeUsuario.setText(e.getMessage());
         } catch (SQLException e) {
             lblMensajeUsuario.setText("No se pudo registrar el usuario: " + e.getMessage());
-        }
-    }
-
-    // New association registration creates the association record and its login account.
-    @FXML
-    public void registrarAsociacion(ActionEvent event) throws IOException {
-        try {
-            authRepository.registerAssociation(new AssociationRegistrationData(
-                    txtNombreAsociacion.getText(),
-                    txtIdentificacionAsociacion.getText(),
-                    txtCorreoLoginAsociacion.getText(),
-                    txtContrasenaLoginAsociacion.getText()
-            ));
-            lblMensajeAsociacion.setText("");
-            NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
-        } catch (IllegalArgumentException e) {
-            lblMensajeAsociacion.setText(e.getMessage());
-        } catch (SQLException e) {
-            lblMensajeAsociacion.setText("No se pudo registrar la asociacion: " + e.getMessage());
         }
     }
 
@@ -215,14 +188,9 @@ public class LoginController {
     }
 
     @FXML
-    public void limpiarAsociacion() {
-        clearFields(
-                txtCorreoLoginAsociacion,
-                txtContrasenaLoginAsociacion,
-                txtNombreAsociacion,
-                txtIdentificacionAsociacion
-        );
-        clearMessage(lblMensajeAsociacion);
+    public void limpiarAdmin() {
+        clearFields(txtCorreoLoginAdmin, txtContrasenaLoginAdmin);
+        clearMessage(lblMensajeAdmin);
     }
 
     private void clearFields(TextInputControl... fields) {

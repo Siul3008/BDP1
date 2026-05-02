@@ -35,7 +35,6 @@
                 <Label text="Consultas rápidas y combinación de filtros" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Reportes" onAction="#abrirReportes" styleClass="secondary-button"/>
             <Button text="Volver al menú" onAction="#volverMenu" styleClass="ghost-button"/>
         </HBox>
     </top>

@@ -55,12 +55,12 @@
                     </Button>
                 </VBox>
                 <VBox alignment="CENTER" spacing="18.0" prefWidth="330" prefHeight="230" styleClass="card account-card">
-                    <Label text="Asociación" styleClass="title-lg"/>
-                    <Button text="Continuar como asociación"
-                            onAction="#abrirLoginAsociacion"
+                    <Label text="Admin" styleClass="title-lg"/>
+                    <Button text="Continuar como admin"
+                            onAction="#abrirLoginAdmin"
                             styleClass="primary-button">
                         <tooltip>
-                            <Tooltip text="Entrar con una cuenta de asociación."/>
+                            <Tooltip text="Entrar con permisos administrativos."/>
                         </tooltip>
                     </Button>
                 </VBox>

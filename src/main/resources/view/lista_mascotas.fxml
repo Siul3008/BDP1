@@ -32,7 +32,6 @@
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="Nuevo registro" onAction="#abrirRegistro" styleClass="secondary-button"/>
-            <Button text="Estadísticas" onAction="#abrirEstadisticas" styleClass="ghost-button"/>
             <Button text="Volver al menú" onAction="#volverMenu" styleClass="ghost-button"/>
         </HBox>
     </top>
@@ -71,4 +70,3 @@
         </VBox>
     </center>
 </BorderPane>
-

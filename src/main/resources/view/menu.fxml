@@ -33,7 +33,7 @@
                     <tooltip><Tooltip text="Verifica si la conexión con Oracle responde correctamente."/></tooltip>
                 </Button>
                 <Button text="Cerrar sesión" onAction="#cerrarSesion" styleClass="ghost-button">
-                    <tooltip><Tooltip text="Vuelve a la pantalla para escoger usuario o asociación."/></tooltip>
+                    <tooltip><Tooltip text="Vuelve a la pantalla para escoger usuario o admin."/></tooltip>
                 </Button>
                 <Button text="Salir" onAction="#salirSistema" styleClass="danger-button">
                     <tooltip><Tooltip text="Cierra la aplicación."/></tooltip>
@@ -46,7 +46,7 @@
             <padding>
                 <Insets top="18" right="24" bottom="24" left="24"/>
             </padding>
-            <Label text="Módulos del sistema" styleClass="title-lg"/>
+            <Label text="Módulos del usuario" styleClass="title-lg"/>
             <FlowPane hgap="16.0" vgap="16.0" prefWrapLength="1000">
                 <Button text="Mascotas" onAction="#abrirRegistrarMascota" styleClass="menu-tile">
                     <tooltip><Tooltip text="Abre el formulario principal para registrar publicaciones de mascotas."/></tooltip>
@@ -67,19 +67,7 @@
                     <tooltip><Tooltip text="Permite registrar hogares temporales y sus condiciones."/></tooltip>
                 </Button>
                 <Button text="Donaciones" onAction="#abrirDonaciones" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Administra aportes, beneficiarios y distribución de donaciones."/></tooltip>
-                </Button>
-                <Button text="Asociaciones" onAction="#abrirAsociaciones" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Muestra información de asociaciones de bienestar animal."/></tooltip>
-                </Button>
-                <Button text="Consultas y reportes" onAction="#abrirReportes" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Genera consultas, reportes y resultados de coincidencias."/></tooltip>
-                </Button>
-                <Button text="Bitácora" onAction="#abrirBitacora" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Consulta cambios y auditoría de información sensible."/></tooltip>
-                </Button>
-                <Button text="Estadísticas" onAction="#abrirEstadisticas" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Visualiza indicadores, gráficas y porcentajes del sistema."/></tooltip>
+                    <tooltip><Tooltip text="Permite registrar o revisar aportes de donación."/></tooltip>
                 </Button>
             </FlowPane>
         </VBox>
