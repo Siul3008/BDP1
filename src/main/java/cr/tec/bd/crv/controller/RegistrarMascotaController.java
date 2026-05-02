@@ -9,6 +9,9 @@ import javafx.scene.control.Label;
 
 import java.io.IOException;
 
+/**
+ * Controller for the pet registration screen.
+ */
 public class RegistrarMascotaController {
 
     @FXML
@@ -26,6 +29,7 @@ public class RegistrarMascotaController {
     @FXML
     private Label lblMensaje;
 
+    // Temporary catalog values are loaded in the UI until these lists come from the database.
     @FXML
     public void initialize() {
         cbTipo.setItems(FXCollections.observableArrayList(
@@ -58,9 +62,10 @@ public class RegistrarMascotaController {
         ));
     }
 
+    // Placeholder action; the database insert will be connected when the pet schema is finalized.
     @FXML
     public void guardarMascota() {
-        lblMensaje.setText("Formulario visual preparado para registrar la mascota.");
+        lblMensaje.setText("Revise los datos antes de guardar la mascota.");
     }
 
     @FXML
@@ -73,9 +78,9 @@ public class RegistrarMascotaController {
         NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
     }
 
+    // Lets users review existing pet publications without going back through the main menu.
     @FXML
     public void abrirListaMascotas(ActionEvent event) throws IOException {
         NavigationUtil.openWindow(event, "/view/lista_mascotas.fxml", "Lista de Mascotas");
     }
 }
-

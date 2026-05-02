@@ -5,6 +5,9 @@ import oracle.jdbc.pool.OracleDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * Centralizes the Oracle connection settings used by the application.
+ */
 public class ConexionBD {
 
     private static final String URL = "jdbc:oracle:thin:@//100.85.86.27:1521/dbprueba";
@@ -19,6 +22,8 @@ public class ConexionBD {
             throw new SQLException("La contrasena de la base de datos no esta configurada.");
         }
 
+        // OracleDataSource is used instead of DriverManager because it sends Oracle-specific
+        // connection properties more reliably for this project setup.
         OracleDataSource dataSource = new OracleDataSource();
         dataSource.setURL(URL);
         dataSource.setUser(USER);

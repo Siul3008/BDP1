@@ -17,10 +17,15 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * Handles account selection, login, registration, and database connection checks.
+ */
 public class LoginController {
 
     private final AuthRepository authRepository = new AuthRepository();
 
+    // The same controller is reused by the selector, login, and registration FXML files.
+    // Fields that do not exist in the current FXML simply remain null.
     @FXML
     private TextField txtCorreoLoginUsuario;
 
@@ -69,6 +74,7 @@ public class LoginController {
     @FXML
     private Label lblMensajeAsociacion;
 
+    // Navigation between the separated authentication screens.
     @FXML
     public void abrirLoginUsuario(ActionEvent event) throws IOException {
         NavigationUtil.openWindow(event, "/view/login_usuario.fxml", "Inicio de sesion - Usuario");
@@ -94,6 +100,7 @@ public class LoginController {
         NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
     }
 
+    // Quick connection test used during setup and demonstrations.
     @FXML
     public void probarConexion() {
         try (Connection connection = ConexionBD.conectar()) {
@@ -103,6 +110,7 @@ public class LoginController {
         }
     }
 
+    // Login only asks for the credentials needed to identify an existing user.
     @FXML
     public void iniciarSesionUsuario(ActionEvent event) throws IOException {
         try {
@@ -123,6 +131,7 @@ public class LoginController {
         }
     }
 
+    // Association login is separated because associations are stored with a different account type.
     @FXML
     public void iniciarSesionAsociacion(ActionEvent event) throws IOException {
         try {
@@ -143,6 +152,7 @@ public class LoginController {
         }
     }
 
+    // New user registration creates the person, adopter profile, contact data, and app account.
     @FXML
     public void registrarUsuario(ActionEvent event) throws IOException {
         try {
@@ -167,6 +177,7 @@ public class LoginController {
         }
     }
 
+    // New association registration creates the association record and its login account.
     @FXML
     public void registrarAsociacion(ActionEvent event) throws IOException {
         try {
@@ -185,6 +196,7 @@ public class LoginController {
         }
     }
 
+    // Clear helpers are null-safe because this controller is shared across several FXML screens.
     @FXML
     public void limpiarUsuario() {
         clearFields(

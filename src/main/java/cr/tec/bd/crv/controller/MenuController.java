@@ -10,8 +10,12 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * Main menu controller. It routes users to the different modules after login.
+ */
 public class MenuController {
 
+    // All menu buttons reuse the same navigation helper to keep window behavior consistent.
     private void openModule(ActionEvent event, String fxmlPath, String title) throws IOException {
         NavigationUtil.openWindow(event, fxmlPath, title);
     }
@@ -60,10 +64,12 @@ public class MenuController {
         openModule(event, "/view/reportes.fxml", "Consultas y Reportes");
     }
 
+    // Returns to the first login screen without closing the desktop application.
     public void cerrarSesion(ActionEvent event) throws IOException {
         NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
     }
 
+    // Keeps a manual database check available from the UI while the project is being integrated.
     public void probarConexion() {
         try (Connection connection = ConexionBD.conectar()) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -80,6 +86,7 @@ public class MenuController {
         }
     }
 
+    // This is the only action that closes the JavaFX Stage completely.
     public void salirSistema(ActionEvent event) {
         Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
         stage.close();

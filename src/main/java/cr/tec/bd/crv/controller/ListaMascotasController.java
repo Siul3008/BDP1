@@ -12,6 +12,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.IOException;
 
+/**
+ * Controller for the pet list screen.
+ */
 public class ListaMascotasController {
 
     @FXML
@@ -35,6 +38,7 @@ public class ListaMascotasController {
     @FXML
     private TableColumn<Mascota, String> colEstado;
 
+    // PropertyValueFactory reads JavaBean getters from Mascota, such as getNombre().
     @FXML
     public void initialize() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -44,6 +48,7 @@ public class ListaMascotasController {
         colColor.setCellValueFactory(new PropertyValueFactory<>("color"));
         colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
 
+        // Sample data keeps the table usable until pet records are loaded from Oracle.
         ObservableList<Mascota> datos = FXCollections.observableArrayList(
                 new Mascota(1, "Luna", "Gato", "Siamés", "Blanco", "En adopción"),
                 new Mascota(2, "Max", "Perro", "Labrador", "Negro", "Perdido"),
@@ -69,4 +74,3 @@ public class ListaMascotasController {
         NavigationUtil.openWindow(event, "/view/estadisticas.fxml", "Estadísticas");
     }
 }
-

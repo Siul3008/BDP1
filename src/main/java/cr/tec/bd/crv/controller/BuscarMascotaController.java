@@ -8,6 +8,9 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 
+/**
+ * Controller for the pet search screen.
+ */
 public class BuscarMascotaController {
 
     @FXML
@@ -16,11 +19,12 @@ public class BuscarMascotaController {
     @FXML
     private Label lblResultado;
 
+    // Current search behavior is visual feedback; real queries can be added behind this method.
     @FXML
     public void buscarMascota() {
         String criterio = txtBusqueda.getText().trim();
         if (criterio.isEmpty()) {
-            lblResultado.setText("Escriba un criterio para mostrar resultados en esta plantilla.");
+            lblResultado.setText("Escriba un criterio para mostrar resultados.");
             return;
         }
 
@@ -43,9 +47,9 @@ public class BuscarMascotaController {
         NavigationUtil.openWindow(event, "/view/lista_mascotas.fxml", "Lista de Mascotas");
     }
 
+    // Search connects to reports because both flows depend on filtered pet information.
     @FXML
     public void abrirReportes(ActionEvent event) throws IOException {
         NavigationUtil.openWindow(event, "/view/reportes.fxml", "Consultas y Reportes");
     }
 }
-

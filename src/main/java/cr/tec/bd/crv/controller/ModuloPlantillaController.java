@@ -6,6 +6,9 @@ import javafx.fxml.FXML;
 
 import java.io.IOException;
 
+/**
+ * Shared controller for modules that already have UI but are not fully connected yet.
+ */
 public class ModuloPlantillaController {
 
     @FXML
@@ -13,6 +16,7 @@ public class ModuloPlantillaController {
         NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
     }
 
+    // Gives the user feedback instead of leaving placeholder buttons with no response.
     @FXML
     public void mostrarAviso() {
         NavigationUtil.showInfo(

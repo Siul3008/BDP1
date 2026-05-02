@@ -1,7 +1,11 @@
 package cr.tec.bd.crv.model;
 
+/**
+ * Simple pet model used by the pet list table.
+ */
 public class Mascota {
 
+    // Field names match the TableView PropertyValueFactory keys.
     private int id;
     private String nombre;
     private String tipo;
