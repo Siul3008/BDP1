@@ -46,11 +46,10 @@
                 </VBox>
                 <VBox spacing="12.0" prefWidth="320" styleClass="card side-summary">
                     <Label text="Panel de lectura" styleClass="section-title"/>
-                    <Label text="Esta plantilla deja listo el espacio para mostrar números, porcentajes y gráficas como lo pide el PDF." wrapText="true" styleClass="subtle-text"/>
+                    <Label text="Consulte números, porcentajes y gráficas del sistema." wrapText="true" styleClass="subtle-text"/>
                     <Button text="Actualizar estadísticas" onAction="#mostrarAviso" styleClass="primary-button"/>
                 </VBox>
             </HBox>
         </VBox>
     </center>
 </BorderPane>
-

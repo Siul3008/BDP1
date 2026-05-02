@@ -16,9 +16,8 @@ public class ModuloPlantillaController {
     @FXML
     public void mostrarAviso() {
         NavigationUtil.showInfo(
-                "Plantilla visual",
-                "Esta sección quedó preparada a nivel de interfaz para integrar la lógica del sistema."
+                "Accion disponible",
+                "Esta opcion se conectara con la informacion del sistema."
         );
     }
 }
-

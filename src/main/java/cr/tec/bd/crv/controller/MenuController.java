@@ -60,6 +60,10 @@ public class MenuController {
         openModule(event, "/view/reportes.fxml", "Consultas y Reportes");
     }
 
+    public void cerrarSesion(ActionEvent event) throws IOException {
+        NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
+    }
+
     public void probarConexion() {
         try (Connection connection = ConexionBD.conectar()) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -81,4 +85,3 @@ public class MenuController {
         stage.close();
     }
 }
-

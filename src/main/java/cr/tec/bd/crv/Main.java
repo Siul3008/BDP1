@@ -11,7 +11,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(
-                Main.class.getResource("/view/menu.fxml")
+                Main.class.getResource("/view/login.fxml")
         );
 
         Scene scene = new Scene(loader.load(), 1200, 780);
@@ -34,4 +34,3 @@ public class Main extends Application {
         launch(args);
     }
 }
-

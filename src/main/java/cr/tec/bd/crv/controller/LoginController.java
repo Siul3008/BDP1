@@ -1,15 +1,25 @@
 package cr.tec.bd.crv.controller;
 
+import cr.tec.bd.crv.database.AuthRepository;
+import cr.tec.bd.crv.database.ConexionBD;
+import cr.tec.bd.crv.model.AssociationRegistrationData;
+import cr.tec.bd.crv.model.UserRegistrationData;
 import cr.tec.bd.crv.util.NavigationUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class LoginController {
+
+    private final AuthRepository authRepository = new AuthRepository();
 
     @FXML
     private TextField txtCorreoLoginUsuario;
@@ -18,10 +28,40 @@ public class LoginController {
     private PasswordField txtContrasenaLoginUsuario;
 
     @FXML
+    private TextField txtPrimerNombreUsuario;
+
+    @FXML
+    private TextField txtSegundoNombreUsuario;
+
+    @FXML
+    private TextField txtPrimerApellidoUsuario;
+
+    @FXML
+    private TextField txtSegundoApellidoUsuario;
+
+    @FXML
+    private TextField txtIdentificacionUsuario;
+
+    @FXML
+    private TextField txtTelefonoUsuario;
+
+    @FXML
+    private TextField txtTelefonoSecundarioUsuario;
+
+    @FXML
+    private TextField txtCorreoSecundarioUsuario;
+
+    @FXML
     private TextField txtCorreoLoginAsociacion;
 
     @FXML
     private PasswordField txtContrasenaLoginAsociacion;
+
+    @FXML
+    private TextField txtNombreAsociacion;
+
+    @FXML
+    private TextField txtIdentificacionAsociacion;
 
     @FXML
     private Label lblMensajeUsuario;
@@ -30,55 +70,168 @@ public class LoginController {
     private Label lblMensajeAsociacion;
 
     @FXML
-    public void iniciarSesionUsuario(ActionEvent event) throws IOException {
-        String email = txtCorreoLoginUsuario.getText().trim();
-        String password = txtContrasenaLoginUsuario.getText();
+    public void abrirLoginUsuario(ActionEvent event) throws IOException {
+        NavigationUtil.openWindow(event, "/view/login_usuario.fxml", "Inicio de sesion - Usuario");
+    }
 
-        if (!email.isEmpty() && !password.isEmpty()) {
-            lblMensajeUsuario.setText("");
-            NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
-            return;
+    @FXML
+    public void abrirLoginAsociacion(ActionEvent event) throws IOException {
+        NavigationUtil.openWindow(event, "/view/login_asociacion.fxml", "Inicio de sesion - Asociacion");
+    }
+
+    @FXML
+    public void abrirRegistroUsuario(ActionEvent event) throws IOException {
+        NavigationUtil.openWindow(event, "/view/registro_usuario.fxml", "Crear cuenta - Usuario");
+    }
+
+    @FXML
+    public void abrirRegistroAsociacion(ActionEvent event) throws IOException {
+        NavigationUtil.openWindow(event, "/view/registro_asociacion.fxml", "Crear cuenta - Asociacion");
+    }
+
+    @FXML
+    public void volverSeleccion(ActionEvent event) throws IOException {
+        NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
+    }
+
+    @FXML
+    public void probarConexion() {
+        try (Connection connection = ConexionBD.conectar()) {
+            showAlert(Alert.AlertType.INFORMATION, "Conexion", "Conexion exitosa con Oracle");
+        } catch (SQLException e) {
+            showAlert(Alert.AlertType.ERROR, "Error de conexion", e.getMessage());
         }
+    }
 
-        lblMensajeUsuario.setText("Complete correo y contraseña.");
+    @FXML
+    public void iniciarSesionUsuario(ActionEvent event) throws IOException {
+        try {
+            boolean authenticated = authRepository.loginUser(
+                    txtCorreoLoginUsuario.getText(),
+                    txtContrasenaLoginUsuario.getText()
+            );
+
+            if (authenticated) {
+                lblMensajeUsuario.setText("");
+                NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+                return;
+            }
+
+            lblMensajeUsuario.setText("Correo o contrasena incorrectos.");
+        } catch (SQLException e) {
+            lblMensajeUsuario.setText("No se pudo iniciar sesion: " + e.getMessage());
+        }
     }
 
     @FXML
     public void iniciarSesionAsociacion(ActionEvent event) throws IOException {
-        String email = txtCorreoLoginAsociacion.getText().trim();
-        String password = txtContrasenaLoginAsociacion.getText();
+        try {
+            boolean authenticated = authRepository.loginAssociation(
+                    txtCorreoLoginAsociacion.getText(),
+                    txtContrasenaLoginAsociacion.getText()
+            );
 
-        if (!email.isEmpty() && !password.isEmpty()) {
+            if (authenticated) {
+                lblMensajeAsociacion.setText("");
+                NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+                return;
+            }
+
+            lblMensajeAsociacion.setText("Correo o contrasena incorrectos.");
+        } catch (SQLException e) {
+            lblMensajeAsociacion.setText("No se pudo iniciar sesion: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void registrarUsuario(ActionEvent event) throws IOException {
+        try {
+            authRepository.registerUser(new UserRegistrationData(
+                    txtPrimerNombreUsuario.getText(),
+                    txtSegundoNombreUsuario.getText(),
+                    txtPrimerApellidoUsuario.getText(),
+                    txtSegundoApellidoUsuario.getText(),
+                    txtIdentificacionUsuario.getText(),
+                    txtCorreoLoginUsuario.getText(),
+                    txtCorreoSecundarioUsuario.getText(),
+                    txtTelefonoUsuario.getText(),
+                    txtTelefonoSecundarioUsuario.getText(),
+                    txtContrasenaLoginUsuario.getText()
+            ));
+            lblMensajeUsuario.setText("");
+            NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+        } catch (IllegalArgumentException e) {
+            lblMensajeUsuario.setText(e.getMessage());
+        } catch (SQLException e) {
+            lblMensajeUsuario.setText("No se pudo registrar el usuario: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void registrarAsociacion(ActionEvent event) throws IOException {
+        try {
+            authRepository.registerAssociation(new AssociationRegistrationData(
+                    txtNombreAsociacion.getText(),
+                    txtIdentificacionAsociacion.getText(),
+                    txtCorreoLoginAsociacion.getText(),
+                    txtContrasenaLoginAsociacion.getText()
+            ));
             lblMensajeAsociacion.setText("");
             NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
-            return;
+        } catch (IllegalArgumentException e) {
+            lblMensajeAsociacion.setText(e.getMessage());
+        } catch (SQLException e) {
+            lblMensajeAsociacion.setText("No se pudo registrar la asociacion: " + e.getMessage());
         }
-
-        lblMensajeAsociacion.setText("Complete correo y contraseña.");
-    }
-
-    @FXML
-    public void registrarUsuario() {
-        lblMensajeUsuario.setText("Formulario listo para crear cuenta de usuario.");
-    }
-
-    @FXML
-    public void registrarAsociacion() {
-        lblMensajeAsociacion.setText("Formulario listo para crear cuenta de asociación.");
     }
 
     @FXML
     public void limpiarUsuario() {
-        txtCorreoLoginUsuario.clear();
-        txtContrasenaLoginUsuario.clear();
-        lblMensajeUsuario.setText("");
+        clearFields(
+                txtCorreoLoginUsuario,
+                txtContrasenaLoginUsuario,
+                txtPrimerNombreUsuario,
+                txtSegundoNombreUsuario,
+                txtPrimerApellidoUsuario,
+                txtSegundoApellidoUsuario,
+                txtIdentificacionUsuario,
+                txtTelefonoUsuario,
+                txtTelefonoSecundarioUsuario,
+                txtCorreoSecundarioUsuario
+        );
+        clearMessage(lblMensajeUsuario);
     }
 
     @FXML
     public void limpiarAsociacion() {
-        txtCorreoLoginAsociacion.clear();
-        txtContrasenaLoginAsociacion.clear();
-        lblMensajeAsociacion.setText("");
+        clearFields(
+                txtCorreoLoginAsociacion,
+                txtContrasenaLoginAsociacion,
+                txtNombreAsociacion,
+                txtIdentificacionAsociacion
+        );
+        clearMessage(lblMensajeAsociacion);
+    }
+
+    private void clearFields(TextInputControl... fields) {
+        for (TextInputControl field : fields) {
+            if (field != null) {
+                field.clear();
+            }
+        }
+    }
+
+    private void clearMessage(Label label) {
+        if (label != null) {
+            label.setText("");
+        }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
-

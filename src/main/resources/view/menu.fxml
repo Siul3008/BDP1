@@ -32,6 +32,9 @@
                 <Button text="Probar conexión BD" onAction="#probarConexion" styleClass="secondary-button">
                     <tooltip><Tooltip text="Verifica si la conexión con Oracle responde correctamente."/></tooltip>
                 </Button>
+                <Button text="Cerrar sesión" onAction="#cerrarSesion" styleClass="ghost-button">
+                    <tooltip><Tooltip text="Vuelve a la pantalla para escoger usuario o asociación."/></tooltip>
+                </Button>
                 <Button text="Salir" onAction="#salirSistema" styleClass="danger-button">
                     <tooltip><Tooltip text="Cierra la aplicación."/></tooltip>
                 </Button>
@@ -82,4 +85,3 @@
         </VBox>
     </center>
 </BorderPane>
-
