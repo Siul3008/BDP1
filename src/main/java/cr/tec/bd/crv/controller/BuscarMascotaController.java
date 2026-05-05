@@ -1,45 +1,96 @@
 package cr.tec.bd.crv.controller;
 
+import cr.tec.bd.crv.database.CatalogRepository;
+import cr.tec.bd.crv.database.PetRepository;
+import cr.tec.bd.crv.model.CatalogOption;
+import cr.tec.bd.crv.model.Mascota;
+import cr.tec.bd.crv.model.PetSearchCriteria;
 import cr.tec.bd.crv.util.NavigationUtil;
+import cr.tec.bd.crv.util.SessionContext;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Controller for the pet search screen.
  */
 public class BuscarMascotaController {
 
+    private final CatalogRepository catalogRepository = new CatalogRepository();
+    private final PetRepository petRepository = new PetRepository();
+
     @FXML
     private TextField txtBusqueda;
 
     @FXML
+    private ComboBox<CatalogOption> cbEstado;
+
+    @FXML
+    private DatePicker dpDesde;
+
+    @FXML
+    private DatePicker dpHasta;
+
+    @FXML
+    private TableView<Mascota> tablaResultados;
+
+    @FXML
+    private TableColumn<Mascota, String> colMascota;
+
+    @FXML
+    private TableColumn<Mascota, String> colEstado;
+
+    @FXML
+    private TableColumn<Mascota, String> colLugar;
+
+    @FXML
+    private TableColumn<Mascota, String> colFecha;
+
+    @FXML
     private Label lblResultado;
 
-    // Current search behavior is visual feedback; real queries can be added behind this method.
+    @FXML
+    public void initialize() {
+        configureColumns();
+        loadStatuses();
+    }
+
     @FXML
     public void buscarMascota() {
-        String criterio = txtBusqueda.getText().trim();
-        if (criterio.isEmpty()) {
-            lblResultado.setText("Escriba un criterio para mostrar resultados.");
-            return;
+        try {
+            List<Mascota> results = petRepository.findPets(buildCriteria());
+            tablaResultados.setItems(FXCollections.observableArrayList(results));
+            lblResultado.setText(results.size() + " resultado(s) encontrados.");
+        } catch (SQLException e) {
+            lblResultado.setText("No se pudo realizar la busqueda: " + e.getMessage());
         }
-
-        lblResultado.setText("Consulta lista para filtrar por: " + criterio);
     }
 
     @FXML
     public void limpiarBusqueda() {
         txtBusqueda.clear();
+        cbEstado.getSelectionModel().clearSelection();
+        dpDesde.setValue(null);
+        dpHasta.setValue(null);
+        tablaResultados.getItems().clear();
         lblResultado.setText("");
     }
 
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+        String menuPath = SessionContext.isAdmin() ? "/view/admin_menu.fxml" : "/view/menu.fxml";
+        NavigationUtil.openWindow(event, menuPath, "BDP1 - Bienestar Animal");
     }
 
     @FXML
@@ -47,9 +98,29 @@ public class BuscarMascotaController {
         NavigationUtil.openWindow(event, "/view/lista_mascotas.fxml", "Lista de Mascotas");
     }
 
-    // Search connects to reports because both flows depend on filtered pet information.
     @FXML
     public void abrirReportes(ActionEvent event) throws IOException {
         NavigationUtil.openWindow(event, "/view/reportes.fxml", "Consultas y Reportes");
+    }
+
+    private void configureColumns() {
+        colMascota.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+        colLugar.setCellValueFactory(new PropertyValueFactory<>("lugar"));
+        colFecha.setCellValueFactory(new PropertyValueFactory<>("fechaEvento"));
+    }
+
+    private void loadStatuses() {
+        try {
+            cbEstado.setItems(FXCollections.observableArrayList(catalogRepository.findPetStatuses()));
+        } catch (SQLException e) {
+            lblResultado.setText("No se pudieron cargar estados: " + e.getMessage());
+        }
+    }
+
+    private PetSearchCriteria buildCriteria() {
+        CatalogOption selectedStatus = cbEstado.getValue();
+        Long statusId = selectedStatus == null ? null : selectedStatus.getId();
+        return new PetSearchCriteria(txtBusqueda.getText(), statusId, dpDesde.getValue(), dpHasta.getValue());
     }
 }

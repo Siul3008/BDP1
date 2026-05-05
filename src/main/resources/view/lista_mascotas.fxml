@@ -28,11 +28,11 @@
             </ImageView>
             <VBox spacing="2.0">
                 <Label text="Lista de mascotas" styleClass="brand-title"/>
-                <Label text="Tabla general de registros" styleClass="brand-subtitle"/>
+                <Label text="Tabla general conectada a Oracle" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="Nuevo registro" onAction="#abrirRegistro" styleClass="secondary-button"/>
-            <Button text="Volver al menú" onAction="#volverMenu" styleClass="ghost-button"/>
+            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button"/>
         </HBox>
     </top>
     <center>
@@ -42,15 +42,15 @@
             </padding>
             <HBox spacing="16.0">
                 <VBox spacing="6.0" prefWidth="220" styleClass="card mini-stat">
-                    <Label text="4" styleClass="stat-number"/>
-                    <Label text="Registros de ejemplo" styleClass="subtle-text"/>
+                    <Label fx:id="lblTotalMascotas" text="0" styleClass="stat-number"/>
+                    <Label text="Registros guardados" styleClass="subtle-text"/>
                 </VBox>
                 <VBox spacing="6.0" prefWidth="220" styleClass="card mini-stat">
-                    <Label text="2" styleClass="stat-number"/>
-                    <Label text="Mascotas en adopción" styleClass="subtle-text"/>
+                    <Label fx:id="lblAdopcion" text="0" styleClass="stat-number"/>
+                    <Label text="Mascotas en adopcion" styleClass="subtle-text"/>
                 </VBox>
                 <VBox spacing="6.0" prefWidth="220" styleClass="card mini-stat">
-                    <Label text="1" styleClass="stat-number"/>
+                    <Label fx:id="lblPerdidas" text="0" styleClass="stat-number"/>
                     <Label text="Mascotas perdidas" styleClass="subtle-text"/>
                 </VBox>
             </HBox>
@@ -66,6 +66,7 @@
                         <TableColumn fx:id="colEstado" text="Estado" prefWidth="180"/>
                     </columns>
                 </TableView>
+                <Label fx:id="lblMensaje" text="" wrapText="true" styleClass="message-label"/>
             </VBox>
         </VBox>
     </center>

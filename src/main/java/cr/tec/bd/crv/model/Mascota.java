@@ -12,14 +12,31 @@ public class Mascota {
     private String raza;
     private String color;
     private String estado;
+    private String lugar;
+    private String fechaEvento;
 
     public Mascota(int id, String nombre, String tipo, String raza, String color, String estado) {
+        this(id, nombre, tipo, raza, color, estado, "", "");
+    }
+
+    public Mascota(
+            int id,
+            String nombre,
+            String tipo,
+            String raza,
+            String color,
+            String estado,
+            String lugar,
+            String fechaEvento
+    ) {
         this.id = id;
         this.nombre = nombre;
         this.tipo = tipo;
         this.raza = raza;
         this.color = color;
         this.estado = estado;
+        this.lugar = lugar;
+        this.fechaEvento = fechaEvento;
     }
 
     public int getId() {
@@ -44,5 +61,13 @@ public class Mascota {
 
     public String getEstado() {
         return estado;
+    }
+
+    public String getLugar() {
+        return lugar;
+    }
+
+    public String getFechaEvento() {
+        return fechaEvento;
     }
 }

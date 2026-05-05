@@ -15,15 +15,39 @@ public class AuthRepository {
 
     // Public login entry points keep account type details out of the controller.
     public boolean loginUser(String email, String password) throws SQLException {
-        return login("USER", email, password);
+        return loginUserPersonId(email, password) != null;
     }
 
     public boolean loginAdmin(String email, String password) throws SQLException {
         return login("ADMIN", email, password);
     }
 
+    public Long loginUserPersonId(String email, String password) throws SQLException {
+        String sql = """
+                SELECT idPerson
+                FROM appAccount
+                WHERE accountType = 'USER'
+                  AND loginEmail = ?
+                  AND passwordHash = ?
+                  AND isActive = 'Y'
+                """;
+
+        try (Connection connection = ConexionBD.conectar();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, email.trim());
+            statement.setString(2, PasswordUtil.hash(password));
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getLong("idPerson");
+                }
+                return null;
+            }
+        }
+    }
+
     // User registration touches several tables, so it runs inside a single transaction.
-    public void registerUser(UserRegistrationData data) throws SQLException {
+    public long registerUser(UserRegistrationData data) throws SQLException {
         validateUserRegistration(data);
 
         try (Connection connection = ConexionBD.conectar()) {
@@ -51,6 +75,7 @@ public class AuthRepository {
                 );
 
                 connection.commit();
+                return personId;
             } catch (SQLException e) {
                 connection.rollback();
                 throw e;
@@ -91,11 +116,53 @@ public class AuthRepository {
         requireValue(data.getPrimaryEmail(), "El correo principal es obligatorio.");
         requireValue(data.getPrimaryPhone(), "El telefono principal es obligatorio.");
         requireValue(data.getPassword(), "La contrasena es obligatoria.");
+        validateEmail(data.getPrimaryEmail(), "El correo principal no tiene un formato valido.");
+        validateOptionalEmail(data.getSecondaryEmail(), "El correo adicional no tiene un formato valido.");
+        validatePhone(data.getPrimaryPhone(), "El telefono principal debe tener 8 digitos.");
+        validateOptionalPhone(data.getSecondaryPhone(), "El telefono adicional debe tener 8 digitos.");
+        validatePassword(data.getPassword());
     }
 
     private void requireValue(String value, String message) {
         if (value == null || value.trim().isEmpty()) {
             throw new IllegalArgumentException(message);
+        }
+    }
+
+    private void validateOptionalEmail(String email, String message) {
+        if (emptyToNull(email) != null) {
+            validateEmail(email, message);
+        }
+    }
+
+    private void validateEmail(String email, String message) {
+        if (!email.trim().matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    private void validateOptionalPhone(String phone, String message) {
+        if (emptyToNull(phone) != null) {
+            validatePhone(phone, message);
+        }
+    }
+
+    private void validatePhone(String phone, String message) {
+        if (!phone.trim().matches("\\d{8}")) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    private void validatePassword(String password) {
+        String normalizedPassword = password.trim();
+        if (normalizedPassword.length() < 8
+                || !normalizedPassword.matches(".*[A-Z].*")
+                || !normalizedPassword.matches(".*[a-z].*")
+                || !normalizedPassword.matches(".*\\d.*")
+                || !normalizedPassword.matches(".*[^A-Za-z0-9].*")) {
+            throw new IllegalArgumentException(
+                    "La contrasena debe tener minimo 8 caracteres, mayuscula, minuscula, numero y caracter especial."
+            );
         }
     }
 

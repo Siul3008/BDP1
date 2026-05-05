@@ -31,11 +31,11 @@
                 </image>
             </ImageView>
             <VBox spacing="2.0">
-                <Label text="Búsqueda de mascotas" styleClass="brand-title"/>
-                <Label text="Consultas rápidas y combinación de filtros" styleClass="brand-subtitle"/>
+                <Label text="Busqueda de mascotas" styleClass="brand-title"/>
+                <Label text="Filtros conectados a los registros guardados" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menú" onAction="#volverMenu" styleClass="ghost-button"/>
+            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button"/>
         </HBox>
     </top>
     <center>
@@ -52,15 +52,15 @@
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                         <Label text="Estado" styleClass="field-label"/>
-                        <ComboBox promptText="Perdido, encontrado, adopción"/>
+                        <ComboBox fx:id="cbEstado" promptText="Seleccione estado"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
                         <Label text="Fecha desde" styleClass="field-label"/>
-                        <DatePicker/>
+                        <DatePicker fx:id="dpDesde"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="3" GridPane.rowIndex="0">
                         <Label text="Fecha hasta" styleClass="field-label"/>
-                        <DatePicker/>
+                        <DatePicker fx:id="dpHasta"/>
                     </VBox>
                 </GridPane>
                 <HBox spacing="10.0">
@@ -72,20 +72,20 @@
             </VBox>
             <HBox spacing="18.0">
                 <VBox spacing="10.0" HBox.hgrow="ALWAYS" styleClass="card result-card">
-                    <Label text="Vista previa de resultados" styleClass="section-title"/>
-                    <TableView prefHeight="320">
+                    <Label text="Resultados" styleClass="section-title"/>
+                    <TableView fx:id="tablaResultados" prefHeight="320">
                         <columns>
-                            <TableColumn text="Mascota" prefWidth="180"/>
-                            <TableColumn text="Estado" prefWidth="120"/>
-                            <TableColumn text="Lugar" prefWidth="180"/>
-                            <TableColumn text="Fecha" prefWidth="140"/>
+                            <TableColumn fx:id="colMascota" text="Mascota" prefWidth="180"/>
+                            <TableColumn fx:id="colEstado" text="Estado" prefWidth="150"/>
+                            <TableColumn fx:id="colLugar" text="Lugar" prefWidth="260"/>
+                            <TableColumn fx:id="colFecha" text="Fecha" prefWidth="140"/>
                         </columns>
                     </TableView>
                 </VBox>
                 <VBox spacing="12.0" prefWidth="280" styleClass="card side-summary">
                     <Label text="Consejos de uso" styleClass="section-title"/>
-                    <Label text="Combine filtros por lugar, fecha, estado o chip para encontrar mascotas." wrapText="true" styleClass="subtle-text"/>
-                    <Label text="Revise la tabla para comparar los resultados de la búsqueda." wrapText="true" styleClass="subtle-text"/>
+                    <Label text="Use nombre, raza, color, chip, provincia, canton o distrito para buscar." wrapText="true" styleClass="subtle-text"/>
+                    <Label text="Los resultados se ordenan por fecha descendente cuando la columna existe en la base." wrapText="true" styleClass="subtle-text"/>
                 </VBox>
             </HBox>
         </VBox>

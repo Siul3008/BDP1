@@ -103,14 +103,14 @@ public class LoginController {
     @FXML
     public void iniciarSesionUsuario(ActionEvent event) throws IOException {
         try {
-            boolean authenticated = authRepository.loginUser(
+            Long personId = authRepository.loginUserPersonId(
                     txtCorreoLoginUsuario.getText(),
                     txtContrasenaLoginUsuario.getText()
             );
 
-            if (authenticated) {
+            if (personId != null) {
                 clearMessage(lblMensajeUsuario);
-                SessionContext.setRole("USER");
+                SessionContext.setUserSession(personId, txtCorreoLoginUsuario.getText().trim());
                 NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
                 return;
             }
@@ -132,7 +132,7 @@ public class LoginController {
 
             if (authenticated) {
                 clearMessage(lblMensajeAdmin);
-                SessionContext.setRole("ADMIN");
+                SessionContext.setAdminSession(txtCorreoLoginAdmin.getText().trim());
                 NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
                 return;
             }
@@ -147,7 +147,7 @@ public class LoginController {
     @FXML
     public void registrarUsuario(ActionEvent event) throws IOException {
         try {
-            authRepository.registerUser(new UserRegistrationData(
+            long personId = authRepository.registerUser(new UserRegistrationData(
                     txtPrimerNombreUsuario.getText(),
                     txtSegundoNombreUsuario.getText(),
                     txtPrimerApellidoUsuario.getText(),
@@ -160,7 +160,7 @@ public class LoginController {
                     txtContrasenaLoginUsuario.getText()
             ));
             clearMessage(lblMensajeUsuario);
-            SessionContext.setRole("USER");
+            SessionContext.setUserSession(personId, txtCorreoLoginUsuario.getText().trim());
             NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
         } catch (IllegalArgumentException e) {
             lblMensajeUsuario.setText(e.getMessage());

@@ -1,21 +1,29 @@
 package cr.tec.bd.crv.controller;
 
+import cr.tec.bd.crv.database.PetRepository;
 import cr.tec.bd.crv.model.Mascota;
+import cr.tec.bd.crv.model.PetSearchCriteria;
 import cr.tec.bd.crv.util.NavigationUtil;
+import cr.tec.bd.crv.util.SessionContext;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Controller for the pet list screen.
  */
 public class ListaMascotasController {
+
+    private final PetRepository petRepository = new PetRepository();
 
     @FXML
     private TableView<Mascota> tablaMascotas;
@@ -38,30 +46,28 @@ public class ListaMascotasController {
     @FXML
     private TableColumn<Mascota, String> colEstado;
 
-    // PropertyValueFactory reads JavaBean getters from Mascota, such as getNombre().
+    @FXML
+    private Label lblTotalMascotas;
+
+    @FXML
+    private Label lblAdopcion;
+
+    @FXML
+    private Label lblPerdidas;
+
+    @FXML
+    private Label lblMensaje;
+
     @FXML
     public void initialize() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        colTipo.setCellValueFactory(new PropertyValueFactory<>("tipo"));
-        colRaza.setCellValueFactory(new PropertyValueFactory<>("raza"));
-        colColor.setCellValueFactory(new PropertyValueFactory<>("color"));
-        colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
-
-        // Sample data keeps the table usable until pet records are loaded from Oracle.
-        ObservableList<Mascota> datos = FXCollections.observableArrayList(
-                new Mascota(1, "Luna", "Gato", "Siamés", "Blanco", "En adopción"),
-                new Mascota(2, "Max", "Perro", "Labrador", "Negro", "Perdido"),
-                new Mascota(3, "Coco", "Ave", "Perico", "Verde", "Encontrado"),
-                new Mascota(4, "Milo", "Perro", "Pug", "Café", "En adopción")
-        );
-
-        tablaMascotas.setItems(datos);
+        configureColumns();
+        loadPets();
     }
 
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+        String menuPath = SessionContext.isAdmin() ? "/view/admin_menu.fxml" : "/view/menu.fxml";
+        NavigationUtil.openWindow(event, menuPath, "BDP1 - Bienestar Animal");
     }
 
     @FXML
@@ -71,6 +77,42 @@ public class ListaMascotasController {
 
     @FXML
     public void abrirEstadisticas(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/estadisticas.fxml", "Estadísticas");
+        NavigationUtil.openWindow(event, "/view/estadisticas.fxml", "Estadisticas");
+    }
+
+    private void configureColumns() {
+        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        colTipo.setCellValueFactory(new PropertyValueFactory<>("tipo"));
+        colRaza.setCellValueFactory(new PropertyValueFactory<>("raza"));
+        colColor.setCellValueFactory(new PropertyValueFactory<>("color"));
+        colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+    }
+
+    private void loadPets() {
+        try {
+            List<Mascota> pets = petRepository.findPets(new PetSearchCriteria(null, null, null, null));
+            tablaMascotas.setItems(FXCollections.observableArrayList(pets));
+            updateStats(pets);
+            lblMensaje.setText("");
+        } catch (SQLException e) {
+            lblMensaje.setText("No se pudieron cargar mascotas: " + e.getMessage());
+        }
+    }
+
+    private void updateStats(List<Mascota> pets) {
+        long adoption = countByStatusText(pets, "adop");
+        long lost = countByStatusText(pets, "lost") + countByStatusText(pets, "perd");
+
+        lblTotalMascotas.setText(String.valueOf(pets.size()));
+        lblAdopcion.setText(String.valueOf(adoption));
+        lblPerdidas.setText(String.valueOf(lost));
+    }
+
+    private long countByStatusText(List<Mascota> pets, String text) {
+        return pets.stream()
+                .map(Mascota::getEstado)
+                .filter(status -> status != null && status.toLowerCase(Locale.ROOT).contains(text))
+                .count();
     }
 }
