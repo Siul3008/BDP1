@@ -110,6 +110,10 @@ public class CatalogRepository {
         return findSimpleOptions("SELECT id, acronym || ' - ' || name AS label FROM currency ORDER BY acronym");
     }
 
+    public List<CatalogOption> findAssociations() throws SQLException {
+        return findSimpleOptions("SELECT id, name AS label FROM association ORDER BY name");
+    }
+
     public List<CatalogOption> findTrainingEases() throws SQLException {
         return findSimpleOptions("SELECT id, name AS label FROM trainingEase ORDER BY name");
     }

@@ -2,10 +2,13 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -16,37 +19,119 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="cr.tec.bd.crv.controller.ModuloPlantillaController"
+            fx:controller="cr.tec.bd.crv.controller.DonationController"
             styleClass="screen">
     <top>
         <HBox alignment="CENTER_LEFT" styleClass="top-bar">
-            <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
-            <ImageView fitHeight="52" fitWidth="52" preserveRatio="true"><image><Image url="@/images/logo.png"/></image></ImageView>
-            <VBox spacing="2.0"><Label text="Donaciones" styleClass="brand-title"/><Label text="Registro de aportes y distribución" styleClass="brand-subtitle"/></VBox>
+            <padding>
+                <Insets top="18" right="24" bottom="10" left="24"/>
+            </padding>
+            <ImageView fitHeight="52" fitWidth="52" preserveRatio="true">
+                <image>
+                    <Image url="@/images/logo.png"/>
+                </image>
+            </ImageView>
+            <VBox spacing="2.0">
+                <Label text="Donaciones" styleClass="brand-title"/>
+                <Label text="Registro de aportes y consulta administrativa" styleClass="brand-subtitle"/>
+            </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menú" onAction="#volverMenu" styleClass="ghost-button"/>
+            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button">
+                <tooltip>
+                    <Tooltip text="Regresa al menu principal segun la sesion actual."/>
+                </tooltip>
+            </Button>
         </HBox>
     </top>
     <center>
         <VBox spacing="18.0">
-            <padding><Insets top="10" right="24" bottom="24" left="24"/></padding>
+            <padding>
+                <Insets top="10" right="24" bottom="24" left="24"/>
+            </padding>
             <HBox spacing="18.0">
-                <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="card form-card">
-                    <Label text="Nueva donación" styleClass="title-lg"/>
+                <VBox fx:id="pnlRegistroDonacion" spacing="12.0" prefWidth="410" styleClass="card form-card">
+                    <Label text="Nueva donacion" styleClass="title-lg"/>
+                    <Label fx:id="lblModoDonacion" text="" wrapText="true" styleClass="subtle-text"/>
                     <GridPane hgap="14.0" vgap="14.0">
-                        <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0"><Label text="Donador" styleClass="field-label"/><TextField promptText="Nombre del donador"/></VBox>
-                        <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0"><Label text="Asociación beneficiada" styleClass="field-label"/><TextField promptText="Organización seleccionada"/></VBox>
-                        <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1"><Label text="Monto" styleClass="field-label"/><TextField promptText="0.00"/></VBox>
-                        <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1"><Label text="Porcentaje o tipo" styleClass="field-label"/><TextField promptText="Voluntaria, 50%, 25%, etc."/></VBox>
+                        <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">
+                            <Label text="Asociacion beneficiada" styleClass="field-label"/>
+                            <ComboBox fx:id="cbAsociacionDonacion" promptText="Seleccione asociacion" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <Label text="Moneda" styleClass="field-label"/>
+                            <ComboBox fx:id="cbMonedaDonacion" promptText="CRC / USD"/>
+                        </VBox>
+                        <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <Label text="Monto" styleClass="field-label"/>
+                            <TextField fx:id="txtMontoDonacion" promptText="0.00"/>
+                        </VBox>
+                        <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2">
+                            <Label text="Fecha de donacion" styleClass="field-label"/>
+                            <DatePicker fx:id="dpFechaDonacion"/>
+                        </VBox>
                     </GridPane>
-                    <HBox spacing="10.0"><Button text="Registrar donación" onAction="#mostrarAviso" styleClass="primary-button"/><Button text="Ver total por asociación" onAction="#mostrarAviso" styleClass="secondary-button"/></HBox>
+                    <HBox spacing="10.0">
+                        <Button fx:id="btnRegistrarDonacion" text="Registrar donacion" onAction="#registrarDonacion" styleClass="primary-button">
+                            <tooltip>
+                                <Tooltip text="Guarda la donacion y la asocia con su usuario."/>
+                            </tooltip>
+                        </Button>
+                        <Button text="Limpiar" onAction="#limpiarFormularioDonacion" styleClass="secondary-button">
+                            <tooltip>
+                                <Tooltip text="Limpia los campos del formulario de donacion."/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
+                    <Label text="La distribucion se registra al 100% para la asociacion seleccionada." wrapText="true" styleClass="subtle-text"/>
                 </VBox>
-                <VBox spacing="12.0" prefWidth="420" styleClass="card result-card">
-                    <Label text="Consulta de donaciones" styleClass="section-title"/>
-                    <TableView prefHeight="320"><columns><TableColumn text="Donador" prefWidth="120"/><TableColumn text="Asociación" prefWidth="140"/><TableColumn text="Monto" prefWidth="80"/><TableColumn text="Fecha" prefWidth="90"/></columns></TableView>
+                <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="card form-card">
+                    <Label text="Consulta de donaciones" styleClass="title-lg"/>
+                    <GridPane hgap="14.0" vgap="14.0">
+                        <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="Desde" styleClass="field-label"/>
+                            <DatePicker fx:id="dpDesdeFiltro"/>
+                        </VBox>
+                        <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="Hasta" styleClass="field-label"/>
+                            <DatePicker fx:id="dpHastaFiltro"/>
+                        </VBox>
+                        <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                            <Label text="Donador" styleClass="field-label"/>
+                            <TextField fx:id="txtDonadorFiltro" promptText="Nombre o apellido"/>
+                        </VBox>
+                        <VBox spacing="6.0" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                            <Label text="Asociacion" styleClass="field-label"/>
+                            <ComboBox fx:id="cbFiltroAsociacion" promptText="Todas"/>
+                        </VBox>
+                    </GridPane>
+                    <HBox spacing="10.0">
+                        <Button text="Consultar" onAction="#buscarDonaciones" styleClass="primary-button">
+                            <tooltip>
+                                <Tooltip text="Consulta donaciones por rango de fecha, donador o asociacion."/>
+                            </tooltip>
+                        </Button>
+                        <Button text="Limpiar filtros" onAction="#limpiarFiltros" styleClass="secondary-button"/>
+                        <Button fx:id="btnEliminarDonacion" text="Eliminar seleccionada" onAction="#eliminarDonacionSeleccionada" styleClass="danger-button">
+                            <tooltip>
+                                <Tooltip text="Solo admin: elimina la donacion seleccionada."/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
+                    <Label fx:id="lblResumenDonaciones" text="0 registros" wrapText="true" styleClass="section-title"/>
                 </VBox>
             </HBox>
+            <VBox spacing="12.0" styleClass="card result-card">
+                <Label text="Resultados" styleClass="section-title"/>
+                <TableView fx:id="tablaDonaciones" prefHeight="330">
+                    <columns>
+                        <TableColumn fx:id="colDonador" text="Donador" prefWidth="220"/>
+                        <TableColumn fx:id="colAsociacion" text="Asociacion" prefWidth="230"/>
+                        <TableColumn fx:id="colMonto" text="Monto" prefWidth="140"/>
+                        <TableColumn fx:id="colFecha" text="Fecha" prefWidth="130"/>
+                    </columns>
+                </TableView>
+            </VBox>
+            <Label fx:id="lblMensajeDonacion" text="" wrapText="true" styleClass="message-label"/>
         </VBox>
     </center>
 </BorderPane>
-
