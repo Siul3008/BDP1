@@ -101,7 +101,7 @@
                                 </tooltip>
                             </Button>
                             <Button text="Volver"
-                                    onAction="#abrirLoginUsuario"
+                                    onAction="#volverSeleccion"
                                     styleClass="ghost-button">
                                 <tooltip>
                                     <Tooltip text="Regresar al inicio de sesión de usuario."/>

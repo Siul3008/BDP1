@@ -40,6 +40,10 @@ public final class SessionContext {
         return currentEmail;
     }
 
+    public static void updateCurrentEmail(String email) {
+        currentEmail = email;
+    }
+
     public static void clear() {
         currentRole = null;
         currentPersonId = null;

@@ -63,6 +63,10 @@ public class PetRepository {
     }
 
     public List<Mascota> findPets(PetSearchCriteria criteria) throws SQLException {
+        return findPets(criteria, null);
+    }
+
+    public List<Mascota> findPets(PetSearchCriteria criteria, Long ownerPersonId) throws SQLException {
         try (Connection connection = ConexionBD.conectar()) {
             Set<String> petColumns = findColumnNames(connection, "PET");
             boolean hasChip = petColumns.contains("CHIP");
@@ -70,7 +74,7 @@ public class PetRepository {
             boolean hasCreationDate = petColumns.contains("CREATION_DATE");
 
             List<Object> parameters = new ArrayList<>();
-            String sql = buildPetSearchSql(criteria, hasChip, hasEventDate, hasCreationDate, parameters);
+            String sql = buildPetSearchSql(criteria, hasChip, hasEventDate, hasCreationDate, ownerPersonId, parameters);
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 setParameters(statement, parameters);
@@ -95,11 +99,80 @@ public class PetRepository {
         }
     }
 
+    public void updatePetStatus(long petId, long statusId, Long currentPersonId, boolean admin) throws SQLException {
+        validateStatusChange(petId, statusId, currentPersonId, admin);
+
+        try (Connection connection = ConexionBD.conectar()) {
+            ensurePetStatusExists(connection, statusId);
+
+            String sql;
+            if (admin) {
+                sql = "UPDATE pet SET idPetStatus = ? WHERE id = ?";
+            } else {
+                sql = """
+                        UPDATE pet
+                        SET idPetStatus = ?
+                        WHERE id = ?
+                          AND EXISTS (
+                              SELECT 1
+                              FROM rescuerxPet rp
+                              WHERE rp.idPet = pet.id
+                                AND rp.idRescuer = ?
+                          )
+                        """;
+            }
+
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setLong(1, statusId);
+                statement.setLong(2, petId);
+                if (!admin) {
+                    statement.setLong(3, currentPersonId);
+                }
+
+                int updatedRows = statement.executeUpdate();
+                if (updatedRows == 0) {
+                    throw new IllegalArgumentException(
+                            "Solo quien creo la publicacion o un administrador puede cambiar ese estado."
+                    );
+                }
+            }
+        }
+    }
+
+    public void transferPetControlToFosterHome(long petId, long fosterHomePersonId, Long currentPersonId, boolean admin)
+            throws SQLException {
+        validateControlTransfer(petId, fosterHomePersonId, currentPersonId, admin);
+
+        try (Connection connection = ConexionBD.conectar()) {
+            connection.setAutoCommit(false);
+
+            try {
+                ensurePetExists(connection, petId);
+                ensureFosterHomeExists(connection, fosterHomePersonId);
+                if (!admin && !userControlsPet(connection, petId, currentPersonId)) {
+                    throw new IllegalArgumentException(
+                            "Solo quien controla la publicacion puede pasarla a una casa cuna."
+                    );
+                }
+
+                ensureRescuerProfile(connection, fosterHomePersonId);
+                replacePetController(connection, petId, fosterHomePersonId);
+                connection.commit();
+            } catch (SQLException | RuntimeException e) {
+                connection.rollback();
+                throw e;
+            } finally {
+                connection.setAutoCommit(true);
+            }
+        }
+    }
+
     private String buildPetSearchSql(
             PetSearchCriteria criteria,
             boolean hasChip,
             boolean hasEventDate,
             boolean hasCreationDate,
+            Long ownerPersonId,
             List<Object> parameters
     ) {
         String dateExpression = null;
@@ -178,6 +251,18 @@ public class PetRepository {
             for (int index = 0; index < predicates.size(); index++) {
                 parameters.add(searchValue);
             }
+        }
+
+        if (ownerPersonId != null) {
+            sql.append("""
+                     AND EXISTS (
+                         SELECT 1
+                         FROM rescuerxPet rp
+                         WHERE rp.idPet = p.id
+                           AND rp.idRescuer = ?
+                     )
+                    """);
+            parameters.add(ownerPersonId);
         }
 
         if (dateExpression != null) {
@@ -406,6 +491,104 @@ public class PetRepository {
                 && data.getRewardAmount().compareTo(BigDecimal.ZERO) > 0
                 && data.getCurrencyId() == null) {
             throw new IllegalArgumentException("Seleccione la moneda de la recompensa.");
+        }
+    }
+
+    private void validateStatusChange(long petId, long statusId, Long currentPersonId, boolean admin) {
+        if (petId <= 0) {
+            throw new IllegalArgumentException("Seleccione una mascota valida.");
+        }
+
+        if (statusId <= 0) {
+            throw new IllegalArgumentException("Seleccione un estado valido.");
+        }
+
+        if (!admin && currentPersonId == null) {
+            throw new IllegalArgumentException("Debe iniciar sesion para cambiar el estado.");
+        }
+    }
+
+    private void validateControlTransfer(long petId, long fosterHomePersonId, Long currentPersonId, boolean admin) {
+        if (petId <= 0) {
+            throw new IllegalArgumentException("Seleccione una mascota valida.");
+        }
+
+        if (fosterHomePersonId <= 0) {
+            throw new IllegalArgumentException("Seleccione una casa cuna valida.");
+        }
+
+        if (!admin && currentPersonId == null) {
+            throw new IllegalArgumentException("Debe iniciar sesion para pasar el control.");
+        }
+    }
+
+    private void ensurePetExists(Connection connection, long petId) throws SQLException {
+        String sql = "SELECT 1 FROM pet WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    throw new IllegalArgumentException("La mascota seleccionada no existe.");
+                }
+            }
+        }
+    }
+
+    private void ensureFosterHomeExists(Connection connection, long fosterHomePersonId) throws SQLException {
+        String sql = "SELECT 1 FROM fosterHome WHERE idPerson = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, fosterHomePersonId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    throw new IllegalArgumentException("La casa cuna seleccionada no esta activa.");
+                }
+            }
+        }
+    }
+
+    private boolean userControlsPet(Connection connection, long petId, Long personId) throws SQLException {
+        if (personId == null) {
+            return false;
+        }
+
+        String sql = """
+                SELECT 1
+                FROM rescuerxPet
+                WHERE idPet = ?
+                  AND idRescuer = ?
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+            statement.setLong(2, personId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
+        }
+    }
+
+    private void replacePetController(Connection connection, long petId, long fosterHomePersonId) throws SQLException {
+        try (PreparedStatement deleteStatement = connection.prepareStatement("DELETE FROM rescuerxPet WHERE idPet = ?")) {
+            deleteStatement.setLong(1, petId);
+            deleteStatement.executeUpdate();
+        }
+
+        linkRescuerToPet(connection, fosterHomePersonId, petId);
+    }
+
+    private void ensurePetStatusExists(Connection connection, long statusId) throws SQLException {
+        String sql = "SELECT 1 FROM petStatus WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, statusId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    throw new IllegalArgumentException("El estado seleccionado no existe en la base de datos.");
+                }
+            }
         }
     }
 

@@ -1,12 +1,17 @@
 package cr.tec.bd.crv.controller;
 
+import cr.tec.bd.crv.database.CatalogRepository;
+import cr.tec.bd.crv.database.FosterHomeRepository;
 import cr.tec.bd.crv.database.PetRepository;
+import cr.tec.bd.crv.model.CatalogOption;
 import cr.tec.bd.crv.model.Mascota;
 import cr.tec.bd.crv.model.PetSearchCriteria;
 import cr.tec.bd.crv.util.NavigationUtil;
 import cr.tec.bd.crv.util.SessionContext;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -23,6 +28,8 @@ import java.util.Locale;
  */
 public class ListaMascotasController {
 
+    private final CatalogRepository catalogRepository = new CatalogRepository();
+    private final FosterHomeRepository fosterHomeRepository = new FosterHomeRepository();
     private final PetRepository petRepository = new PetRepository();
 
     @FXML
@@ -47,6 +54,15 @@ public class ListaMascotasController {
     private TableColumn<Mascota, String> colEstado;
 
     @FXML
+    private ComboBox<CatalogOption> cbNuevoEstado;
+
+    @FXML
+    private ComboBox<CatalogOption> cbCasaCuna;
+
+    @FXML
+    private CheckBox chkSoloMisMascotas;
+
+    @FXML
     private Label lblTotalMascotas;
 
     @FXML
@@ -61,6 +77,8 @@ public class ListaMascotasController {
     @FXML
     public void initialize() {
         configureColumns();
+        loadStatuses();
+        loadFosterHomes();
         loadPets();
     }
 
@@ -80,6 +98,74 @@ public class ListaMascotasController {
         NavigationUtil.openWindow(event, "/view/estadisticas.fxml", "Estadisticas");
     }
 
+    @FXML
+    public void cambiarEstadoMascota() {
+        Mascota selectedPet = tablaMascotas.getSelectionModel().getSelectedItem();
+        CatalogOption selectedStatus = cbNuevoEstado.getValue();
+
+        if (selectedPet == null) {
+            lblMensaje.setText("Seleccione una mascota de la tabla.");
+            return;
+        }
+
+        if (selectedStatus == null) {
+            lblMensaje.setText("Seleccione el nuevo estado.");
+            return;
+        }
+
+        try {
+            petRepository.updatePetStatus(
+                    selectedPet.getId(),
+                    selectedStatus.getId(),
+                    SessionContext.getCurrentPersonId(),
+                    SessionContext.isAdmin()
+            );
+            loadPets();
+            lblMensaje.setText("Estado actualizado correctamente.");
+        } catch (IllegalArgumentException e) {
+            lblMensaje.setText(e.getMessage());
+        } catch (SQLException e) {
+            lblMensaje.setText("No se pudo cambiar el estado: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void recargarMascotas() {
+        loadPets();
+    }
+
+    @FXML
+    public void pasarControlCasaCuna() {
+        Mascota selectedPet = tablaMascotas.getSelectionModel().getSelectedItem();
+        CatalogOption selectedFosterHome = cbCasaCuna.getValue();
+
+        if (selectedPet == null) {
+            lblMensaje.setText("Seleccione una mascota de la tabla.");
+            return;
+        }
+
+        if (selectedFosterHome == null) {
+            lblMensaje.setText("Seleccione la casa cuna que recibira el control.");
+            return;
+        }
+
+        try {
+            petRepository.transferPetControlToFosterHome(
+                    selectedPet.getId(),
+                    selectedFosterHome.getId(),
+                    SessionContext.getCurrentPersonId(),
+                    SessionContext.isAdmin()
+            );
+            chkSoloMisMascotas.setSelected(false);
+            loadPets();
+            lblMensaje.setText("Control transferido a la casa cuna seleccionada.");
+        } catch (IllegalArgumentException e) {
+            lblMensaje.setText(e.getMessage());
+        } catch (SQLException e) {
+            lblMensaje.setText("No se pudo transferir el control: " + e.getMessage());
+        }
+    }
+
     private void configureColumns() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
@@ -89,9 +175,30 @@ public class ListaMascotasController {
         colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
     }
 
+    private void loadStatuses() {
+        try {
+            cbNuevoEstado.setItems(FXCollections.observableArrayList(catalogRepository.findPetStatuses()));
+        } catch (SQLException e) {
+            lblMensaje.setText("No se pudieron cargar los estados: " + e.getMessage());
+        }
+    }
+
+    private void loadFosterHomes() {
+        try {
+            cbCasaCuna.setItems(FXCollections.observableArrayList(fosterHomeRepository.findFosterHomeOptions()));
+        } catch (SQLException e) {
+            lblMensaje.setText("No se pudieron cargar casas cuna: " + e.getMessage());
+        }
+    }
+
     private void loadPets() {
         try {
-            List<Mascota> pets = petRepository.findPets(new PetSearchCriteria(null, null, null, null));
+            Long ownerFilter = chkSoloMisMascotas != null
+                    && chkSoloMisMascotas.isSelected()
+                    && !SessionContext.isAdmin()
+                    ? SessionContext.getCurrentPersonId()
+                    : null;
+            List<Mascota> pets = petRepository.findPets(new PetSearchCriteria(null, null, null, null), ownerFilter);
             tablaMascotas.setItems(FXCollections.observableArrayList(pets));
             updateStats(pets);
             lblMensaje.setText("");

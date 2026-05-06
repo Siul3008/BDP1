@@ -1,10 +1,13 @@
 package cr.tec.bd.crv.controller;
 
 import cr.tec.bd.crv.database.ConexionBD;
+import cr.tec.bd.crv.database.FosterHomeRepository;
 import cr.tec.bd.crv.util.NavigationUtil;
 import cr.tec.bd.crv.util.SessionContext;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -15,6 +18,16 @@ import java.sql.SQLException;
  * Main menu controller. It routes users to the different modules after login.
  */
 public class MenuController {
+
+    private final FosterHomeRepository fosterHomeRepository = new FosterHomeRepository();
+
+    @FXML
+    private Button btnCasasCuna;
+
+    @FXML
+    public void initialize() {
+        configureFosterHomeAccess();
+    }
 
     // All menu buttons reuse the same navigation helper to keep window behavior consistent.
     private void openModule(ActionEvent event, String fxmlPath, String title) throws IOException {
@@ -93,5 +106,20 @@ public class MenuController {
         SessionContext.clear();
         Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
         stage.close();
+    }
+
+    private void configureFosterHomeAccess() {
+        if (btnCasasCuna == null || SessionContext.isAdmin()) {
+            return;
+        }
+
+        try {
+            boolean active = fosterHomeRepository.isFosterHome(SessionContext.getCurrentPersonId());
+            btnCasasCuna.setVisible(active);
+            btnCasasCuna.setManaged(active);
+        } catch (SQLException e) {
+            btnCasasCuna.setVisible(false);
+            btnCasasCuna.setManaged(false);
+        }
     }
 }

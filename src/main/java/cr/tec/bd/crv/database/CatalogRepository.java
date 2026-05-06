@@ -106,6 +106,10 @@ public class CatalogRepository {
         return findSimpleOptions("SELECT id, name AS label FROM petSize ORDER BY name");
     }
 
+    public List<CatalogOption> findFoodDonationOptions() throws SQLException {
+        return findSimpleOptions("SELECT id, name AS label FROM requiresFoodDonation ORDER BY id");
+    }
+
     public List<CatalogOption> findCurrencies() throws SQLException {
         return findSimpleOptions("SELECT id, acronym || ' - ' || name AS label FROM currency ORDER BY acronym");
     }

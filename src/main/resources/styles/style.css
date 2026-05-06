@@ -225,3 +225,44 @@
     -fx-background-color: transparent;
 }
 
+.profile-sidebar {
+    -fx-background-color: rgba(255, 255, 255, 0.88);
+    -fx-padding: 18;
+}
+
+.profile-content {
+    -fx-padding: 28;
+}
+
+.profile-nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #5a438c;
+    -fx-alignment: center-left;
+    -fx-pref-width: 210;
+    -fx-padding: 12 14 12 14;
+}
+
+.profile-nav-button:hover {
+    -fx-background-color: #efe5ff;
+}
+
+.check-scroll {
+    -fx-background-color: #fcfaff;
+    -fx-background-radius: 14;
+    -fx-border-color: #cfbdf5;
+    -fx-border-radius: 14;
+    -fx-border-width: 1.2;
+}
+
+.check-scroll > .viewport {
+    -fx-background-color: #fcfaff;
+}
+
+.check-list {
+    -fx-padding: 12;
+}
+
+.check-option {
+    -fx-text-fill: #4f308f;
+    -fx-font-size: 13px;
+}

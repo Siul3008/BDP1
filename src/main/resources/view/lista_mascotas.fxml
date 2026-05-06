@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -56,6 +58,33 @@
             </HBox>
             <VBox spacing="12.0" styleClass="card result-card">
                 <Label text="Registros consultados" styleClass="title-lg"/>
+                <VBox spacing="10.0">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <CheckBox fx:id="chkSoloMisMascotas"
+                                  text="Ver solo mis mascotas"
+                                  onAction="#recargarMascotas"/>
+                        <Button text="Actualizar lista"
+                                onAction="#recargarMascotas"
+                                styleClass="ghost-button"/>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="Nuevo estado" styleClass="field-label"/>
+                        <ComboBox fx:id="cbNuevoEstado" promptText="Seleccione estado" prefWidth="220"/>
+                        <Button text="Cambiar estado"
+                                onAction="#cambiarEstadoMascota"
+                                styleClass="secondary-button"/>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="Pasar a casa cuna" styleClass="field-label"/>
+                        <ComboBox fx:id="cbCasaCuna" promptText="Seleccione casa cuna" prefWidth="260"/>
+                        <Button text="Transferir control"
+                                onAction="#pasarControlCasaCuna"
+                                styleClass="secondary-button"/>
+                    </HBox>
+                    <Label text="El cambio de estado y la transferencia solo los puede hacer quien controla la publicacion o un admin."
+                           wrapText="true"
+                           styleClass="subtle-text"/>
+                </VBox>
                 <TableView fx:id="tablaMascotas" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="colId" text="ID" prefWidth="70"/>

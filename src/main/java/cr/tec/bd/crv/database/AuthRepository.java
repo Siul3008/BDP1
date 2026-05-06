@@ -1,5 +1,6 @@
 package cr.tec.bd.crv.database;
 
+import cr.tec.bd.crv.model.AuthenticatedAccount;
 import cr.tec.bd.crv.model.UserRegistrationData;
 import cr.tec.bd.crv.util.PasswordUtil;
 
@@ -14,36 +15,59 @@ import java.sql.SQLException;
 public class AuthRepository {
 
     // Public login entry points keep account type details out of the controller.
-    public boolean loginUser(String email, String password) throws SQLException {
-        return loginUserPersonId(email, password) != null;
-    }
+    public AuthenticatedAccount loginAccount(String email, String password) throws SQLException {
+        String normalizedEmail = emptyToNull(email);
+        String normalizedPassword = emptyToNull(password);
+        if (normalizedEmail == null || normalizedPassword == null) {
+            return null;
+        }
 
-    public boolean loginAdmin(String email, String password) throws SQLException {
-        return login("ADMIN", email, password);
-    }
-
-    public Long loginUserPersonId(String email, String password) throws SQLException {
         String sql = """
-                SELECT idPerson
+                SELECT id, accountType, loginEmail, idPerson
                 FROM appAccount
-                WHERE accountType = 'USER'
-                  AND loginEmail = ?
+                WHERE loginEmail = ?
                   AND passwordHash = ?
                   AND isActive = 'Y'
                 """;
 
         try (Connection connection = ConexionBD.conectar();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, email.trim());
-            statement.setString(2, PasswordUtil.hash(password));
+            statement.setString(1, normalizedEmail);
+            statement.setString(2, PasswordUtil.hash(normalizedPassword));
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getLong("idPerson");
+                if (!resultSet.next()) {
+                    return null;
                 }
-                return null;
+
+                long accountId = resultSet.getLong("id");
+                Long personId = resultSet.getObject("idPerson") == null ? null : resultSet.getLong("idPerson");
+                AuthenticatedAccount account = new AuthenticatedAccount(
+                        resultSet.getString("accountType"),
+                        resultSet.getString("loginEmail"),
+                        personId
+                );
+                updateLastLogin(connection, accountId);
+                return account;
             }
         }
+    }
+
+    public boolean loginUser(String email, String password) throws SQLException {
+        return loginUserPersonId(email, password) != null;
+    }
+
+    public boolean loginAdmin(String email, String password) throws SQLException {
+        AuthenticatedAccount account = loginAccount(email, password);
+        return account != null && account.isAdmin();
+    }
+
+    public Long loginUserPersonId(String email, String password) throws SQLException {
+        AuthenticatedAccount account = loginAccount(email, password);
+        if (account != null && account.isUser()) {
+            return account.getPersonId();
+        }
+        return null;
     }
 
     // User registration touches several tables, so it runs inside a single transaction.
@@ -85,26 +109,12 @@ public class AuthRepository {
         }
     }
 
-    // Both user and admin login use appAccount, filtered by accountType.
-    private boolean login(String accountType, String email, String password) throws SQLException {
-        String sql = """
-                SELECT 1
-                FROM appAccount
-                WHERE accountType = ?
-                  AND loginEmail = ?
-                  AND passwordHash = ?
-                  AND isActive = 'Y'
-                """;
-
-        try (Connection connection = ConexionBD.conectar();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, accountType);
-            statement.setString(2, email.trim());
-            statement.setString(3, PasswordUtil.hash(password));
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                return resultSet.next();
-            }
+    // Last login is only informational, so a failure here should not block access.
+    private void updateLastLogin(Connection connection, long accountId) throws SQLException {
+        String sql = "UPDATE appAccount SET lastLoginAt = SYSDATE WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, accountId);
+            statement.executeUpdate();
         }
     }
 

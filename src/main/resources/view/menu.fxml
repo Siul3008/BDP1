@@ -63,7 +63,7 @@
                 <Button text="Adopciones" onAction="#abrirAdopciones" styleClass="menu-tile">
                     <tooltip><Tooltip text="Abre la solicitud y el seguimiento de adopciones."/></tooltip>
                 </Button>
-                <Button text="Casas cuna" onAction="#abrirCasasCuna" styleClass="menu-tile">
+                <Button fx:id="btnCasasCuna" text="Casa cuna" onAction="#abrirCasasCuna" styleClass="menu-tile">
                     <tooltip><Tooltip text="Permite registrar hogares temporales y sus condiciones."/></tooltip>
                 </Button>
                 <Button text="Donaciones" onAction="#abrirDonaciones" styleClass="menu-tile">

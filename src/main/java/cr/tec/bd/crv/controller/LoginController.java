@@ -2,6 +2,7 @@ package cr.tec.bd.crv.controller;
 
 import cr.tec.bd.crv.database.AuthRepository;
 import cr.tec.bd.crv.database.ConexionBD;
+import cr.tec.bd.crv.model.AuthenticatedAccount;
 import cr.tec.bd.crv.model.UserRegistrationData;
 import cr.tec.bd.crv.util.NavigationUtil;
 import cr.tec.bd.crv.util.SessionContext;
@@ -68,15 +69,15 @@ public class LoginController {
     @FXML
     private Label lblMensajeAdmin;
 
-    // Navigation between the separated authentication screens.
+    // Legacy navigation methods now return to the single login screen.
     @FXML
     public void abrirLoginUsuario(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/login_usuario.fxml", "Inicio de sesion - Usuario");
+        NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
     }
 
     @FXML
     public void abrirLoginAdmin(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/login_admin.fxml", "Inicio de sesion - Admin");
+        NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
     }
 
     @FXML
@@ -99,26 +100,43 @@ public class LoginController {
         }
     }
 
-    // User login routes to the regular application menu.
+    // A single login form routes the account by role after authentication.
     @FXML
-    public void iniciarSesionUsuario(ActionEvent event) throws IOException {
+    public void iniciarSesion(ActionEvent event) throws IOException {
         try {
-            Long personId = authRepository.loginUserPersonId(
+            AuthenticatedAccount account = authRepository.loginAccount(
                     txtCorreoLoginUsuario.getText(),
                     txtContrasenaLoginUsuario.getText()
             );
 
-            if (personId != null) {
-                clearMessage(lblMensajeUsuario);
-                SessionContext.setUserSession(personId, txtCorreoLoginUsuario.getText().trim());
+            if (account == null) {
+                lblMensajeUsuario.setText("Correo o contrasena incorrectos.");
+                return;
+            }
+
+            clearMessage(lblMensajeUsuario);
+            if (account.isAdmin()) {
+                SessionContext.setAdminSession(account.getLoginEmail());
+                NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
+                return;
+            }
+
+            if (account.isUser() && account.getPersonId() != null) {
+                SessionContext.setUserSession(account.getPersonId(), account.getLoginEmail());
                 NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
                 return;
             }
 
-            lblMensajeUsuario.setText("Correo o contrasena incorrectos.");
+            lblMensajeUsuario.setText("Esta cuenta no tiene un perfil de usuario activo.");
         } catch (SQLException e) {
             lblMensajeUsuario.setText("No se pudo iniciar sesion: " + e.getMessage());
         }
+    }
+
+    // Kept for older FXML files while the project moves to a single login screen.
+    @FXML
+    public void iniciarSesionUsuario(ActionEvent event) throws IOException {
+        iniciarSesion(event);
     }
 
     // Admin login routes to a restricted menu for system management tasks.
