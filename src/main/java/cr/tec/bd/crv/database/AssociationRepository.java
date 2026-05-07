@@ -1,9 +1,13 @@
 package cr.tec.bd.crv.database;
 
+import cr.tec.bd.crv.model.AssociationRecord;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Data access class for association records managed by admins.
@@ -22,6 +26,53 @@ public class AssociationRepository {
                 statement.setLong(1, associationId);
                 statement.setString(2, name.trim());
                 statement.executeUpdate();
+            }
+        }
+    }
+
+    public List<AssociationRecord> findAssociationRecords() throws SQLException {
+        String sql = """
+                SELECT
+                    a.id,
+                    a.name,
+                    COUNT(d.id) AS donationCount,
+                    NVL(TO_CHAR(SUM(d.amount), 'FM9999999990.00'), '0.00') AS totalDonated
+                FROM association a
+                LEFT JOIN associationxDonation ad
+                    ON ad.idAssociation = a.id
+                LEFT JOIN donation d
+                    ON d.id = ad.idDonation
+                GROUP BY a.id, a.name
+                ORDER BY a.name
+                """;
+
+        try (Connection connection = ConexionBD.conectar();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            List<AssociationRecord> associations = new ArrayList<>();
+            while (resultSet.next()) {
+                associations.add(new AssociationRecord(
+                        resultSet.getLong("id"),
+                        resultSet.getString("name"),
+                        resultSet.getInt("donationCount"),
+                        resultSet.getString("totalDonated")
+                ));
+            }
+            return associations;
+        }
+    }
+
+    public void updateAssociationName(long associationId, String name) throws SQLException {
+        requireValue(name, "El nombre de la asociacion es obligatorio.");
+
+        try (Connection connection = ConexionBD.conectar();
+             PreparedStatement statement = connection.prepareStatement("UPDATE association SET name = ? WHERE id = ?")) {
+            statement.setString(1, name.trim());
+            statement.setLong(2, associationId);
+
+            int updatedRows = statement.executeUpdate();
+            if (updatedRows == 0) {
+                throw new IllegalArgumentException("La asociacion seleccionada no existe.");
             }
         }
     }

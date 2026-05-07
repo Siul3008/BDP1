@@ -54,6 +54,9 @@
                 <Button text="Donaciones" onAction="#abrirDonaciones" styleClass="menu-tile">
                     <tooltip><Tooltip text="Revisar aportes y distribución de donaciones."/></tooltip>
                 </Button>
+                <Button text="Adopciones" onAction="#abrirAdopciones" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Consultar y registrar procesos de adopcion."/></tooltip>
+                </Button>
                 <Button text="Consultas y reportes" onAction="#abrirReportes" styleClass="menu-tile">
                     <tooltip><Tooltip text="Generar consultas administrativas."/></tooltip>
                 </Button>

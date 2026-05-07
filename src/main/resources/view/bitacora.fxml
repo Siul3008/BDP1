@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -16,34 +17,74 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="cr.tec.bd.crv.controller.ModuloPlantillaController"
+            fx:controller="cr.tec.bd.crv.controller.AuditController"
             styleClass="screen">
     <top>
         <HBox alignment="CENTER_LEFT" styleClass="top-bar">
-            <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
-            <ImageView fitHeight="52" fitWidth="52" preserveRatio="true"><image><Image url="@/images/logo.png"/></image></ImageView>
-            <VBox spacing="2.0"><Label text="Bitácora" styleClass="brand-title"/><Label text="Auditoría de cambios sensibles" styleClass="brand-subtitle"/></VBox>
+            <padding>
+                <Insets top="18" right="24" bottom="10" left="24"/>
+            </padding>
+            <ImageView fitHeight="52" fitWidth="52" preserveRatio="true">
+                <image>
+                    <Image url="@/images/logo.png"/>
+                </image>
+            </ImageView>
+            <VBox spacing="2.0">
+                <Label text="Bitacora" styleClass="brand-title"/>
+                <Label text="Revision de auditoria y cambios registrados" styleClass="brand-subtitle"/>
+            </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menú" onAction="#volverMenu" styleClass="ghost-button"/>
+            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button"/>
         </HBox>
     </top>
     <center>
         <VBox spacing="18.0">
-            <padding><Insets top="10" right="24" bottom="24" left="24"/></padding>
+            <padding>
+                <Insets top="10" right="24" bottom="24" left="24"/>
+            </padding>
             <VBox spacing="12.0" styleClass="card form-card">
-                <Label text="Filtros de bitácora" styleClass="title-lg"/>
+                <Label text="Filtros de bitacora" styleClass="title-lg"/>
                 <GridPane hgap="14.0" vgap="14.0">
-                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0"><Label text="Tabla o módulo" styleClass="field-label"/><TextField promptText="Mascotas, donaciones, adopciones"/></VBox>
-                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0"><Label text="Usuario" styleClass="field-label"/><TextField promptText="Usuario que realizó el cambio"/></VBox>
-                    <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0"><Label text="Campo afectado" styleClass="field-label"/><TextField promptText="Estado, monto, calificación"/></VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="Modulo" styleClass="field-label"/>
+                        <TextField fx:id="txtModuloBitacora" promptText="Mascotas, donaciones, adopciones"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="Usuario" styleClass="field-label"/>
+                        <TextField fx:id="txtUsuarioBitacora" promptText="Usuario de base de datos"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                        <Label text="Campo" styleClass="field-label"/>
+                        <TextField fx:id="txtCampoBitacora" promptText="Campo afectado"/>
+                    </VBox>
                 </GridPane>
-                <HBox spacing="10.0"><Button text="Consultar cambios" onAction="#mostrarAviso" styleClass="primary-button"/><Button text="Exportar reporte" onAction="#mostrarAviso" styleClass="secondary-button"/></HBox>
+                <HBox spacing="10.0">
+                    <Button text="Consultar cambios" onAction="#consultarBitacora" styleClass="primary-button">
+                        <tooltip>
+                            <Tooltip text="Consulta journal y columnas de auditoria disponibles."/>
+                        </tooltip>
+                    </Button>
+                    <Button text="Limpiar filtros" onAction="#limpiarBitacora" styleClass="secondary-button"/>
+                </HBox>
+                <Label fx:id="lblMensajeBitacora" text="" wrapText="true" styleClass="message-label"/>
             </VBox>
             <VBox spacing="12.0" styleClass="card result-card">
-                <Label text="Registro de auditoría" styleClass="section-title"/>
-                <TableView prefHeight="360"><columns><TableColumn text="Fecha" prefWidth="140"/><TableColumn text="Usuario" prefWidth="120"/><TableColumn text="Cambio" prefWidth="220"/><TableColumn text="Valor nuevo" prefWidth="220"/></columns></TableView>
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Registro de auditoria" styleClass="section-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblResumenBitacora" text="0 registro(s)" styleClass="message-label"/>
+                </HBox>
+                <TableView fx:id="tablaBitacora" prefHeight="430">
+                    <columns>
+                        <TableColumn fx:id="colFechaBitacora" text="Fecha" prefWidth="120"/>
+                        <TableColumn fx:id="colModuloBitacora" text="Modulo" prefWidth="150"/>
+                        <TableColumn fx:id="colUsuarioBitacora" text="Usuario" prefWidth="130"/>
+                        <TableColumn fx:id="colCampoBitacora" text="Campo" prefWidth="180"/>
+                        <TableColumn fx:id="colAnteriorBitacora" text="Valor anterior" prefWidth="190"/>
+                        <TableColumn fx:id="colNuevoBitacora" text="Valor nuevo" prefWidth="220"/>
+                    </columns>
+                </TableView>
             </VBox>
         </VBox>
     </center>
 </BorderPane>
-
