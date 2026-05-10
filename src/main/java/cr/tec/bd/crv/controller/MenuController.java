@@ -1,17 +1,13 @@
 package cr.tec.bd.crv.controller;
 
-import cr.tec.bd.crv.database.ConexionBD;
 import cr.tec.bd.crv.util.NavigationUtil;
 import cr.tec.bd.crv.util.SessionContext;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * Controls the main menu screens.
@@ -27,7 +23,7 @@ public class MenuController {
 
     @FXML
     public void initialize() {
-        // Casa cuna stays visible because users can activate their own profile
+        // Foster home stays visible because users can activate their own profile
         // or review active foster homes from the same module.
     }
 
@@ -68,7 +64,7 @@ public class MenuController {
      * Opens the foster home area when the user has activated that profile.
      */
     public void abrirCasasCuna(ActionEvent event) throws IOException {
-        openModule(event, "/view/casas_cuna.fxml", "Casas Cuna");
+        openModule(event, "/view/casas_cuna.fxml", "Foster Homes");
     }
 
     /**
@@ -133,25 +129,6 @@ public class MenuController {
     public void cerrarSesion(ActionEvent event) throws IOException {
         SessionContext.clear();
         NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Animal Welfare");
-    }
-
-    /**
-     * Runs a quick connection test so the user can confirm Oracle is reachable.
-     */
-    public void probarConexion() {
-        try (Connection connection = ConexionBD.conectar()) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Connection");
-            alert.setHeaderText(null);
-            alert.setContentText("Connection is working.");
-            alert.showAndWait();
-        } catch (SQLException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Connection error");
-            alert.setHeaderText("Could not connect to the system service");
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
-        }
     }
 
     /**

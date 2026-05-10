@@ -38,7 +38,7 @@ public class AuditRepository {
                 addAuditTableRecords(connection, records, "ADOPTION", "Adoptions", "TO_CHAR(id)");
                 addAuditTableRecords(connection, records, "DONATION", "Donations", "TO_CHAR(amount)");
                 addAuditTableRecords(connection, records, "ASSOCIATION", "Associations", "name");
-                addAuditTableRecords(connection, records, "PERSON", "Personas", "firstName || ' ' || firstLastName");
+                addAuditTableRecords(connection, records, "PERSON", "People", "firstName || ' ' || firstLastName");
             }
 
             String module = normalized(moduleFilter);

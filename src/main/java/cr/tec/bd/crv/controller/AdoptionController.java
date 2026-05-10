@@ -217,9 +217,14 @@ public class AdoptionController {
     }
 
     @FXML
-    public void volverMenu(ActionEvent event) throws IOException {
-        String menuPath = SessionContext.isAdmin() ? "/view/admin_menu.fxml" : "/view/menu.fxml";
-        NavigationUtil.openWindow(event, menuPath, "BDP1 - Animal Welfare");
+    public void volverMenu(ActionEvent event) {
+        try {
+            String menuPath = SessionContext.isAdmin() ? "/view/admin_menu.fxml" : "/view/menu.fxml";
+            String menuTitle = SessionContext.isAdmin() ? "BDP1 - Administration" : "BDP1 - Animal Welfare";
+            NavigationUtil.openWindow(event, menuPath, menuTitle);
+        } catch (IOException e) {
+            lblMensajeAdopcion.setText("Could not return to the menu: " + e.getMessage());
+        }
     }
 
     private void configureColumns() {

@@ -47,7 +47,7 @@ public class DonationRepository {
                 insertDonation(connection, donationId, currencyId, allocationId, donationDate, amount);
                 linkPersonDonation(connection, donorPersonId, donationId);
                 linkAssociationDonation(connection, associationId, donationId);
-                auditRepository.log(connection, "Donations", "Crear", "-", amount.toPlainString());
+                auditRepository.log(connection, "Donations", "Create", "-", amount.toPlainString());
 
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
@@ -172,7 +172,7 @@ public class DonationRepository {
                 if (allocationId != null) {
                     deleteById(connection, "donationAllLocation", allocationId);
                 }
-                auditRepository.log(connection, "Donations", "Eliminar", "id:" + donationId, "-");
+                auditRepository.log(connection, "Donations", "Delete", "id:" + donationId, "-");
 
                 connection.commit();
             } catch (SQLException | RuntimeException e) {

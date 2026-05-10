@@ -1,21 +1,18 @@
 package cr.tec.bd.crv.controller;
 
 import cr.tec.bd.crv.database.AuthRepository;
-import cr.tec.bd.crv.database.ConexionBD;
 import cr.tec.bd.crv.model.AuthenticatedAccount;
 import cr.tec.bd.crv.model.UserRegistrationData;
 import cr.tec.bd.crv.util.NavigationUtil;
 import cr.tec.bd.crv.util.SessionContext;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -92,18 +89,6 @@ public class LoginController {
     @FXML
     public void volverSeleccion(ActionEvent event) throws IOException {
         NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Animal Welfare");
-    }
-
-    /**
-     * Tests whether the application can open an Oracle connection.
-     */
-    @FXML
-    public void probarConexion() {
-        try (Connection connection = ConexionBD.conectar()) {
-            showAlert(Alert.AlertType.INFORMATION, "Connection", "Connection is working.");
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Connection error", e.getMessage());
-        }
     }
 
     /**
@@ -239,11 +224,4 @@ public class LoginController {
         }
     }
 
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 }

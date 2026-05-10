@@ -33,7 +33,7 @@ public class AssociationRepository {
                 statement.setLong(1, associationId);
                 statement.setString(2, name.trim());
                 statement.executeUpdate();
-                auditRepository.log(connection, "Associations", "Crear", "-", name.trim());
+                auditRepository.log(connection, "Associations", "Create", "-", name.trim());
             }
         }
     }

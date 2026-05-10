@@ -203,7 +203,7 @@ public class FosterHomeRepository {
                 linkHomeCondition(connection, personId, conditionId);
                 insertAcceptedTypes(connection, conditionId, typeIds);
                 insertAcceptedSizes(connection, conditionId, sizeIds);
-                auditRepository.log(connection, "Foster home", "Perfil", "person:" + personId, "activa");
+                auditRepository.log(connection, "Foster home", "Profile", "person:" + personId, "active");
 
                 connection.commit();
             } catch (SQLException | RuntimeException e) {

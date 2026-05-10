@@ -33,7 +33,7 @@ public class ReportController {
     private static final String BLACKLIST = "Blacklist";
     private static final String NOT_ADOPTED_TWO_MONTHS = "Not adopted after 2 months";
     private static final String TOP_RESCUERS = "Top rescuers";
-    private static final String FOSTER_HOME_TYPES = "Casas cuna por tipo";
+    private static final String FOSTER_HOME_TYPES = "Foster homes by type";
     private static final String CRITICAL_ADOPTION_PETS = "Critical pets for adoption";
 
     private final ReportRepository reportRepository = new ReportRepository();

@@ -118,7 +118,7 @@ public class ParameterRepository {
                     statement.setString(2, name.trim());
                     statement.executeUpdate();
                 }
-                auditRepository.log(connection, "Parameters", "Crear", category, name);
+                auditRepository.log(connection, "Parameters", "Create", category, name);
                 return;
             }
 
@@ -128,7 +128,7 @@ public class ParameterRepository {
                 statement.setLong(2, id);
                 statement.executeUpdate();
             }
-            auditRepository.log(connection, "Parameters", "Editar", category, name);
+            auditRepository.log(connection, "Parameters", "Edit", category, name);
         }
     }
 
@@ -218,7 +218,7 @@ public class ParameterRepository {
                     statement.setString(4, value.trim());
                     statement.executeUpdate();
                 }
-                auditRepository.log(connection, "Parameters", "Sistema", "-", name);
+                auditRepository.log(connection, "Parameters", "System", "-", name);
                 return;
             }
 
@@ -231,7 +231,7 @@ public class ParameterRepository {
                 statement.setLong(4, id);
                 statement.executeUpdate();
             }
-            auditRepository.log(connection, "Parameters", "Sistema", "id:" + id, name);
+            auditRepository.log(connection, "Parameters", "System", "id:" + id, name);
         }
     }
 

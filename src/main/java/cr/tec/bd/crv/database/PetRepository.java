@@ -62,7 +62,7 @@ public class PetRepository {
                 }
                 insertOptionalHealthAndVeterinarian(connection, petId, data);
                 insertPetReportIfNeeded(connection, data);
-                auditRepository.log(connection, "Pets", "Crear", "-", data.getName());
+                auditRepository.log(connection, "Pets", "Create", "-", data.getName());
 
                 connection.commit();
                 return warnings;
@@ -229,7 +229,7 @@ public class PetRepository {
                 upsertReward(connection, petId, data.getCurrencyId(), data.getRewardAmount());
                 insertOptionalHealthAndVeterinarian(connection, petId, data);
                 insertPetReportIfNeeded(connection, data);
-                auditRepository.log(connection, "Pets", "Editar", "pet:" + petId, data.getName());
+                auditRepository.log(connection, "Pets", "Edit", "pet:" + petId, data.getName());
 
                 connection.commit();
                 return warnings;

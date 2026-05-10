@@ -88,7 +88,7 @@ public class UserProfileRepository {
                 statement.setString(4, emptyToNull(secondLastName));
                 statement.setLong(5, personId);
                 statement.executeUpdate();
-                auditRepository.log(connection, "Perfil", "Names", "person:" + personId, firstName.trim());
+                auditRepository.log(connection, "Profile", "Names", "person:" + personId, firstName.trim());
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
                 connection.rollback();
@@ -152,7 +152,7 @@ public class UserProfileRepository {
                     statement.setLong(2, personId);
                     statement.executeUpdate();
                 }
-                auditRepository.log(connection, "Perfil", "Password", "person:" + personId, "actualizada");
+                auditRepository.log(connection, "Profile", "Password", "person:" + personId, "updated");
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
                 connection.rollback();
