@@ -203,7 +203,7 @@ public class FosterHomeRepository {
                 linkHomeCondition(connection, personId, conditionId);
                 insertAcceptedTypes(connection, conditionId, typeIds);
                 insertAcceptedSizes(connection, conditionId, sizeIds);
-                auditRepository.log(connection, "Casa cuna", "Perfil", "person:" + personId, "activa");
+                auditRepository.log(connection, "Foster home", "Perfil", "person:" + personId, "activa");
 
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
@@ -217,19 +217,19 @@ public class FosterHomeRepository {
 
     private void validateProfile(Long personId, Long foodDonationId, List<Long> typeIds, List<Long> sizeIds) {
         if (personId == null) {
-            throw new IllegalArgumentException("Debe iniciar sesion como usuario para activar casa cuna.");
+            throw new IllegalArgumentException("You must sign in as a user to activate foster home.");
         }
 
         if (foodDonationId == null) {
-            throw new IllegalArgumentException("Seleccione si requiere donacion de alimento.");
+            throw new IllegalArgumentException("Select whether food donation is required.");
         }
 
         if (typeIds == null || typeIds.isEmpty()) {
-            throw new IllegalArgumentException("Seleccione al menos un tipo de mascota aceptado.");
+            throw new IllegalArgumentException("Select at least one accepted pet type.");
         }
 
         if (sizeIds == null || sizeIds.isEmpty()) {
-            throw new IllegalArgumentException("Seleccione al menos un tamano aceptado.");
+            throw new IllegalArgumentException("Select at least one accepted size.");
         }
     }
 

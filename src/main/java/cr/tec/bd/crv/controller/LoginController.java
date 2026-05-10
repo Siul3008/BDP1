@@ -76,22 +76,22 @@ public class LoginController {
     // Older buttons still call these methods, but the app now uses one shared login screen.
     @FXML
     public void abrirLoginUsuario(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
+        NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Animal Welfare");
     }
 
     @FXML
     public void abrirLoginAdmin(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
+        NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Animal Welfare");
     }
 
     @FXML
     public void abrirRegistroUsuario(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/registro_usuario.fxml", "Crear cuenta - Usuario");
+        NavigationUtil.openWindow(event, "/view/registro_usuario.fxml", "Create account - User");
     }
 
     @FXML
     public void volverSeleccion(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
+        NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Animal Welfare");
     }
 
     /**
@@ -100,9 +100,9 @@ public class LoginController {
     @FXML
     public void probarConexion() {
         try (Connection connection = ConexionBD.conectar()) {
-            showAlert(Alert.AlertType.INFORMATION, "Conexion", "Conexion exitosa con Oracle");
+            showAlert(Alert.AlertType.INFORMATION, "Connection", "Connection is working.");
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error de conexion", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Connection error", e.getMessage());
         }
     }
 
@@ -118,26 +118,26 @@ public class LoginController {
             );
 
             if (account == null) {
-                lblMensajeUsuario.setText("Correo o contrasena incorrectos.");
+                lblMensajeUsuario.setText("Email or password is incorrect.");
                 return;
             }
 
             clearMessage(lblMensajeUsuario);
             if (account.isAdmin()) {
                 SessionContext.setAdminSession(account.getLoginEmail());
-                NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
+                NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administration");
                 return;
             }
 
             if (account.isUser() && account.getPersonId() != null) {
                 SessionContext.setUserSession(account.getPersonId(), account.getLoginEmail());
-                NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+                NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Animal Welfare");
                 return;
             }
 
-            lblMensajeUsuario.setText("Esta cuenta no tiene un perfil de usuario activo.");
+            lblMensajeUsuario.setText("This account does not have an active user profile.");
         } catch (SQLException e) {
-            lblMensajeUsuario.setText("No se pudo iniciar sesion: " + e.getMessage());
+            lblMensajeUsuario.setText("Could not sign in: " + e.getMessage());
         }
     }
 
@@ -163,13 +163,13 @@ public class LoginController {
             if (authenticated) {
                 clearMessage(lblMensajeAdmin);
                 SessionContext.setAdminSession(txtCorreoLoginAdmin.getText().trim());
-                NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
+                NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administration");
                 return;
             }
 
-            lblMensajeAdmin.setText("Correo o contrasena incorrectos.");
+            lblMensajeAdmin.setText("Email or password is incorrect.");
         } catch (SQLException e) {
-            lblMensajeAdmin.setText("No se pudo iniciar sesion: " + e.getMessage());
+            lblMensajeAdmin.setText("Could not sign in: " + e.getMessage());
         }
     }
 
@@ -193,11 +193,11 @@ public class LoginController {
             ));
             clearMessage(lblMensajeUsuario);
             SessionContext.setUserSession(personId, txtCorreoLoginUsuario.getText().trim());
-            NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+            NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Animal Welfare");
         } catch (IllegalArgumentException e) {
             lblMensajeUsuario.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensajeUsuario.setText("No se pudo registrar el usuario: " + e.getMessage());
+            lblMensajeUsuario.setText("Could not register the user: " + e.getMessage());
         }
     }
 

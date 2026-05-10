@@ -149,15 +149,15 @@ public class RegistrarMascotaController {
             }
             if (warnings.isEmpty()) {
                 lblMensaje.setText(editingPetId == null
-                        ? "Mascota guardada correctamente."
-                        : "Mascota actualizada correctamente.");
+                        ? "Pet saved successfully."
+                        : "Pet updated successfully.");
             } else {
-                lblMensaje.setText("Mascota guardada. Revise: " + String.join(" ", warnings));
+                lblMensaje.setText("Pet saved. Review: " + String.join(" ", warnings));
             }
         } catch (IllegalArgumentException e) {
             lblMensaje.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensaje.setText("No se pudo guardar la mascota: " + e.getMessage());
+            lblMensaje.setText("Could not save the pet: " + e.getMessage());
         }
     }
 
@@ -201,12 +201,12 @@ public class RegistrarMascotaController {
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
         String menuPath = SessionContext.isAdmin() ? "/view/admin_menu.fxml" : "/view/menu.fxml";
-        NavigationUtil.openWindow(event, menuPath, "BDP1 - Bienestar Animal");
+        NavigationUtil.openWindow(event, menuPath, "BDP1 - Animal Welfare");
     }
 
     @FXML
     public void abrirListaMascotas(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/lista_mascotas.fxml", "Lista de Mascotas");
+        NavigationUtil.openWindow(event, "/view/lista_mascotas.fxml", "Pet List");
     }
 
     private void loadCatalogs() {
@@ -225,7 +225,7 @@ public class RegistrarMascotaController {
             cbProvincia.setItems(FXCollections.observableArrayList(catalogRepository.findProvinces()));
             cbEnergia.setItems(FXCollections.observableArrayList(catalogRepository.findEnergyLevels()));
         } catch (SQLException e) {
-            lblMensaje.setText("No se pudieron cargar los catalogos: " + e.getMessage());
+            lblMensaje.setText("Could not load catalogs: " + e.getMessage());
         }
     }
 
@@ -259,7 +259,7 @@ public class RegistrarMascotaController {
         try {
             cbRaza.setItems(FXCollections.observableArrayList(catalogRepository.findBreedsByPetType(petTypeId)));
         } catch (SQLException e) {
-            lblMensaje.setText("No se pudieron cargar las razas: " + e.getMessage());
+            lblMensaje.setText("Could not load breeds: " + e.getMessage());
         }
     }
 
@@ -267,7 +267,7 @@ public class RegistrarMascotaController {
         try {
             cbCanton.setItems(FXCollections.observableArrayList(catalogRepository.findCantons(provinceId)));
         } catch (SQLException e) {
-            lblMensaje.setText("No se pudieron cargar los cantones: " + e.getMessage());
+            lblMensaje.setText("Could not load cantons: " + e.getMessage());
         }
     }
 
@@ -275,7 +275,7 @@ public class RegistrarMascotaController {
         try {
             cbDistrito.setItems(FXCollections.observableArrayList(catalogRepository.findDistricts(cantonId)));
         } catch (SQLException e) {
-            lblMensaje.setText("No se pudieron cargar los distritos: " + e.getMessage());
+            lblMensaje.setText("Could not load districts: " + e.getMessage());
         }
     }
 
@@ -345,9 +345,9 @@ public class RegistrarMascotaController {
             txtFotoAntes.setText(data.getPhotoBeforePath());
             txtFotoDespues.setText(data.getPhotoAfterPath());
             txtDescripcion.setText(data.getDescription());
-            lblMensaje.setText("Modo edicion: actualice los datos y presione Guardar.");
+            lblMensaje.setText("Edit mode: update the data and press Save.");
         } catch (SQLException e) {
-            lblMensaje.setText("No se pudo cargar la mascota para editar: " + e.getMessage());
+            lblMensaje.setText("Could not load the pet for editing: " + e.getMessage());
         }
     }
 
@@ -359,7 +359,7 @@ public class RegistrarMascotaController {
         try {
             return new BigDecimal(amount.trim().replace(",", "."));
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("El monto de recompensa debe ser numerico.");
+            throw new IllegalArgumentException("Reward amount must be numeric.");
         }
     }
 

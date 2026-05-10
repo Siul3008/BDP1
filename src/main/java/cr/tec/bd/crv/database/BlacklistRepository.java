@@ -168,7 +168,7 @@ public class BlacklistRepository {
                 insertBlacklistReport(connection, blacklistId, reporterId, reporteeId, starRatingId, reason, reportDate);
                 linkPersonBlacklistReport(connection, reporteeId, blacklistId);
                 updateAdopterRating(connection, reporteeId, starRatingId, reason);
-                auditRepository.log(connection, "Lista negra", "Reporte", "person:" + reporterId, reporteeName);
+                auditRepository.log(connection, "Blacklist", "Report", "person:" + reporterId, reporteeName);
 
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
@@ -182,22 +182,22 @@ public class BlacklistRepository {
 
     private void validateReport(Long reporterId, Long reporteeId, String rating, String reason, LocalDate reportDate) {
         if (reporterId == null) {
-            throw new IllegalArgumentException("Seleccione quien realiza el reporte.");
+            throw new IllegalArgumentException("Select who is making the report.");
         }
         if (reporteeId == null) {
-            throw new IllegalArgumentException("Seleccione la persona reportada.");
+            throw new IllegalArgumentException("Select the reported person.");
         }
         if (reporterId.equals(reporteeId)) {
             throw new IllegalArgumentException("La persona reportante y reportada no pueden ser la misma.");
         }
         if (emptyToNull(rating) == null) {
-            throw new IllegalArgumentException("Seleccione una calificacion.");
+            throw new IllegalArgumentException("Select a rating.");
         }
         if (emptyToNull(reason) == null) {
-            throw new IllegalArgumentException("Digite la razon del reporte.");
+            throw new IllegalArgumentException("Enter the report reason.");
         }
         if (reportDate == null) {
-            throw new IllegalArgumentException("Seleccione la fecha del reporte.");
+            throw new IllegalArgumentException("Select the report date.");
         }
     }
 
@@ -206,7 +206,7 @@ public class BlacklistRepository {
                 || !hasColumn(connection, "blacklistReport", "idReportee")
                 || !hasColumn(connection, "blacklistReport", "idStarRating")) {
             throw new IllegalStateException(
-                    "Falta actualizar blacklistReport. Ejecute el script 20_patch_current_schema_front_alignment.sql."
+                    "The blacklist module needs an administrative setup update."
             );
         }
     }

@@ -23,7 +23,7 @@ public class AssociationRepository {
      * Creates a new association. Associations are registered by an admin and do not log in.
      */
     public void registerAssociation(String name) throws SQLException {
-        requireValue(name, "El nombre de la asociacion es obligatorio.");
+        requireValue(name, "Association name is required.");
 
         try (Connection connection = ConexionBD.conectar()) {
             long associationId = nextSequenceValue(connection, "sAssociation");
@@ -33,7 +33,7 @@ public class AssociationRepository {
                 statement.setLong(1, associationId);
                 statement.setString(2, name.trim());
                 statement.executeUpdate();
-                auditRepository.log(connection, "Asociaciones", "Crear", "-", name.trim());
+                auditRepository.log(connection, "Associations", "Crear", "-", name.trim());
             }
         }
     }
@@ -77,7 +77,7 @@ public class AssociationRepository {
      * Renames an existing association.
      */
     public void updateAssociationName(long associationId, String name) throws SQLException {
-        requireValue(name, "El nombre de la asociacion es obligatorio.");
+        requireValue(name, "Association name is required.");
 
         try (Connection connection = ConexionBD.conectar();
              PreparedStatement statement = connection.prepareStatement("UPDATE association SET name = ? WHERE id = ?")) {
@@ -86,9 +86,9 @@ public class AssociationRepository {
 
             int updatedRows = statement.executeUpdate();
             if (updatedRows == 0) {
-                throw new IllegalArgumentException("La asociacion seleccionada no existe.");
+                throw new IllegalArgumentException("The selected association does not exist.");
             }
-            auditRepository.log(connection, "Asociaciones", "Nombre", "id:" + associationId, name.trim());
+            auditRepository.log(connection, "Associations", "Name", "id:" + associationId, name.trim());
         }
     }
 

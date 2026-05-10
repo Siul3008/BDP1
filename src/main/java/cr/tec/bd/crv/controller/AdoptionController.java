@@ -156,14 +156,14 @@ public class AdoptionController {
                     SessionContext.isAdmin()
             );
 
-            lblMensajeAdopcion.setText("Adopcion registrada correctamente.");
+            lblMensajeAdopcion.setText("Adoption registered successfully.");
             limpiarFormularioAdopcion();
             loadAdoptablePets();
             loadAdoptions();
         } catch (IllegalArgumentException e) {
             lblMensajeAdopcion.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensajeAdopcion.setText("No se pudo registrar la adopcion: " + e.getMessage());
+            lblMensajeAdopcion.setText("Could not register the adoption: " + e.getMessage());
         }
     }
 
@@ -194,7 +194,7 @@ public class AdoptionController {
     public void actualizarSeguimiento() {
         AdoptionRecord selectedAdoption = tablaAdopciones.getSelectionModel().getSelectedItem();
         if (selectedAdoption == null) {
-            lblMensajeAdopcion.setText("Seleccione una adopcion del historial.");
+            lblMensajeAdopcion.setText("Select an adoption from the history.");
             return;
         }
 
@@ -206,20 +206,20 @@ public class AdoptionController {
                     SessionContext.getCurrentPersonId(),
                     SessionContext.isAdmin()
             );
-            lblMensajeAdopcion.setText("Seguimiento actualizado correctamente.");
+            lblMensajeAdopcion.setText("Follow-up updated successfully.");
             txtFotoSeguimiento.clear();
             loadAdoptions();
         } catch (IllegalArgumentException e) {
             lblMensajeAdopcion.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensajeAdopcion.setText("No se pudo actualizar seguimiento: " + e.getMessage());
+            lblMensajeAdopcion.setText("Could not update follow-up: " + e.getMessage());
         }
     }
 
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
         String menuPath = SessionContext.isAdmin() ? "/view/admin_menu.fxml" : "/view/menu.fxml";
-        NavigationUtil.openWindow(event, menuPath, "BDP1 - Bienestar Animal");
+        NavigationUtil.openWindow(event, menuPath, "BDP1 - Animal Welfare");
     }
 
     private void configureColumns() {
@@ -246,7 +246,7 @@ public class AdoptionController {
             setLabelIfPresent(lblOtrasMascotas, labels.get("adopt.pets"));
             setLabelIfPresent(lblRespuestas, labels.get("adopt.answers"));
         } catch (SQLException e) {
-            lblMensajeAdopcion.setText("No se pudieron cargar preguntas configurables: " + e.getMessage());
+            lblMensajeAdopcion.setText("Could not load configurable questions: " + e.getMessage());
         }
     }
 
@@ -265,7 +265,7 @@ public class AdoptionController {
             );
             cbMascotaAdopcion.setItems(FXCollections.observableArrayList(pets));
         } catch (SQLException e) {
-            lblMensajeAdopcion.setText("No se pudieron cargar mascotas disponibles: " + e.getMessage());
+            lblMensajeAdopcion.setText("Could not load available pets: " + e.getMessage());
         }
     }
 
@@ -277,9 +277,9 @@ public class AdoptionController {
                     SessionContext.isAdmin()
             );
             tablaAdopciones.setItems(FXCollections.observableArrayList(adoptions));
-            lblTotalAdopciones.setText(adoptions.size() + " registro(s)");
+            lblTotalAdopciones.setText(adoptions.size() + " record(s)");
         } catch (SQLException e) {
-            lblMensajeAdopcion.setText("No se pudieron cargar adopciones: " + e.getMessage());
+            lblMensajeAdopcion.setText("Could not load adoptions: " + e.getMessage());
         }
     }
 }

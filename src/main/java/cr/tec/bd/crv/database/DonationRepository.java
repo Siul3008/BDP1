@@ -47,7 +47,7 @@ public class DonationRepository {
                 insertDonation(connection, donationId, currencyId, allocationId, donationDate, amount);
                 linkPersonDonation(connection, donorPersonId, donationId);
                 linkAssociationDonation(connection, associationId, donationId);
-                auditRepository.log(connection, "Donaciones", "Crear", "-", amount.toPlainString());
+                auditRepository.log(connection, "Donations", "Crear", "-", amount.toPlainString());
 
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
@@ -172,7 +172,7 @@ public class DonationRepository {
                 if (allocationId != null) {
                     deleteById(connection, "donationAllLocation", allocationId);
                 }
-                auditRepository.log(connection, "Donaciones", "Eliminar", "id:" + donationId, "-");
+                auditRepository.log(connection, "Donations", "Eliminar", "id:" + donationId, "-");
 
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
@@ -192,19 +192,19 @@ public class DonationRepository {
             LocalDate donationDate
     ) {
         if (donorPersonId == null) {
-            throw new IllegalArgumentException("Debe iniciar sesion como usuario para registrar una donacion.");
+            throw new IllegalArgumentException("You must sign in as a user to register a donation.");
         }
         if (associationId == null) {
-            throw new IllegalArgumentException("Seleccione la asociacion beneficiaria.");
+            throw new IllegalArgumentException("Select the beneficiary association.");
         }
         if (currencyId == null) {
-            throw new IllegalArgumentException("Seleccione la moneda.");
+            throw new IllegalArgumentException("Select the currency.");
         }
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("El monto debe ser mayor que cero.");
+            throw new IllegalArgumentException("Amount must be greater than zero.");
         }
         if (donationDate == null) {
-            throw new IllegalArgumentException("Seleccione la fecha de donacion.");
+            throw new IllegalArgumentException("Select the donation date.");
         }
     }
 

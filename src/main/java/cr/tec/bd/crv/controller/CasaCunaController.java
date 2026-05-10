@@ -94,19 +94,19 @@ public class CasaCunaController {
                     idsOf(boxTamanosAceptados),
                     txtNotasCasaCuna.getText()
             );
-            lblEstadoCasaCuna.setText("Casa cuna activa.");
+            lblEstadoCasaCuna.setText("Foster home is active.");
             lblMensajeCasaCuna.setText("Condiciones guardadas correctamente.");
             loadDirectory();
         } catch (IllegalArgumentException e) {
             lblMensajeCasaCuna.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensajeCasaCuna.setText("No se pudo guardar casa cuna: " + e.getMessage());
+            lblMensajeCasaCuna.setText("Could not save foster home: " + e.getMessage());
         }
     }
 
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+        NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Animal Welfare");
     }
 
     @FXML
@@ -132,15 +132,15 @@ public class CasaCunaController {
 
             FosterHomeProfile profile = fosterHomeRepository.findProfile(SessionContext.getCurrentPersonId());
             lblEstadoCasaCuna.setText(profile.isActive()
-                    ? "Casa cuna activa."
-                    : "Completa estas condiciones para activar casa cuna.");
+                    ? "Foster home is active."
+                    : "Complete these conditions to activate foster home.");
             txtNotasCasaCuna.setText(profile.getNotes() == null ? "" : profile.getNotes());
             selectByIds(boxTiposAceptados, profile.getAcceptedTypeIds());
             selectByIds(boxTamanosAceptados, profile.getAcceptedSizeIds());
             selectComboById(cbDonacionAlimento, profile.getFoodDonationId());
             lblMensajeCasaCuna.setText("");
         } catch (SQLException e) {
-            lblMensajeCasaCuna.setText("No se pudieron cargar las condiciones: " + e.getMessage());
+            lblMensajeCasaCuna.setText("Could not load conditions: " + e.getMessage());
         }
     }
 
@@ -148,7 +148,7 @@ public class CasaCunaController {
         try {
             tablaCasasCuna.setItems(FXCollections.observableArrayList(fosterHomeRepository.findDirectory()));
         } catch (SQLException e) {
-            lblMensajeCasaCuna.setText("No se pudieron cargar casas cuna activas: " + e.getMessage());
+            lblMensajeCasaCuna.setText("Could not load active foster homes: " + e.getMessage());
         }
     }
 

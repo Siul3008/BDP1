@@ -168,7 +168,7 @@ public class ReportRepository {
                     NVL(pt.name, 'No type') AS column2,
                     NVL(b.name, 'No breed') AS column3,
                     NVL(TO_CHAR(p.eventDate, 'YYYY-MM-DD'), 'No date') AS column4,
-                    TO_CHAR(TRUNC(SYSDATE - NVL(p.eventDate, SYSDATE))) || ' dias' AS column5
+                    TO_CHAR(TRUNC(SYSDATE - NVL(p.eventDate, SYSDATE))) || ' days' AS column5
                 FROM pet p
                 LEFT JOIN petType pt
                     ON pt.id = p.idPetType
@@ -218,7 +218,7 @@ public class ReportRepository {
                     TO_CHAR(COUNT(DISTINCT pt.id)) AS column2,
                     LISTAGG(pt.name, ', ') WITHIN GROUP (ORDER BY pt.name) AS column3,
                     TO_CHAR(fh.idPerson) AS column4,
-                    'Casa cuna' AS column5
+                    'Foster home' AS column5
                 FROM fosterHomexFosterCondition fhxfc
                 JOIN fosterHome fh
                     ON fhxfc.idFosterHome = fh.idPerson

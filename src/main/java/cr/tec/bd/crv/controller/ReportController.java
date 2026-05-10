@@ -27,14 +27,14 @@ import java.util.List;
  */
 public class ReportController {
 
-    private static final String PETS_BY_STATUS = "Mascotas por estado";
-    private static final String DONATIONS_BY_ASSOCIATION = "Donaciones por asociacion";
-    private static final String POTENTIAL_MATCHES = "Matches potenciales";
-    private static final String BLACKLIST = "Lista negra";
-    private static final String NOT_ADOPTED_TWO_MONTHS = "No adoptadas 2 meses";
-    private static final String TOP_RESCUERS = "Top rescatistas";
+    private static final String PETS_BY_STATUS = "Pets by status";
+    private static final String DONATIONS_BY_ASSOCIATION = "Donations by association";
+    private static final String POTENTIAL_MATCHES = "Potential matches";
+    private static final String BLACKLIST = "Blacklist";
+    private static final String NOT_ADOPTED_TWO_MONTHS = "Not adopted after 2 months";
+    private static final String TOP_RESCUERS = "Top rescuers";
     private static final String FOSTER_HOME_TYPES = "Casas cuna por tipo";
-    private static final String CRITICAL_ADOPTION_PETS = "Criticas en adopcion";
+    private static final String CRITICAL_ADOPTION_PETS = "Critical pets for adoption";
 
     private final ReportRepository reportRepository = new ReportRepository();
 
@@ -129,10 +129,10 @@ public class ReportController {
             };
 
             tablaReportes.setItems(FXCollections.observableArrayList(rows));
-            lblResumenReporte.setText(rows.size() + " registro(s)");
+            lblResumenReporte.setText(rows.size() + " record(s)");
             lblMensajeReporte.setText("");
         } catch (SQLException e) {
-            lblMensajeReporte.setText("No se pudo generar el reporte: " + e.getMessage());
+            lblMensajeReporte.setText("Could not generate the report: " + e.getMessage());
         }
     }
 
@@ -146,7 +146,7 @@ public class ReportController {
 
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
+        NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administration");
     }
 
     private void configureColumns() {
@@ -160,14 +160,14 @@ public class ReportController {
     private void configureHeaders(String reportType) {
         // One table is reused for many reports, so the visible headers change with the report.
         switch (reportType) {
-            case DONATIONS_BY_ASSOCIATION -> setHeaders("Asociacion", "Moneda", "Total", "Cantidad", "Ultima donacion");
-            case POTENTIAL_MATCHES -> setHeaders("Mascota", "Tipo", "Raza", "Color", "Fecha reporte");
-            case BLACKLIST -> setHeaders("Reporta", "Reportado", "Rating", "Razon", "Fecha");
-            case NOT_ADOPTED_TWO_MONTHS -> setHeaders("Mascota", "Tipo", "Raza", "Desde", "Tiempo espera");
-            case TOP_RESCUERS -> setHeaders("Rescatista", "Mascotas", "Segundo nombre", "Segundo apellido", "ID");
-            case FOSTER_HOME_TYPES -> setHeaders("Casa cuna", "Tipos aceptados", "Detalle", "ID", "Modulo");
-            case CRITICAL_ADOPTION_PETS -> setHeaders("Mascota", "Tipo", "Raza", "Salud", "Descripcion");
-            default -> setHeaders("Estado", "Tipo", "Cantidad", "Ultima fecha", "Porcentaje");
+            case DONATIONS_BY_ASSOCIATION -> setHeaders("Association", "Currency", "Total", "Count", "Last donation");
+            case POTENTIAL_MATCHES -> setHeaders("Pet", "Type", "Breed", "Color", "Report date");
+            case BLACKLIST -> setHeaders("Reporter", "Reported person", "Rating", "Reason", "Date");
+            case NOT_ADOPTED_TWO_MONTHS -> setHeaders("Pet", "Type", "Breed", "From", "Waiting time");
+            case TOP_RESCUERS -> setHeaders("Rescuer", "Pets", "Middle name", "Second last name", "ID");
+            case FOSTER_HOME_TYPES -> setHeaders("Foster home", "Accepted types", "Detail", "ID", "Module");
+            case CRITICAL_ADOPTION_PETS -> setHeaders("Pet", "Type", "Breed", "Health", "Description");
+            default -> setHeaders("Status", "Type", "Count", "Last date", "Porcentaje");
         }
     }
 

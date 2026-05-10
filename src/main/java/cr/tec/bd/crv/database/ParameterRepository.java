@@ -18,19 +18,19 @@ import java.util.Map;
  */
 public class ParameterRepository {
 
-    public static final String PET_TYPES = "Tipos de mascota";
+    public static final String PET_TYPES = "Pet types";
     public static final String BREEDS = "Razas";
-    public static final String PET_STATUSES = "Estados de mascota";
+    public static final String PET_STATUSES = "Pet statuses";
     public static final String COLORS = "Colores";
-    public static final String PET_SIZES = "Tamanos";
+    public static final String PET_SIZES = "Sizes";
     public static final String TRAINING_EASES = "Facilidad de entrenamiento";
-    public static final String DISEASES = "Enfermedades";
-    public static final String TREATMENTS = "Tratamientos";
-    public static final String MEDICINES = "Medicamentos";
-    public static final String VETERINARIANS = "Veterinarios";
+    public static final String DISEASES = "Diseases";
+    public static final String TREATMENTS = "Treatments";
+    public static final String MEDICINES = "Medicines";
+    public static final String VETERINARIANS = "Veterinarians";
     public static final String CURRENCIES = "Monedas";
-    public static final String FOOD_DONATION = "Donacion de alimento";
-    public static final String SYSTEM_PARAMETERS = "Parametros del sistema";
+    public static final String FOOD_DONATION = "Food donation";
+    public static final String SYSTEM_PARAMETERS = "System parameters";
 
     private final ApplicationAuditRepository auditRepository = new ApplicationAuditRepository();
 
@@ -104,10 +104,10 @@ public class ParameterRepository {
     public void saveSimple(String category, Long id, String name) throws SQLException {
         SimpleCatalog catalog = simpleCatalogs.get(category);
         if (catalog == null) {
-            throw new IllegalArgumentException("Seleccione un catalogo simple valido.");
+            throw new IllegalArgumentException("Select a valid simple catalog.");
         }
-        requireValue(name, "Digite el nombre.");
-        validateLength(name, catalog.maxLength(), "El nombre supera el maximo permitido.");
+        requireValue(name, "Enter the name.");
+        validateLength(name, catalog.maxLength(), "Name exceeds the maximum length.");
 
         try (Connection connection = ConexionBD.conectar()) {
             if (id == null) {
@@ -118,7 +118,7 @@ public class ParameterRepository {
                     statement.setString(2, name.trim());
                     statement.executeUpdate();
                 }
-                auditRepository.log(connection, "Parametros", "Crear", category, name);
+                auditRepository.log(connection, "Parameters", "Crear", category, name);
                 return;
             }
 
@@ -128,7 +128,7 @@ public class ParameterRepository {
                 statement.setLong(2, id);
                 statement.executeUpdate();
             }
-            auditRepository.log(connection, "Parametros", "Editar", category, name);
+            auditRepository.log(connection, "Parameters", "Editar", category, name);
         }
     }
 
@@ -136,10 +136,10 @@ public class ParameterRepository {
      * Saves a breed and the pet type it belongs to.
      */
     public void saveBreed(Long id, String name, Long petTypeId) throws SQLException {
-        requireValue(name, "Digite el nombre de la raza.");
+        requireValue(name, "Enter the breed name.");
         validateLength(name, 25, "La raza no puede superar 25 caracteres.");
         if (petTypeId == null) {
-            throw new IllegalArgumentException("Seleccione el tipo de mascota de la raza.");
+            throw new IllegalArgumentException("Select the pet type for the breed.");
         }
 
         try (Connection connection = ConexionBD.conectar()) {
@@ -152,7 +152,7 @@ public class ParameterRepository {
                     statement.setLong(3, petTypeId);
                     statement.executeUpdate();
                 }
-                auditRepository.log(connection, "Parametros", "Raza", "-", name);
+                auditRepository.log(connection, "Parameters", "Breed", "-", name);
                 return;
             }
 
@@ -164,14 +164,14 @@ public class ParameterRepository {
                 statement.setLong(3, id);
                 statement.executeUpdate();
             }
-            auditRepository.log(connection, "Parametros", "Raza", "id:" + id, name);
+            auditRepository.log(connection, "Parameters", "Breed", "id:" + id, name);
         }
     }
 
     public void saveCurrency(Long id, String name, String acronym) throws SQLException {
-        requireValue(name, "Digite el nombre de la moneda.");
-        requireValue(acronym, "Digite el acronimo.");
-        validateLength(name, 25, "El nombre de la moneda no puede superar 25 caracteres.");
+        requireValue(name, "Enter the currency name.");
+        requireValue(acronym, "Enter the acronym.");
+        validateLength(name, 25, "Currency name cannot exceed 25 characters.");
         validateLength(acronym, 3, "El acronimo no puede superar 3 caracteres.");
 
         try (Connection connection = ConexionBD.conectar()) {
@@ -184,7 +184,7 @@ public class ParameterRepository {
                     statement.setString(3, acronym.trim().toUpperCase());
                     statement.executeUpdate();
                 }
-                auditRepository.log(connection, "Parametros", "Moneda", "-", acronym);
+                auditRepository.log(connection, "Parameters", "Currency", "-", acronym);
                 return;
             }
 
@@ -196,15 +196,15 @@ public class ParameterRepository {
                 statement.setLong(3, id);
                 statement.executeUpdate();
             }
-            auditRepository.log(connection, "Parametros", "Moneda", "id:" + id, acronym);
+            auditRepository.log(connection, "Parameters", "Currency", "id:" + id, acronym);
         }
     }
 
     public void saveSystemParameter(Long id, String name, String description, String value) throws SQLException {
-        requireValue(name, "Digite el nombre del parametro.");
-        requireValue(value, "Digite el valor.");
-        validateLength(name, 20, "El nombre del parametro no puede superar 20 caracteres.");
-        validateLength(description, 50, "La descripcion no puede superar 50 caracteres.");
+        requireValue(name, "Enter the parameter name.");
+        requireValue(value, "Enter the value.");
+        validateLength(name, 20, "Parameter name cannot exceed 20 characters.");
+        validateLength(description, 50, "Description cannot exceed 50 characters.");
         validateLength(value, 255, "El valor no puede superar 255 caracteres.");
 
         try (Connection connection = ConexionBD.conectar()) {
@@ -218,7 +218,7 @@ public class ParameterRepository {
                     statement.setString(4, value.trim());
                     statement.executeUpdate();
                 }
-                auditRepository.log(connection, "Parametros", "Sistema", "-", name);
+                auditRepository.log(connection, "Parameters", "Sistema", "-", name);
                 return;
             }
 
@@ -231,7 +231,7 @@ public class ParameterRepository {
                 statement.setLong(4, id);
                 statement.executeUpdate();
             }
-            auditRepository.log(connection, "Parametros", "Sistema", "id:" + id, name);
+            auditRepository.log(connection, "Parameters", "Sistema", "id:" + id, name);
         }
     }
 

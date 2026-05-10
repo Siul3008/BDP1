@@ -31,7 +31,7 @@ public class AdoptionRepository {
     public List<CatalogOption> findAdoptablePets(Long currentPersonId, boolean admin) throws SQLException {
         List<Object> parameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
-                SELECT p.id, p.name || ' - ' || NVL(ps.status, 'Sin estado') AS label
+                SELECT p.id, p.name || ' - ' || NVL(ps.status, 'No status') AS label
                 FROM pet p
                 LEFT JOIN petStatus ps
                     ON ps.id = p.idPetStatus
@@ -138,7 +138,7 @@ public class AdoptionRepository {
                 PersonSummary adopter = findAdopterByEmail(connection, data.getAdopterEmail());
                 ensurePetIsForAdoption(connection, data.getPetId());
                 if (!admin && !userControlsPet(connection, data.getPetId(), currentPersonId)) {
-                    throw new IllegalArgumentException("Solo quien controla la mascota puede registrar su adopcion.");
+                    throw new IllegalArgumentException("Only the pet controller can register its adoption.");
                 }
 
                 long applicationId = nextSequenceValue(connection, "sAdoptionAppication");
@@ -158,8 +158,8 @@ public class AdoptionRepository {
                 transferPetControlToAdopter(connection, data.getPetId(), adopter.personId());
                 auditRepository.log(
                         connection,
-                        "Adopciones",
-                        "Registro",
+                        "Adoptions",
+                        "Record",
                         "pet:" + data.getPetId(),
                         adopter.displayName()
                 );
@@ -180,11 +180,11 @@ public class AdoptionRepository {
     public void updateFollowUp(long adoptionId, String followUpNotes, String followUpPhotoPath, Long currentPersonId, boolean admin)
             throws SQLException {
         if (adoptionId <= 0) {
-            throw new IllegalArgumentException("Seleccione una adopcion de la tabla.");
+            throw new IllegalArgumentException("Select an adoption from the list.");
         }
-        requireValue(followUpNotes, "Digite las notas de seguimiento.");
+        requireValue(followUpNotes, "Enter follow-up notes.");
         if (!admin && currentPersonId == null) {
-            throw new IllegalArgumentException("Debe iniciar sesion para actualizar el seguimiento.");
+            throw new IllegalArgumentException("You must sign in to update follow-up.");
         }
 
         try (Connection connection = ConexionBD.conectar()) {
@@ -218,13 +218,13 @@ public class AdoptionRepository {
                     int updatedRows = statement.executeUpdate();
                     if (updatedRows == 0) {
                         throw new IllegalArgumentException(
-                                "Solo una persona vinculada a la adopcion o un admin puede actualizar el seguimiento."
+                                "Only someone linked to the adoption or an admin can update follow-up."
                         );
                     }
                 }
 
                 insertOptionalPhoto(connection, adoptionId, "Follow-up", followUpPhotoPath);
-                auditRepository.log(connection, "Adopciones", "Seguimiento", "id:" + adoptionId, followUpNotes);
+                auditRepository.log(connection, "Adoptions", "Follow-up", "id:" + adoptionId, followUpNotes);
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
                 connection.rollback();
@@ -236,23 +236,23 @@ public class AdoptionRepository {
     }
 
     private void validateAdoption(AdoptionFormData data, Long currentPersonId, boolean admin) {
-        requireSelected(data.getPetId(), "Seleccione la mascota.");
-        requireValue(data.getAdopterEmail(), "Digite el correo del adoptante.");
+        requireSelected(data.getPetId(), "Select the pet.");
+        requireValue(data.getAdopterEmail(), "Enter the adopter email.");
         if (!data.getAdopterEmail().trim().matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
-            throw new IllegalArgumentException("El correo del adoptante no tiene un formato valido.");
+            throw new IllegalArgumentException("Adopter email has an invalid format.");
         }
         if (data.getAdoptionDate() == null) {
-            throw new IllegalArgumentException("Seleccione la fecha de adopcion.");
+            throw new IllegalArgumentException("Select the adoption date.");
         }
         requireValue(data.getYard(), "Indique si el adoptante tiene patio.");
         requireValue(data.getExerciseTime(), "Indique el tiempo de ejercicio.");
         requireValue(data.getHousingType(), "Indique el tipo de vivienda.");
-        requireValue(data.getOtherPets(), "Indique si hay otras mascotas.");
+        requireValue(data.getOtherPets(), "Indicate whether there are other pets.");
         requireValue(data.getAnswers(), "Complete las respuestas de la solicitud.");
-        requireValue(data.getRating(), "Seleccione la calificacion.");
+        requireValue(data.getRating(), "Select the rating.");
 
         if (!admin && currentPersonId == null) {
-            throw new IllegalArgumentException("Debe iniciar sesion como usuario para registrar adopciones.");
+            throw new IllegalArgumentException("You must sign in as a user to register adoptions.");
         }
     }
 
@@ -276,7 +276,7 @@ public class AdoptionRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
-                    throw new IllegalArgumentException("No existe un usuario adoptante con ese correo.");
+                    throw new IllegalArgumentException("No adopter user exists with that email.");
                 }
 
                 return new PersonSummary(resultSet.getLong("id"), resultSet.getString("displayName"));
@@ -320,13 +320,13 @@ public class AdoptionRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
-                    throw new IllegalArgumentException("La mascota seleccionada no existe.");
+                    throw new IllegalArgumentException("The selected pet does not exist.");
                 }
 
                 String statusName = resultSet.getString("statusName");
                 if (!isForAdoptionStatus(statusName)) {
                     throw new IllegalArgumentException(
-                            "Solo se puede registrar adopcion de mascotas que estan en adopcion."
+                            "Adoption can only be registered for pets that are for adoption."
                     );
                 }
             }
@@ -502,7 +502,7 @@ public class AdoptionRepository {
             }
         }
 
-        throw new IllegalArgumentException("No existe el estado Adopted en petStatus.");
+        throw new IllegalArgumentException("The Adopted status is not available.");
     }
 
     private void ensureRescuerProfile(Connection connection, long personId) throws SQLException {

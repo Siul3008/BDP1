@@ -27,16 +27,16 @@
                         <Image url="@/images/logo.png"/>
                     </image>
                 </ImageView>
-                <Label text="Bienestar Animal" styleClass="brand-title"/>
+                <Label text="Animal Welfare" styleClass="brand-title"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Probar conexión BD" onAction="#probarConexion" styleClass="secondary-button">
-                    <tooltip><Tooltip text="Verifica si la conexión con Oracle responde correctamente."/></tooltip>
+                <Button text="Check connection" onAction="#probarConexion" styleClass="secondary-button">
+                    <tooltip><Tooltip text="Checks whether the application can reach its services."/></tooltip>
                 </Button>
-                <Button text="Cerrar sesión" onAction="#cerrarSesion" styleClass="ghost-button">
-                    <tooltip><Tooltip text="Vuelve a la pantalla para escoger usuario o admin."/></tooltip>
+                <Button text="Sign out" onAction="#cerrarSesion" styleClass="ghost-button">
+                    <tooltip><Tooltip text="Returns to the sign-in screen."/></tooltip>
                 </Button>
-                <Button text="Salir" onAction="#salirSistema" styleClass="danger-button">
-                    <tooltip><Tooltip text="Cierra la aplicación."/></tooltip>
+                <Button text="Exit" onAction="#salirSistema" styleClass="danger-button">
+                    <tooltip><Tooltip text="Closes the application."/></tooltip>
                 </Button>
             </HBox>
         </VBox>
@@ -46,31 +46,31 @@
             <padding>
                 <Insets top="18" right="24" bottom="24" left="24"/>
             </padding>
-            <Label text="Módulos del usuario" styleClass="title-lg"/>
+            <Label text="User modules" styleClass="title-lg"/>
             <FlowPane hgap="16.0" vgap="16.0" prefWrapLength="1000">
-                <Button text="Mascotas" onAction="#abrirRegistrarMascota" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Abre el formulario principal para registrar publicaciones de mascotas."/></tooltip>
+                <Button text="Pets" onAction="#abrirRegistrarMascota" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Opens the main form to publish pets."/></tooltip>
                 </Button>
-                <Button text="Búsqueda" onAction="#abrirBuscarMascota" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Permite buscar mascotas por filtros como nombre, estado o ubicación."/></tooltip>
+                <Button text="Search" onAction="#abrirBuscarMascota" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Lets you search pets by filters such as name, status, or location."/></tooltip>
                 </Button>
-                <Button text="Listado de mascotas" onAction="#abrirListaMascotas" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Muestra una tabla general con los registros de mascotas."/></tooltip>
+                <Button text="Pet list" onAction="#abrirListaMascotas" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Shows a general list of pet records."/></tooltip>
                 </Button>
-                <Button text="Mi perfil" onAction="#abrirPerfil" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Administra datos del usuario y activa opciones como casa cuna o rescatista."/></tooltip>
+                <Button text="My profile" onAction="#abrirPerfil" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Manages user data and participation options such as foster home."/></tooltip>
                 </Button>
-                <Button text="Adopciones" onAction="#abrirAdopciones" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Abre la solicitud y el seguimiento de adopciones."/></tooltip>
+                <Button text="Adoptions" onAction="#abrirAdopciones" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Opens adoption requests and follow-up."/></tooltip>
                 </Button>
-                <Button fx:id="btnCasasCuna" text="Casa cuna" onAction="#abrirCasasCuna" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Permite registrar hogares temporales y sus condiciones."/></tooltip>
+                <Button fx:id="btnCasasCuna" text="Foster home" onAction="#abrirCasasCuna" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Lets users register temporary foster homes and their conditions."/></tooltip>
                 </Button>
-                <Button text="Donaciones" onAction="#abrirDonaciones" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Permite registrar o revisar aportes de donación."/></tooltip>
+                <Button text="Donations" onAction="#abrirDonaciones" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Lets users register or review donations."/></tooltip>
                 </Button>
-                <Button text="Lista negra" onAction="#abrirListaNegra" styleClass="menu-tile">
-                    <tooltip><Tooltip text="Permite reportar personas con calificacion y motivo."/></tooltip>
+                <Button text="Blacklist" onAction="#abrirListaNegra" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Lets users report people with a rating and reason."/></tooltip>
                 </Button>
             </FlowPane>
         </VBox>

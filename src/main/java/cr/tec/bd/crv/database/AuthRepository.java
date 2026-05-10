@@ -140,16 +140,16 @@ public class AuthRepository {
 
     // Validation stays in the repository because it protects database operations too.
     private void validateUserRegistration(UserRegistrationData data) {
-        requireValue(data.getFirstName(), "El primer nombre es obligatorio.");
-        requireValue(data.getFirstLastName(), "El primer apellido es obligatorio.");
-        requireValue(data.getIdentification(), "La identificacion es obligatoria.");
-        requireValue(data.getPrimaryEmail(), "El correo principal es obligatorio.");
-        requireValue(data.getPrimaryPhone(), "El telefono principal es obligatorio.");
-        requireValue(data.getPassword(), "La contrasena es obligatoria.");
-        validateEmail(data.getPrimaryEmail(), "El correo principal no tiene un formato valido.");
-        validateOptionalEmail(data.getSecondaryEmail(), "El correo adicional no tiene un formato valido.");
-        validatePhone(data.getPrimaryPhone(), "El telefono principal debe tener 8 digitos.");
-        validateOptionalPhone(data.getSecondaryPhone(), "El telefono adicional debe tener 8 digitos.");
+        requireValue(data.getFirstName(), "First name is required.");
+        requireValue(data.getFirstLastName(), "First last name is required.");
+        requireValue(data.getIdentification(), "Identification is required.");
+        requireValue(data.getPrimaryEmail(), "Primary email is required.");
+        requireValue(data.getPrimaryPhone(), "Primary phone is required.");
+        requireValue(data.getPassword(), "Password is required.");
+        validateEmail(data.getPrimaryEmail(), "Primary email has an invalid format.");
+        validateOptionalEmail(data.getSecondaryEmail(), "Additional email has an invalid format.");
+        validatePhone(data.getPrimaryPhone(), "Primary phone must have 8 digits.");
+        validateOptionalPhone(data.getSecondaryPhone(), "Additional phone must have 8 digits.");
         validatePassword(data.getPassword());
     }
 
@@ -191,7 +191,7 @@ public class AuthRepository {
                 || !normalizedPassword.matches(".*\\d.*")
                 || !normalizedPassword.matches(".*[^A-Za-z0-9].*")) {
             throw new IllegalArgumentException(
-                    "La contrasena debe tener minimo 8 caracteres, mayuscula, minuscula, numero y caracter especial."
+                    "Password must have at least 8 characters, uppercase, lowercase, number, and special character."
             );
         }
     }
@@ -211,7 +211,7 @@ public class AuthRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    throw new IllegalArgumentException("Ya existe una cuenta con ese correo o identificacion.");
+                    throw new IllegalArgumentException("An account already exists with that email or identification.");
                 }
             }
         }

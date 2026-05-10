@@ -32,13 +32,13 @@
                 </image>
             </ImageView>
             <VBox spacing="2.0">
-                <Label text="Donaciones" styleClass="brand-title"/>
-                <Label text="Registro de aportes y consulta administrativa" styleClass="brand-subtitle"/>
+                <Label text="Donations" styleClass="brand-title"/>
+                <Label text="Donation entry and administrative search" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button">
+            <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button">
                 <tooltip>
-                    <Tooltip text="Regresa al menu principal de la cuenta activa."/>
+                    <Tooltip text="Returns to the active account menu."/>
                 </tooltip>
             </Button>
         </HBox>
@@ -50,88 +50,88 @@
             </padding>
             <HBox spacing="18.0">
                 <VBox fx:id="pnlRegistroDonacion" spacing="12.0" prefWidth="410" styleClass="card form-card">
-                    <Label text="Nueva donacion" styleClass="title-lg"/>
+                    <Label text="New donation" styleClass="title-lg"/>
                     <Label fx:id="lblModoDonacion" text="" wrapText="true" styleClass="subtle-text"/>
                     <GridPane hgap="14.0" vgap="14.0">
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">
-                            <Label text="Asociacion beneficiada" styleClass="field-label"/>
-                            <ComboBox fx:id="cbAsociacionDonacion" promptText="Seleccione asociacion" maxWidth="Infinity"/>
+                            <Label text="Beneficiary association" styleClass="field-label"/>
+                            <ComboBox fx:id="cbAsociacionDonacion" promptText="Select association" maxWidth="Infinity"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                            <Label text="Moneda" styleClass="field-label"/>
+                            <Label text="Currency" styleClass="field-label"/>
                             <ComboBox fx:id="cbMonedaDonacion" promptText="CRC / USD"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                            <Label text="Monto" styleClass="field-label"/>
+                            <Label text="Amount" styleClass="field-label"/>
                             <TextField fx:id="txtMontoDonacion" promptText="0.00"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2">
-                            <Label text="Fecha de donacion" styleClass="field-label"/>
+                            <Label text="Donation date" styleClass="field-label"/>
                             <DatePicker fx:id="dpFechaDonacion"/>
                         </VBox>
                     </GridPane>
                     <HBox spacing="10.0">
-                        <Button fx:id="btnRegistrarDonacion" text="Registrar donacion" onAction="#registrarDonacion" styleClass="primary-button">
+                        <Button fx:id="btnRegistrarDonacion" text="Register donation" onAction="#registrarDonacion" styleClass="primary-button">
                             <tooltip>
-                                <Tooltip text="Guarda la donacion y la asocia con su usuario."/>
+                                <Tooltip text="Saves the donation and links it to your user."/>
                             </tooltip>
                         </Button>
-                        <Button text="Limpiar" onAction="#limpiarFormularioDonacion" styleClass="secondary-button">
+                        <Button text="Clear" onAction="#limpiarFormularioDonacion" styleClass="secondary-button">
                             <tooltip>
-                                <Tooltip text="Limpia los campos del formulario de donacion."/>
+                                <Tooltip text="Clears the donation form fields."/>
                             </tooltip>
                         </Button>
                     </HBox>
-                    <Label text="La distribucion se registra al 100% para la asociacion seleccionada." wrapText="true" styleClass="subtle-text"/>
+                    <Label text="The distribution is recorded as 100% for the selected association." wrapText="true" styleClass="subtle-text"/>
                 </VBox>
                 <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="card form-card">
-                    <Label text="Consulta de donaciones" styleClass="title-lg"/>
+                    <Label text="Donation search" styleClass="title-lg"/>
                     <GridPane hgap="14.0" vgap="14.0">
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                            <Label text="Desde" styleClass="field-label"/>
+                            <Label text="From" styleClass="field-label"/>
                             <DatePicker fx:id="dpDesdeFiltro"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                            <Label text="Hasta" styleClass="field-label"/>
+                            <Label text="To" styleClass="field-label"/>
                             <DatePicker fx:id="dpHastaFiltro"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                            <Label text="Donador" styleClass="field-label"/>
-                            <TextField fx:id="txtDonadorFiltro" promptText="Nombre o apellido"/>
+                            <Label text="Donor" styleClass="field-label"/>
+                            <TextField fx:id="txtDonadorFiltro" promptText="Name or last name"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="3" GridPane.rowIndex="0">
-                            <Label text="Asociacion" styleClass="field-label"/>
-                            <ComboBox fx:id="cbFiltroAsociacion" promptText="Todas"/>
+                            <Label text="Association" styleClass="field-label"/>
+                            <ComboBox fx:id="cbFiltroAsociacion" promptText="All"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="4" GridPane.rowIndex="0">
-                            <Label text="Monto exacto" styleClass="field-label"/>
+                            <Label text="Exact amount" styleClass="field-label"/>
                             <TextField fx:id="txtMontoFiltro" promptText="0.00"/>
                         </VBox>
                     </GridPane>
                     <HBox spacing="10.0">
-                        <Button text="Consultar" onAction="#buscarDonaciones" styleClass="primary-button">
+                        <Button text="Search" onAction="#buscarDonaciones" styleClass="primary-button">
                             <tooltip>
-                                <Tooltip text="Consulta donaciones por rango de fecha, donador o asociacion."/>
+                                <Tooltip text="Searches donations by date range, donor, or association."/>
                             </tooltip>
                         </Button>
-                        <Button text="Limpiar filtros" onAction="#limpiarFiltros" styleClass="secondary-button"/>
-                        <Button fx:id="btnEliminarDonacion" text="Eliminar seleccionada" onAction="#eliminarDonacionSeleccionada" styleClass="danger-button">
+                        <Button text="Clear filters" onAction="#limpiarFiltros" styleClass="secondary-button"/>
+                        <Button fx:id="btnEliminarDonacion" text="Delete selected" onAction="#eliminarDonacionSeleccionada" styleClass="danger-button">
                             <tooltip>
-                                <Tooltip text="Solo admin: elimina la donacion seleccionada."/>
+                                <Tooltip text="Admin only: deletes the selected donation."/>
                             </tooltip>
                         </Button>
                     </HBox>
-                    <Label fx:id="lblResumenDonaciones" text="0 registros" wrapText="true" styleClass="section-title"/>
+                    <Label fx:id="lblResumenDonaciones" text="0 records" wrapText="true" styleClass="section-title"/>
                 </VBox>
             </HBox>
             <VBox spacing="12.0" styleClass="card result-card">
-                <Label text="Resultados" styleClass="section-title"/>
+                <Label text="Results" styleClass="section-title"/>
                 <TableView fx:id="tablaDonaciones" prefHeight="330">
                     <columns>
-                        <TableColumn fx:id="colDonador" text="Donador" prefWidth="220"/>
-                        <TableColumn fx:id="colAsociacion" text="Asociacion" prefWidth="230"/>
-                        <TableColumn fx:id="colMonto" text="Monto" prefWidth="140"/>
-                        <TableColumn fx:id="colFecha" text="Fecha" prefWidth="130"/>
+                        <TableColumn fx:id="colDonador" text="Donor" prefWidth="220"/>
+                        <TableColumn fx:id="colAsociacion" text="Association" prefWidth="230"/>
+                        <TableColumn fx:id="colMonto" text="Amount" prefWidth="140"/>
+                        <TableColumn fx:id="colFecha" text="Date" prefWidth="130"/>
                     </columns>
                 </TableView>
             </VBox>

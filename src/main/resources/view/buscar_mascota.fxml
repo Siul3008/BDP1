@@ -31,11 +31,11 @@
                 </image>
             </ImageView>
             <VBox spacing="2.0">
-                <Label text="Busqueda de mascotas" styleClass="brand-title"/>
-                <Label text="Filtros conectados a los registros guardados" styleClass="brand-subtitle"/>
+                <Label text="Pet search" styleClass="brand-title"/>
+                <Label text="Filters for saved records" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button"/>
+            <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button"/>
         </HBox>
     </top>
     <center>
@@ -44,48 +44,48 @@
                 <Insets top="10" right="24" bottom="24" left="24"/>
             </padding>
             <VBox spacing="14.0" styleClass="card form-card">
-                <Label text="Filtros de consulta" styleClass="title-lg"/>
+                <Label text="Search filters" styleClass="title-lg"/>
                 <GridPane hgap="14.0" vgap="14.0">
                     <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                        <Label text="Criterio principal" styleClass="field-label"/>
-                        <TextField fx:id="txtBusqueda" promptText="Nombre, raza, color, chip o lugar"/>
+                        <Label text="Main criterion" styleClass="field-label"/>
+                        <TextField fx:id="txtBusqueda" promptText="Name, breed, color, chip, or place"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <Label text="Estado" styleClass="field-label"/>
-                        <ComboBox fx:id="cbEstado" promptText="Seleccione estado"/>
+                        <Label text="Status" styleClass="field-label"/>
+                        <ComboBox fx:id="cbEstado" promptText="Select status"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                        <Label text="Fecha desde" styleClass="field-label"/>
+                        <Label text="Date from" styleClass="field-label"/>
                         <DatePicker fx:id="dpDesde"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="3" GridPane.rowIndex="0">
-                        <Label text="Fecha hasta" styleClass="field-label"/>
+                        <Label text="Date to" styleClass="field-label"/>
                         <DatePicker fx:id="dpHasta"/>
                     </VBox>
                 </GridPane>
                 <HBox spacing="10.0">
-                    <Button text="Buscar" onAction="#buscarMascota" styleClass="primary-button"/>
-                    <Button text="Limpiar filtros" onAction="#limpiarBusqueda" styleClass="secondary-button"/>
-                    <Button text="Ver lista completa" onAction="#abrirListaMascotas" styleClass="ghost-button"/>
+                    <Button text="Search" onAction="#buscarMascota" styleClass="primary-button"/>
+                    <Button text="Clear filters" onAction="#limpiarBusqueda" styleClass="secondary-button"/>
+                    <Button text="View full list" onAction="#abrirListaMascotas" styleClass="ghost-button"/>
                 </HBox>
                 <Label fx:id="lblResultado" text="" wrapText="true" styleClass="message-label"/>
             </VBox>
             <HBox spacing="18.0">
                 <VBox spacing="10.0" HBox.hgrow="ALWAYS" styleClass="card result-card">
-                    <Label text="Resultados" styleClass="section-title"/>
+                    <Label text="Results" styleClass="section-title"/>
                     <TableView fx:id="tablaResultados" prefHeight="320">
                         <columns>
-                            <TableColumn fx:id="colMascota" text="Mascota" prefWidth="180"/>
-                            <TableColumn fx:id="colEstado" text="Estado" prefWidth="150"/>
-                            <TableColumn fx:id="colLugar" text="Lugar" prefWidth="260"/>
-                            <TableColumn fx:id="colFecha" text="Fecha" prefWidth="140"/>
+                            <TableColumn fx:id="colMascota" text="Pet" prefWidth="180"/>
+                            <TableColumn fx:id="colEstado" text="Status" prefWidth="150"/>
+                            <TableColumn fx:id="colLugar" text="Place" prefWidth="260"/>
+                            <TableColumn fx:id="colFecha" text="Date" prefWidth="140"/>
                         </columns>
                     </TableView>
                 </VBox>
                 <VBox spacing="12.0" prefWidth="280" styleClass="card side-summary">
-                    <Label text="Consejos de uso" styleClass="section-title"/>
-                    <Label text="Use nombre, raza, color, chip, provincia, canton o distrito para buscar." wrapText="true" styleClass="subtle-text"/>
-                    <Label text="Los resultados se ordenan por fecha descendente cuando la columna existe en la base." wrapText="true" styleClass="subtle-text"/>
+                    <Label text="Usage tips" styleClass="section-title"/>
+                    <Label text="Use name, breed, color, chip, province, canton, or district to search." wrapText="true" styleClass="subtle-text"/>
+                    <Label text="Results are sorted by newest date when the date is available." wrapText="true" styleClass="subtle-text"/>
                 </VBox>
             </HBox>
         </VBox>

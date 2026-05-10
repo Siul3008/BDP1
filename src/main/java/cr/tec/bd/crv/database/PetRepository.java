@@ -42,7 +42,7 @@ public class PetRepository {
             connection.setAutoCommit(false);
 
             try {
-                // Some scripts evolved during the project, so the repository checks real columns at runtime.
+                // Schema versions can differ, so the repository checks real columns at runtime.
                 Set<String> petColumns = findColumnNames(connection, "PET");
                 Map<String, Integer> petColumnSizes = findColumnSizes(connection, "PET");
                 List<String> warnings = new ArrayList<>();
@@ -62,7 +62,7 @@ public class PetRepository {
                 }
                 insertOptionalHealthAndVeterinarian(connection, petId, data);
                 insertPetReportIfNeeded(connection, data);
-                auditRepository.log(connection, "Mascotas", "Crear", "-", data.getName());
+                auditRepository.log(connection, "Pets", "Crear", "-", data.getName());
 
                 connection.commit();
                 return warnings;
@@ -81,6 +81,16 @@ public class PetRepository {
     public PetFormData findPetForEdit(long petId) throws SQLException {
         try (Connection connection = ConexionBD.conectar()) {
             String sql = """
+                    WITH latestReward AS (
+                        SELECT idPet, MAX(id) AS idReward
+                        FROM reward
+                        GROUP BY idPet
+                    ),
+                    latestHealth AS (
+                        SELECT idPet, MAX(idHealthStatus) AS idHealthStatus
+                        FROM petxHealthStatus
+                        GROUP BY idPet
+                    )
                     SELECT
                         p.idPetType,
                         p.idBreed,
@@ -140,18 +150,14 @@ public class PetRepository {
                     FROM pet p
                     LEFT JOIN petPhoto pp
                         ON pp.id = p.idPetPhoto
+                    LEFT JOIN latestReward lr
+                        ON lr.idPet = p.id
                     LEFT JOIN reward rw
-                        ON rw.id = (
-                            SELECT MAX(r2.id)
-                            FROM reward r2
-                            WHERE r2.idPet = p.id
-                        )
+                        ON rw.id = lr.idReward
+                    LEFT JOIN latestHealth lh
+                        ON lh.idPet = p.id
                     LEFT JOIN healthStatus hs
-                        ON hs.id = (
-                            SELECT MAX(pxhs.idHealthStatus)
-                            FROM petxHealthStatus pxhs
-                            WHERE pxhs.idPet = p.id
-                        )
+                        ON hs.id = lh.idHealthStatus
                     WHERE p.id = ?
                     """;
 
@@ -160,7 +166,7 @@ public class PetRepository {
 
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (!resultSet.next()) {
-                        throw new IllegalArgumentException("La mascota seleccionada no existe.");
+                        throw new IllegalArgumentException("The selected pet does not exist.");
                     }
 
                     Date eventDate = resultSet.getDate("eventDate");
@@ -210,7 +216,7 @@ public class PetRepository {
             try {
                 ensurePetExists(connection, petId);
                 if (!admin && !userControlsPet(connection, petId, currentPersonId)) {
-                    throw new IllegalArgumentException("Solo quien controla la publicacion puede editar esta mascota.");
+                    throw new IllegalArgumentException("Only the publication controller can edit this pet.");
                 }
 
                 Set<String> petColumns = findColumnNames(connection, "PET");
@@ -223,7 +229,7 @@ public class PetRepository {
                 upsertReward(connection, petId, data.getCurrencyId(), data.getRewardAmount());
                 insertOptionalHealthAndVeterinarian(connection, petId, data);
                 insertPetReportIfNeeded(connection, data);
-                auditRepository.log(connection, "Mascotas", "Editar", "pet:" + petId, data.getName());
+                auditRepository.log(connection, "Pets", "Editar", "pet:" + petId, data.getName());
 
                 connection.commit();
                 return warnings;
@@ -316,11 +322,11 @@ public class PetRepository {
                 int updatedRows = statement.executeUpdate();
                 if (updatedRows == 0) {
                     throw new IllegalArgumentException(
-                            "Solo quien creo la publicacion o un administrador puede cambiar ese estado."
+                            "Only the publication creator or an admin can change that status."
                     );
                 }
                 insertPetReportForExistingPetIfNeeded(connection, petId);
-                auditRepository.log(connection, "Mascotas", "Estado", "pet:" + petId, "status:" + statusId);
+                auditRepository.log(connection, "Pets", "Status", "pet:" + petId, "status:" + statusId);
             }
         }
     }
@@ -341,13 +347,13 @@ public class PetRepository {
                 ensureFosterHomeExists(connection, fosterHomePersonId);
                 if (!admin && !userControlsPet(connection, petId, currentPersonId)) {
                     throw new IllegalArgumentException(
-                            "Solo quien controla la publicacion puede pasarla a una casa cuna."
+                            "Only the publication controller can transfer it to a foster home."
                     );
                 }
 
                 ensureRescuerProfile(connection, fosterHomePersonId);
                 replacePetController(connection, petId, fosterHomePersonId);
-                auditRepository.log(connection, "Mascotas", "Casa cuna", "pet:" + petId, "person:" + fosterHomePersonId);
+                auditRepository.log(connection, "Pets", "Foster home", "pet:" + petId, "person:" + fosterHomePersonId);
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
                 connection.rollback();
@@ -497,7 +503,7 @@ public class PetRepository {
         if (petColumns.contains("EVENTDATE")) {
             addColumn(columns, values, "eventDate", data.getEventDate() == null ? null : Date.valueOf(data.getEventDate()));
         } else if (data.getEventDate() != null) {
-            warnings.add("La fecha no se guardo porque falta la columna pet.eventDate.");
+            warnings.add("The date was not saved because the event date field is unavailable.");
         }
 
         StringJoiner columnJoiner = new StringJoiner(", ");
@@ -543,7 +549,7 @@ public class PetRepository {
         if (petColumns.contains("CHIP")) {
             addAssignment(assignments, values, petColumnSizes, "chip", "CHIP", data.getChip());
         } else if (emptyToNull(data.getChip()) != null) {
-            warnings.add("No se actualizo chip porque falta la columna pet.chip.");
+            warnings.add("The chip was not updated because the pet.chip field is unavailable.");
         }
 
         if (petColumns.contains("EVENTDATE") && data.getEventDate() != null) {
@@ -703,7 +709,7 @@ public class PetRepository {
         }
 
         if (emptyToNull(value) != null) {
-            warnings.add("No se guardo " + sqlName + " porque falta la columna pet." + sqlName + ".");
+            warnings.add("The " + sqlName + " value was not saved because the pet." + sqlName + " field is unavailable.");
         }
     }
 
@@ -1086,74 +1092,74 @@ public class PetRepository {
     }
 
     private void validatePet(PetFormData data) {
-        requireValue(data.getName(), "El nombre de la mascota es obligatorio.");
-        requireSelected(data.getPetTypeId(), "Seleccione el tipo de mascota.");
-        requireSelected(data.getBreedId(), "Seleccione la raza.");
-        requireSelected(data.getPetStatusId(), "Seleccione el estado.");
-        requireSelected(data.getColorId(), "Seleccione el color.");
-        requireSelected(data.getPetSizeId(), "Seleccione el tamano.");
-        requireSelected(data.getDistrictId(), "Seleccione provincia, canton y distrito.");
+        requireValue(data.getName(), "Pet name is required.");
+        requireSelected(data.getPetTypeId(), "Select the pet type.");
+        requireSelected(data.getBreedId(), "Select the breed.");
+        requireSelected(data.getPetStatusId(), "Select the status.");
+        requireSelected(data.getColorId(), "Select the color.");
+        requireSelected(data.getPetSizeId(), "Select the size.");
+        requireSelected(data.getDistrictId(), "Select province, canton, and district.");
         if (data.getEventDate() == null) {
-            throw new IllegalArgumentException("Seleccione la fecha del evento o publicacion.");
+            throw new IllegalArgumentException("Select the event or publication date.");
         }
 
         if (emptyToNull(data.getContactEmail()) == null && emptyToNull(data.getContactPhone()) == null) {
-            throw new IllegalArgumentException("Indique al menos un correo o telefono de contacto.");
+            throw new IllegalArgumentException("Enter at least one contact email or phone.");
         }
 
         String phone = emptyToNull(data.getContactPhone());
         if (phone != null && !phone.matches("\\d{8}")) {
-            throw new IllegalArgumentException("El telefono de contacto debe tener 8 digitos.");
+            throw new IllegalArgumentException("Contact phone must have 8 digits.");
         }
 
         String email = emptyToNull(data.getContactEmail());
         if (email != null && !email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
-            throw new IllegalArgumentException("El correo de contacto no tiene un formato valido.");
+            throw new IllegalArgumentException("Contact email has an invalid format.");
         }
 
         if (data.getRewardAmount() != null
                 && data.getRewardAmount().compareTo(BigDecimal.ZERO) > 0
                 && data.getCurrencyId() == null) {
-            throw new IllegalArgumentException("Seleccione la moneda de la recompensa.");
+            throw new IllegalArgumentException("Select the reward currency.");
         }
     }
 
     private void validateStatusChange(long petId, long statusId, Long currentPersonId, boolean admin) {
         if (petId <= 0) {
-            throw new IllegalArgumentException("Seleccione una mascota valida.");
+            throw new IllegalArgumentException("Select a valid pet.");
         }
 
         if (statusId <= 0) {
-            throw new IllegalArgumentException("Seleccione un estado valido.");
+            throw new IllegalArgumentException("Select a valid status.");
         }
 
         if (!admin && currentPersonId == null) {
-            throw new IllegalArgumentException("Debe iniciar sesion para cambiar el estado.");
+            throw new IllegalArgumentException("You must sign in to change the status.");
         }
     }
 
     private void validatePetUpdate(long petId, PetFormData data, Long currentPersonId, boolean admin) {
         if (petId <= 0) {
-            throw new IllegalArgumentException("Seleccione una mascota valida.");
+            throw new IllegalArgumentException("Select a valid pet.");
         }
         validatePet(data);
 
         if (!admin && currentPersonId == null) {
-            throw new IllegalArgumentException("Debe iniciar sesion para editar mascotas.");
+            throw new IllegalArgumentException("You must sign in to edit pets.");
         }
     }
 
     private void validateControlTransfer(long petId, long fosterHomePersonId, Long currentPersonId, boolean admin) {
         if (petId <= 0) {
-            throw new IllegalArgumentException("Seleccione una mascota valida.");
+            throw new IllegalArgumentException("Select a valid pet.");
         }
 
         if (fosterHomePersonId <= 0) {
-            throw new IllegalArgumentException("Seleccione una casa cuna valida.");
+            throw new IllegalArgumentException("Select a valid foster home.");
         }
 
         if (!admin && currentPersonId == null) {
-            throw new IllegalArgumentException("Debe iniciar sesion para pasar el control.");
+            throw new IllegalArgumentException("You must sign in to transfer control.");
         }
     }
 
@@ -1164,7 +1170,7 @@ public class PetRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
-                    throw new IllegalArgumentException("La mascota seleccionada no existe.");
+                    throw new IllegalArgumentException("The selected pet does not exist.");
                 }
             }
         }
@@ -1184,13 +1190,13 @@ public class PetRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
-                    throw new IllegalArgumentException("La mascota seleccionada no existe.");
+                    throw new IllegalArgumentException("The selected pet does not exist.");
                 }
 
                 String statusName = resultSet.getString("statusName");
                 if (!isForAdoptionStatus(statusName)) {
                     throw new IllegalArgumentException(
-                            "Solo se puede transferir el control de mascotas que estan en adopcion."
+                            "Control can only be transferred for pets that are for adoption."
                     );
                 }
             }
@@ -1204,7 +1210,7 @@ public class PetRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
-                    throw new IllegalArgumentException("La casa cuna seleccionada no esta activa.");
+                    throw new IllegalArgumentException("The selected foster home is not active.");
                 }
             }
         }
@@ -1259,7 +1265,7 @@ public class PetRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
-                    throw new IllegalArgumentException("El estado seleccionado no existe en la base de datos.");
+                    throw new IllegalArgumentException("The selected status is not available.");
                 }
             }
         }
@@ -1273,13 +1279,13 @@ public class PetRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
-                    throw new IllegalArgumentException("El estado seleccionado no existe en la base de datos.");
+                    throw new IllegalArgumentException("The selected status is not available.");
                 }
 
                 String statusName = resultSet.getString("statusName");
                 if (isAdoptedStatus(statusName)) {
                     throw new IllegalArgumentException(
-                            "Para marcar una mascota como adoptada use el modulo de Adopciones, asi se registra el adoptante."
+                            "To mark a pet as adopted, use the Adoptions module so the adopter is recorded."
                     );
                 }
             }

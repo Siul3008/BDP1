@@ -31,13 +31,13 @@
                 </image>
             </ImageView>
             <VBox spacing="2.0">
-                <Label text="Mi perfil" styleClass="brand-title"/>
-                <Label text="Datos de cuenta, contacto y participacion" styleClass="brand-subtitle"/>
+                <Label text="My profile" styleClass="brand-title"/>
+                <Label text="Account, contact, and participation data" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button">
+            <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button">
                 <tooltip>
-                    <Tooltip text="Regresa al menu principal."/>
+                    <Tooltip text="Returns to the main menu."/>
                 </tooltip>
             </Button>
         </HBox>
@@ -55,111 +55,111 @@
                         </image>
                     </ImageView>
                     <VBox spacing="3.0">
-                        <Label fx:id="lblPerfilNombre" text="Usuario" styleClass="section-title"/>
-                        <Label fx:id="lblPerfilCorreo" text="correo@ejemplo.com" styleClass="subtle-text"/>
+                        <Label fx:id="lblPerfilNombre" text="User" styleClass="section-title"/>
+                        <Label fx:id="lblPerfilCorreo" text="email@example.com" styleClass="subtle-text"/>
                     </VBox>
                 </HBox>
                 <Separator/>
-                <Button text="Cuenta" onAction="#mostrarCuenta" styleClass="profile-nav-button"/>
-                <Button text="Contacto" onAction="#mostrarContacto" styleClass="profile-nav-button"/>
-                <Button text="Seguridad" onAction="#mostrarSeguridad" styleClass="profile-nav-button"/>
-                <Button text="Casa cuna" onAction="#mostrarCasaCuna" styleClass="profile-nav-button"/>
+                <Button text="Account" onAction="#mostrarCuenta" styleClass="profile-nav-button"/>
+                <Button text="Contact" onAction="#mostrarContacto" styleClass="profile-nav-button"/>
+                <Button text="Security" onAction="#mostrarSeguridad" styleClass="profile-nav-button"/>
+                <Button text="Foster home" onAction="#mostrarCasaCuna" styleClass="profile-nav-button"/>
             </VBox>
             <ScrollPane fitToWidth="true" HBox.hgrow="ALWAYS" styleClass="plain-scroll">
                 <content>
                     <VBox spacing="16.0" styleClass="card profile-content">
                         <VBox fx:id="paneCuenta" spacing="16.0">
-                            <Label text="Cuenta" styleClass="title-lg"/>
-                            <Label text="Actualiza tus nombres y apellidos. La identificacion queda fija para proteger el sistema de blacklist."
+                            <Label text="Account" styleClass="title-lg"/>
+                            <Label text="Update your names and last names. Identification stays fixed to protect the blacklist process."
                                    wrapText="true"
                                    styleClass="subtle-text"/>
                             <GridPane hgap="14.0" vgap="14.0">
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                    <Label text="Primer nombre" styleClass="field-label"/>
-                                    <TextField fx:id="txtPrimerNombre" promptText="Primer nombre"/>
+                                    <Label text="First name" styleClass="field-label"/>
+                                    <TextField fx:id="txtPrimerNombre" promptText="First name"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                    <Label text="Segundo nombre" styleClass="field-label"/>
-                                    <TextField fx:id="txtSegundoNombre" promptText="Opcional"/>
+                                    <Label text="Middle name" styleClass="field-label"/>
+                                    <TextField fx:id="txtSegundoNombre" promptText="Optional"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                    <Label text="Primer apellido" styleClass="field-label"/>
-                                    <TextField fx:id="txtPrimerApellido" promptText="Primer apellido"/>
+                                    <Label text="First last name" styleClass="field-label"/>
+                                    <TextField fx:id="txtPrimerApellido" promptText="First last name"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                    <Label text="Segundo apellido" styleClass="field-label"/>
-                                    <TextField fx:id="txtSegundoApellido" promptText="Opcional"/>
+                                    <Label text="Second last name" styleClass="field-label"/>
+                                    <TextField fx:id="txtSegundoApellido" promptText="Optional"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                                    <Label text="Identificacion" styleClass="field-label"/>
-                                    <TextField fx:id="txtIdentificacion" editable="false" promptText="Identificacion"/>
+                                    <Label text="Identification" styleClass="field-label"/>
+                                    <TextField fx:id="txtIdentificacion" editable="false" promptText="Identification"/>
                                 </VBox>
                             </GridPane>
                             <HBox spacing="10.0">
-                                <Button text="Guardar cuenta" onAction="#guardarCuenta" styleClass="primary-button"/>
+                                <Button text="Save account" onAction="#guardarCuenta" styleClass="primary-button"/>
                             </HBox>
                         </VBox>
 
                         <VBox fx:id="paneContacto" spacing="16.0" visible="false" managed="false">
-                            <Label text="Contacto" styleClass="title-lg"/>
-                            <Label text="El correo principal tambien es el correo usado para iniciar sesion."
+                            <Label text="Contact" styleClass="title-lg"/>
+                            <Label text="The primary email is also used to sign in."
                                    wrapText="true"
                                    styleClass="subtle-text"/>
                             <GridPane hgap="14.0" vgap="14.0">
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                    <Label text="Correo principal" styleClass="field-label"/>
-                                    <TextField fx:id="txtCorreoPrincipal" promptText="correo@ejemplo.com"/>
+                                    <Label text="Primary email" styleClass="field-label"/>
+                                    <TextField fx:id="txtCorreoPrincipal" promptText="email@example.com"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                    <Label text="Telefono principal" styleClass="field-label"/>
+                                    <Label text="Primary phone" styleClass="field-label"/>
                                     <TextField fx:id="txtTelefonoPrincipal" promptText="88888888"/>
                                 </VBox>
                             </GridPane>
                             <HBox spacing="10.0">
-                                <Button text="Guardar contacto" onAction="#guardarContacto" styleClass="primary-button"/>
+                                <Button text="Save contact" onAction="#guardarContacto" styleClass="primary-button"/>
                             </HBox>
                         </VBox>
 
                         <VBox fx:id="paneSeguridad" spacing="16.0" visible="false" managed="false">
-                            <Label text="Seguridad" styleClass="title-lg"/>
-                            <Label text="Cambia tu contrasena usando la contrasena actual como confirmacion."
+                            <Label text="Security" styleClass="title-lg"/>
+                            <Label text="Change your password using the current password as confirmation."
                                    wrapText="true"
                                    styleClass="subtle-text"/>
                             <GridPane hgap="14.0" vgap="14.0">
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                    <Label text="Contrasena actual" styleClass="field-label"/>
-                                    <PasswordField fx:id="txtContrasenaActual" promptText="Contrasena actual"/>
+                                    <Label text="Current password" styleClass="field-label"/>
+                                    <PasswordField fx:id="txtContrasenaActual" promptText="Current password"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                    <Label text="Nueva contrasena" styleClass="field-label"/>
-                                    <PasswordField fx:id="txtContrasenaNueva" promptText="Nueva contrasena"/>
+                                    <Label text="New password" styleClass="field-label"/>
+                                    <PasswordField fx:id="txtContrasenaNueva" promptText="New password"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                    <Label text="Confirmar contrasena" styleClass="field-label"/>
-                                    <PasswordField fx:id="txtConfirmarContrasena" promptText="Confirmar contrasena"/>
+                                    <Label text="Confirm password" styleClass="field-label"/>
+                                    <PasswordField fx:id="txtConfirmarContrasena" promptText="Confirm password"/>
                                 </VBox>
                             </GridPane>
                             <HBox spacing="10.0">
-                                <Button text="Cambiar contrasena" onAction="#cambiarContrasena" styleClass="primary-button"/>
+                                <Button text="Change password" onAction="#cambiarContrasena" styleClass="primary-button"/>
                             </HBox>
                         </VBox>
 
                         <VBox fx:id="paneCasaCuna" spacing="16.0" visible="false" managed="false">
-                            <Label text="Casa cuna" styleClass="title-lg"/>
+                            <Label text="Foster home" styleClass="title-lg"/>
                             <Label fx:id="lblEstadoCasaCuna"
-                                   text="Revisando estado de casa cuna..."
+                                   text="Checking foster home status..."
                                    wrapText="true"
                                    styleClass="subtle-text"/>
-                            <Label text="Esta seccion activa o edita las condiciones de alojamiento temporal, sin mezclarlo con los datos normales del perfil."
+                            <Label text="This section activates or edits temporary foster conditions without mixing them with normal profile data."
                                    wrapText="true"
                                    styleClass="subtle-text"/>
                             <HBox spacing="10.0">
                                 <Button fx:id="btnCasaCuna"
-                                        text="Activar casa cuna"
+                                        text="Activate foster home"
                                         onAction="#abrirCasaCuna"
                                         styleClass="primary-button">
                                     <tooltip>
-                                        <Tooltip text="Abre la configuracion de condiciones para casa cuna."/>
+                                        <Tooltip text="Opens the foster home condition setup."/>
                                     </tooltip>
                                 </Button>
                             </HBox>

@@ -29,12 +29,12 @@
                 </image>
             </ImageView>
             <VBox spacing="2.0">
-                <Label text="Lista de mascotas" styleClass="brand-title"/>
-                <Label text="Tabla general conectada a Oracle" styleClass="brand-subtitle"/>
+                <Label text="Pet list" styleClass="brand-title"/>
+                <Label text="General pet list" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Nuevo registro" onAction="#abrirRegistro" styleClass="secondary-button"/>
-            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button"/>
+            <Button text="New record" onAction="#abrirRegistro" styleClass="secondary-button"/>
+            <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button"/>
         </HBox>
     </top>
     <center>
@@ -45,63 +45,63 @@
             <HBox spacing="16.0">
                 <VBox spacing="6.0" prefWidth="220" styleClass="card mini-stat">
                     <Label fx:id="lblTotalMascotas" text="0" styleClass="stat-number"/>
-                    <Label text="Registros guardados" styleClass="subtle-text"/>
+                    <Label text="Saved records" styleClass="subtle-text"/>
                 </VBox>
                 <VBox spacing="6.0" prefWidth="220" styleClass="card mini-stat">
                     <Label fx:id="lblAdopcion" text="0" styleClass="stat-number"/>
-                    <Label text="Mascotas en adopcion" styleClass="subtle-text"/>
+                    <Label text="Pets for adoption" styleClass="subtle-text"/>
                 </VBox>
                 <VBox spacing="6.0" prefWidth="220" styleClass="card mini-stat">
                     <Label fx:id="lblPerdidas" text="0" styleClass="stat-number"/>
-                    <Label text="Mascotas perdidas" styleClass="subtle-text"/>
+                    <Label text="Lost pets" styleClass="subtle-text"/>
                 </VBox>
             </HBox>
             <VBox spacing="12.0" styleClass="card result-card">
-                <Label text="Registros consultados" styleClass="title-lg"/>
+                <Label text="Loaded records" styleClass="title-lg"/>
                 <VBox spacing="10.0">
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                         <CheckBox fx:id="chkSoloMisMascotas"
-                                  text="Ver solo mis mascotas"
+                                  text="Show only my pets"
                                   onAction="#recargarMascotas"/>
-                        <Button text="Actualizar lista"
+                        <Button text="Refresh list"
                                 onAction="#recargarMascotas"
                                 styleClass="ghost-button"/>
-                        <Button text="Editar seleccionada"
+                        <Button text="Edit selected"
                                 onAction="#editarMascotaSeleccionada"
                                 styleClass="secondary-button"/>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
-                        <Label text="Nuevo estado" styleClass="field-label"/>
-                        <ComboBox fx:id="cbNuevoEstado" promptText="Seleccione estado" prefWidth="220"/>
-                        <Button text="Cambiar estado"
+                        <Label text="New status" styleClass="field-label"/>
+                        <ComboBox fx:id="cbNuevoEstado" promptText="Select status" prefWidth="220"/>
+                        <Button text="Change status"
                                 onAction="#cambiarEstadoMascota"
                                 styleClass="primary-button"/>
                     </HBox>
                     <VBox spacing="8.0">
                         <CheckBox fx:id="chkTransferirCasaCuna"
-                                  text="Opcional: transferir control a una casa cuna"
+                                  text="Optional: transfer control to a foster home"
                                   onAction="#configurarTransferenciaCasaCuna"/>
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <Label text="Casa cuna" styleClass="field-label"/>
-                            <ComboBox fx:id="cbCasaCuna" promptText="Seleccione casa cuna" prefWidth="260"/>
+                            <Label text="Foster home" styleClass="field-label"/>
+                            <ComboBox fx:id="cbCasaCuna" promptText="Select foster home" prefWidth="260"/>
                             <Button fx:id="btnTransferirControl"
-                                    text="Transferir control"
+                                    text="Transfer control"
                                 onAction="#pasarControlCasaCuna"
                                 styleClass="secondary-button"/>
                         </HBox>
                     </VBox>
-                    <Label text="Cambiar estado no requiere casa cuna. La transferencia es opcional y solo mueve el control de la publicacion."
+                    <Label text="Changing status does not require a foster home. Transfer is optional and only moves publication control."
                            wrapText="true"
                            styleClass="subtle-text"/>
                 </VBox>
                 <TableView fx:id="tablaMascotas" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="colId" text="ID" prefWidth="70"/>
-                        <TableColumn fx:id="colNombre" text="Nombre" prefWidth="160"/>
-                        <TableColumn fx:id="colTipo" text="Tipo" prefWidth="130"/>
-                        <TableColumn fx:id="colRaza" text="Raza" prefWidth="180"/>
+                        <TableColumn fx:id="colNombre" text="Name" prefWidth="160"/>
+                        <TableColumn fx:id="colTipo" text="Type" prefWidth="130"/>
+                        <TableColumn fx:id="colRaza" text="Breed" prefWidth="180"/>
                         <TableColumn fx:id="colColor" text="Color" prefWidth="130"/>
-                        <TableColumn fx:id="colEstado" text="Estado" prefWidth="180"/>
+                        <TableColumn fx:id="colEstado" text="Status" prefWidth="180"/>
                     </columns>
                 </TableView>
                 <Label fx:id="lblMensaje" text="" wrapText="true" styleClass="message-label"/>

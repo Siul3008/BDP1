@@ -32,11 +32,11 @@
                 </image>
             </ImageView>
             <VBox spacing="2.0">
-                <Label text="Parametros" styleClass="brand-title"/>
-                <Label text="Mantenimiento de catalogos administrables" styleClass="brand-subtitle"/>
+                <Label text="Parameters" styleClass="brand-title"/>
+                <Label text="Manageable catalog maintenance" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menu" onAction="#backToMenu" styleClass="ghost-button"/>
+            <Button text="Back to menu" onAction="#backToMenu" styleClass="ghost-button"/>
         </HBox>
     </top>
     <center>
@@ -45,51 +45,51 @@
                 <Insets top="10" right="24" bottom="24" left="24"/>
             </padding>
             <VBox spacing="12.0" styleClass="card form-card">
-                <Label text="Catalogo a administrar" styleClass="title-lg"/>
+                <Label text="Catalog to manage" styleClass="title-lg"/>
                 <GridPane hgap="14.0" vgap="14.0">
                     <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                        <Label text="Categoria" styleClass="field-label"/>
-                        <ComboBox fx:id="cbCategory" promptText="Seleccione categoria" maxWidth="Infinity"/>
+                        <Label text="Category" styleClass="field-label"/>
+                        <ComboBox fx:id="cbCategory" promptText="Select category" maxWidth="Infinity"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <Label fx:id="lblName" text="Nombre" styleClass="field-label"/>
-                        <TextField fx:id="txtName" promptText="Nombre del registro"/>
+                        <Label fx:id="lblName" text="Name" styleClass="field-label"/>
+                        <TextField fx:id="txtName" promptText="Record name"/>
                     </VBox>
                     <VBox fx:id="boxPetType" spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                        <Label text="Tipo de mascota" styleClass="field-label"/>
-                        <ComboBox fx:id="cbPetType" promptText="Tipo relacionado"/>
+                        <Label text="Pet type" styleClass="field-label"/>
+                        <ComboBox fx:id="cbPetType" promptText="Related type"/>
                     </VBox>
                     <VBox fx:id="boxExtra" spacing="6.0" GridPane.columnIndex="3" GridPane.rowIndex="0">
-                        <Label fx:id="lblExtra" text="Valor" styleClass="field-label"/>
-                        <TextField fx:id="txtExtra" promptText="Valor adicional"/>
+                        <Label fx:id="lblExtra" text="Value" styleClass="field-label"/>
+                        <TextField fx:id="txtExtra" promptText="Additional value"/>
                     </VBox>
                     <VBox fx:id="boxDescription" spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="4">
-                        <Label text="Descripcion" styleClass="field-label"/>
-                        <TextArea fx:id="txtDescription" prefRowCount="2" promptText="Descripcion del parametro"/>
+                        <Label text="Description" styleClass="field-label"/>
+                        <TextArea fx:id="txtDescription" prefRowCount="2" promptText="Parameter description"/>
                     </VBox>
                 </GridPane>
                 <HBox spacing="10.0">
-                    <Button text="Guardar" onAction="#saveParameter" styleClass="primary-button">
+                    <Button text="Save" onAction="#saveParameter" styleClass="primary-button">
                         <tooltip>
-                            <Tooltip text="Crea o actualiza el registro seleccionado."/>
+                            <Tooltip text="Creates or updates the selected record."/>
                         </tooltip>
                     </Button>
-                    <Button text="Nuevo" onAction="#newParameter" styleClass="secondary-button"/>
-                    <Button text="Actualizar lista" onAction="#loadRecords" styleClass="ghost-button"/>
+                    <Button text="New" onAction="#newParameter" styleClass="secondary-button"/>
+                    <Button text="Refresh list" onAction="#loadRecords" styleClass="ghost-button"/>
                 </HBox>
                 <Label fx:id="lblMessage" text="" wrapText="true" styleClass="message-label"/>
             </VBox>
             <VBox spacing="12.0" styleClass="card result-card">
                 <HBox alignment="CENTER_LEFT">
-                    <Label text="Registros del catalogo" styleClass="section-title"/>
+                    <Label text="Catalog records" styleClass="section-title"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="lblSummary" text="0 registro(s)" styleClass="message-label"/>
+                    <Label fx:id="lblSummary" text="0 record(s)" styleClass="message-label"/>
                 </HBox>
                 <TableView fx:id="tableParameters" prefHeight="390">
                     <columns>
                         <TableColumn fx:id="colId" text="ID" prefWidth="90"/>
-                        <TableColumn fx:id="colName" text="Nombre" prefWidth="330"/>
-                        <TableColumn fx:id="colExtra" text="Detalle" prefWidth="360"/>
+                        <TableColumn fx:id="colName" text="Name" prefWidth="330"/>
+                        <TableColumn fx:id="colExtra" text="Detail" prefWidth="360"/>
                     </columns>
                 </TableView>
             </VBox>

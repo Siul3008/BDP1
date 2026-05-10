@@ -22,11 +22,11 @@ public class ModuloPlantillaController {
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
         if (SessionContext.isAdmin()) {
-            NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
+            NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administration");
             return;
         }
 
-        NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+        NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Animal Welfare");
     }
 
     /**

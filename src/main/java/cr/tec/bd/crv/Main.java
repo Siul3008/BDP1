@@ -1,7 +1,9 @@
 package cr.tec.bd.crv;
 
+import cr.tec.bd.crv.util.NavigationUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -23,12 +25,13 @@ public class Main extends Application {
         );
 
         // All screens share the same stylesheet so the visual identity stays consistent.
-        Scene scene = new Scene(loader.load(), 1200, 780);
+        Parent root = loader.load();
+        Scene scene = new Scene(NavigationUtil.wrapScrollable(root), 1200, 780);
         scene.getStylesheets().add(
                 Main.class.getResource("/styles/style.css").toExternalForm()
         );
 
-        stage.setTitle("BDP1 - Bienestar Animal");
+        stage.setTitle("BDP1 - Animal Welfare");
         stage.setScene(scene);
         stage.setResizable(true);
 

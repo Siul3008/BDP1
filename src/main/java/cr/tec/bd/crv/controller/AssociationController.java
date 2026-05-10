@@ -59,7 +59,7 @@ public class AssociationController {
         tablaAsociaciones.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, selected) -> {
             if (selected != null) {
                 txtNombreAsociacion.setText(selected.getName());
-                lblMensajeAsociacion.setText("Editando asociacion seleccionada.");
+                lblMensajeAsociacion.setText("Editing selected association.");
             }
         });
     }
@@ -72,12 +72,12 @@ public class AssociationController {
         try {
             associationRepository.registerAssociation(txtNombreAsociacion.getText());
             txtNombreAsociacion.clear();
-            lblMensajeAsociacion.setText("Asociacion registrada correctamente.");
+            lblMensajeAsociacion.setText("Association registered successfully.");
             loadAssociations();
         } catch (IllegalArgumentException e) {
             lblMensajeAsociacion.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensajeAsociacion.setText("No se pudo registrar la asociacion: " + e.getMessage());
+            lblMensajeAsociacion.setText("Could not register the association: " + e.getMessage());
         }
     }
 
@@ -86,18 +86,18 @@ public class AssociationController {
         // Updates only the selected association to avoid changing the wrong organization.
         AssociationRecord selectedAssociation = tablaAsociaciones.getSelectionModel().getSelectedItem();
         if (selectedAssociation == null) {
-            lblMensajeAsociacion.setText("Seleccione una asociacion de la tabla.");
+            lblMensajeAsociacion.setText("Select an association from the list.");
             return;
         }
 
         try {
             associationRepository.updateAssociationName(selectedAssociation.getId(), txtNombreAsociacion.getText());
-            lblMensajeAsociacion.setText("Asociacion actualizada correctamente.");
+            lblMensajeAsociacion.setText("Association updated successfully.");
             loadAssociations();
         } catch (IllegalArgumentException e) {
             lblMensajeAsociacion.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensajeAsociacion.setText("No se pudo actualizar la asociacion: " + e.getMessage());
+            lblMensajeAsociacion.setText("Could not update the association: " + e.getMessage());
         }
     }
 
@@ -115,7 +115,7 @@ public class AssociationController {
 
     @FXML
     public void volverAdmin(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
+        NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administration");
     }
 
     private void configureColumns() {
@@ -129,9 +129,9 @@ public class AssociationController {
         try {
             List<AssociationRecord> associations = associationRepository.findAssociationRecords();
             tablaAsociaciones.setItems(FXCollections.observableArrayList(associations));
-            lblResumenAsociaciones.setText(associations.size() + " asociacion(es)");
+            lblResumenAsociaciones.setText(associations.size() + " association(s)");
         } catch (SQLException e) {
-            lblMensajeAsociacion.setText("No se pudieron cargar asociaciones: " + e.getMessage());
+            lblMensajeAsociacion.setText("Could not load associations: " + e.getMessage());
         }
     }
 }

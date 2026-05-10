@@ -98,13 +98,13 @@ public class ListaMascotasController {
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
         String menuPath = SessionContext.isAdmin() ? "/view/admin_menu.fxml" : "/view/menu.fxml";
-        NavigationUtil.openWindow(event, menuPath, "BDP1 - Bienestar Animal");
+        NavigationUtil.openWindow(event, menuPath, "BDP1 - Animal Welfare");
     }
 
     @FXML
     public void abrirRegistro(ActionEvent event) throws IOException {
         SessionContext.setEditingPetId(null);
-        NavigationUtil.openWindow(event, "/view/registrar_mascota.fxml", "Registrar Mascota");
+        NavigationUtil.openWindow(event, "/view/registrar_mascota.fxml", "Register Pet");
     }
 
     @FXML
@@ -112,17 +112,17 @@ public class ListaMascotasController {
         // The selected id is stored temporarily so the registration form opens in edit mode.
         Mascota selectedPet = tablaMascotas.getSelectionModel().getSelectedItem();
         if (selectedPet == null) {
-            lblMensaje.setText("Seleccione una mascota de la tabla.");
+            lblMensaje.setText("Select a pet from the list.");
             return;
         }
 
         SessionContext.setEditingPetId((long) selectedPet.getId());
-        NavigationUtil.openWindow(event, "/view/registrar_mascota.fxml", "Editar Mascota");
+        NavigationUtil.openWindow(event, "/view/registrar_mascota.fxml", "Edit Pet");
     }
 
     @FXML
     public void abrirEstadisticas(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/estadisticas.fxml", "Estadisticas");
+        NavigationUtil.openWindow(event, "/view/estadisticas.fxml", "Statistics");
     }
 
     @FXML
@@ -132,12 +132,12 @@ public class ListaMascotasController {
         CatalogOption selectedStatus = cbNuevoEstado.getValue();
 
         if (selectedPet == null) {
-            lblMensaje.setText("Seleccione una mascota de la tabla.");
+            lblMensaje.setText("Select a pet from the list.");
             return;
         }
 
         if (selectedStatus == null) {
-            lblMensaje.setText("Seleccione el nuevo estado.");
+            lblMensaje.setText("Select the new status.");
             return;
         }
 
@@ -149,11 +149,11 @@ public class ListaMascotasController {
                     SessionContext.isAdmin()
             );
             loadPets();
-            lblMensaje.setText("Estado actualizado correctamente.");
+            lblMensaje.setText("Status updated successfully.");
         } catch (IllegalArgumentException e) {
             lblMensaje.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensaje.setText("No se pudo cambiar el estado: " + e.getMessage());
+            lblMensaje.setText("Could not change the status: " + e.getMessage());
         }
     }
 
@@ -177,7 +177,7 @@ public class ListaMascotasController {
     public void pasarControlCasaCuna() {
         // Transfer is separate from status changes: the user can change status without choosing a foster home.
         if (chkTransferirCasaCuna == null || !chkTransferirCasaCuna.isSelected()) {
-            lblMensaje.setText("Active la opcion de transferencia solo si desea pasar el control a una casa cuna.");
+            lblMensaje.setText("Use transfer only if you want to move control to a foster home.");
             return;
         }
 
@@ -185,12 +185,12 @@ public class ListaMascotasController {
         CatalogOption selectedFosterHome = cbCasaCuna.getValue();
 
         if (selectedPet == null) {
-            lblMensaje.setText("Seleccione una mascota de la tabla.");
+            lblMensaje.setText("Select a pet from the list.");
             return;
         }
 
         if (selectedFosterHome == null) {
-            lblMensaje.setText("Seleccione la casa cuna que recibira el control.");
+            lblMensaje.setText("Select the foster home that will receive control.");
             return;
         }
 
@@ -205,11 +205,11 @@ public class ListaMascotasController {
             chkTransferirCasaCuna.setSelected(false);
             configurarTransferenciaCasaCuna();
             loadPets();
-            lblMensaje.setText("Control transferido a la casa cuna seleccionada.");
+            lblMensaje.setText("Control transferred to the selected foster home.");
         } catch (IllegalArgumentException e) {
             lblMensaje.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensaje.setText("No se pudo transferir el control: " + e.getMessage());
+            lblMensaje.setText("Could not transfer control: " + e.getMessage());
         }
     }
 
@@ -226,7 +226,7 @@ public class ListaMascotasController {
         try {
             cbNuevoEstado.setItems(FXCollections.observableArrayList(catalogRepository.findPetStatuses()));
         } catch (SQLException e) {
-            lblMensaje.setText("No se pudieron cargar los estados: " + e.getMessage());
+            lblMensaje.setText("Could not load statuses: " + e.getMessage());
         }
     }
 
@@ -234,7 +234,7 @@ public class ListaMascotasController {
         try {
             cbCasaCuna.setItems(FXCollections.observableArrayList(fosterHomeRepository.findFosterHomeOptions()));
         } catch (SQLException e) {
-            lblMensaje.setText("No se pudieron cargar casas cuna: " + e.getMessage());
+            lblMensaje.setText("Could not load foster homes: " + e.getMessage());
         }
     }
 
@@ -251,7 +251,7 @@ public class ListaMascotasController {
             updateStats(pets);
             lblMensaje.setText("");
         } catch (SQLException e) {
-            lblMensaje.setText("No se pudieron cargar mascotas: " + e.getMessage());
+            lblMensaje.setText("Could not load pets: " + e.getMessage());
         }
     }
 

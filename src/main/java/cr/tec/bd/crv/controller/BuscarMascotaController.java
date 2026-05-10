@@ -77,7 +77,7 @@ public class BuscarMascotaController {
             tablaResultados.setItems(FXCollections.observableArrayList(results));
             lblResultado.setText(results.size() + " resultado(s) encontrados.");
         } catch (SQLException e) {
-            lblResultado.setText("No se pudo realizar la busqueda: " + e.getMessage());
+            lblResultado.setText("Could not complete the search: " + e.getMessage());
         }
     }
 
@@ -94,17 +94,17 @@ public class BuscarMascotaController {
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
         String menuPath = SessionContext.isAdmin() ? "/view/admin_menu.fxml" : "/view/menu.fxml";
-        NavigationUtil.openWindow(event, menuPath, "BDP1 - Bienestar Animal");
+        NavigationUtil.openWindow(event, menuPath, "BDP1 - Animal Welfare");
     }
 
     @FXML
     public void abrirListaMascotas(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/lista_mascotas.fxml", "Lista de Mascotas");
+        NavigationUtil.openWindow(event, "/view/lista_mascotas.fxml", "Pet List");
     }
 
     @FXML
     public void abrirReportes(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/reportes.fxml", "Consultas y Reportes");
+        NavigationUtil.openWindow(event, "/view/reportes.fxml", "Queries and Reports");
     }
 
     private void configureColumns() {
@@ -118,7 +118,7 @@ public class BuscarMascotaController {
         try {
             cbEstado.setItems(FXCollections.observableArrayList(catalogRepository.findPetStatuses()));
         } catch (SQLException e) {
-            lblResultado.setText("No se pudieron cargar estados: " + e.getMessage());
+            lblResultado.setText("Could not load statuses: " + e.getMessage());
         }
     }
 

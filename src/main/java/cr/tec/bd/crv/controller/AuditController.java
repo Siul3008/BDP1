@@ -78,10 +78,10 @@ public class AuditController {
                     txtCampoBitacora.getText()
             );
             tablaBitacora.setItems(FXCollections.observableArrayList(records));
-            lblResumenBitacora.setText(records.size() + " registro(s)");
+            lblResumenBitacora.setText(records.size() + " record(s)");
             lblMensajeBitacora.setText("");
         } catch (SQLException e) {
-            lblMensajeBitacora.setText("No se pudo consultar la bitacora: " + e.getMessage());
+            lblMensajeBitacora.setText("Could not search the audit log: " + e.getMessage());
         }
     }
 
@@ -95,7 +95,7 @@ public class AuditController {
 
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
+        NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administration");
     }
 
     private void configureColumns() {

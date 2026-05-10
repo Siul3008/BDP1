@@ -30,11 +30,11 @@
                 </image>
             </ImageView>
             <VBox spacing="2.0">
-                <Label text="Bitacora" styleClass="brand-title"/>
-                <Label text="Revision de auditoria y cambios registrados" styleClass="brand-subtitle"/>
+                <Label text="Audit log" styleClass="brand-title"/>
+                <Label text="Audit review and registered changes" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button"/>
+            <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button"/>
         </HBox>
     </top>
     <center>
@@ -43,45 +43,45 @@
                 <Insets top="10" right="24" bottom="24" left="24"/>
             </padding>
             <VBox spacing="12.0" styleClass="card form-card">
-                <Label text="Filtros de bitacora" styleClass="title-lg"/>
+                <Label text="Audit filters" styleClass="title-lg"/>
                 <GridPane hgap="14.0" vgap="14.0">
                     <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                        <Label text="Modulo" styleClass="field-label"/>
-                        <TextField fx:id="txtModuloBitacora" promptText="Mascotas, donaciones, adopciones"/>
+                        <Label text="Module" styleClass="field-label"/>
+                        <TextField fx:id="txtModuloBitacora" promptText="Pets, donations, adoptions"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <Label text="Usuario" styleClass="field-label"/>
-                        <TextField fx:id="txtUsuarioBitacora" promptText="Correo o perfil"/>
+                        <Label text="User" styleClass="field-label"/>
+                        <TextField fx:id="txtUsuarioBitacora" promptText="Email or profile"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                        <Label text="Campo" styleClass="field-label"/>
-                        <TextField fx:id="txtCampoBitacora" promptText="Campo afectado"/>
+                        <Label text="Field" styleClass="field-label"/>
+                        <TextField fx:id="txtCampoBitacora" promptText="Affected field"/>
                     </VBox>
                 </GridPane>
                 <HBox spacing="10.0">
-                    <Button text="Consultar cambios" onAction="#consultarBitacora" styleClass="primary-button">
+                    <Button text="Search changes" onAction="#consultarBitacora" styleClass="primary-button">
                         <tooltip>
-                            <Tooltip text="Consulta journal y columnas de auditoria disponibles."/>
+                            <Tooltip text="Reviews available audit changes."/>
                         </tooltip>
                     </Button>
-                    <Button text="Limpiar filtros" onAction="#limpiarBitacora" styleClass="secondary-button"/>
+                    <Button text="Clear filters" onAction="#limpiarBitacora" styleClass="secondary-button"/>
                 </HBox>
                 <Label fx:id="lblMensajeBitacora" text="" wrapText="true" styleClass="message-label"/>
             </VBox>
             <VBox spacing="12.0" styleClass="card result-card">
                 <HBox alignment="CENTER_LEFT">
-                    <Label text="Registro de auditoria" styleClass="section-title"/>
+                    <Label text="Audit records" styleClass="section-title"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="lblResumenBitacora" text="0 registro(s)" styleClass="message-label"/>
+                    <Label fx:id="lblResumenBitacora" text="0 record(s)" styleClass="message-label"/>
                 </HBox>
                 <TableView fx:id="tablaBitacora" prefHeight="430">
                     <columns>
-                        <TableColumn fx:id="colFechaBitacora" text="Fecha" prefWidth="120"/>
-                        <TableColumn fx:id="colModuloBitacora" text="Modulo" prefWidth="150"/>
-                        <TableColumn fx:id="colUsuarioBitacora" text="Usuario" prefWidth="130"/>
-                        <TableColumn fx:id="colCampoBitacora" text="Campo" prefWidth="180"/>
-                        <TableColumn fx:id="colAnteriorBitacora" text="Valor anterior" prefWidth="190"/>
-                        <TableColumn fx:id="colNuevoBitacora" text="Valor nuevo" prefWidth="220"/>
+                        <TableColumn fx:id="colFechaBitacora" text="Date" prefWidth="120"/>
+                        <TableColumn fx:id="colModuloBitacora" text="Module" prefWidth="150"/>
+                        <TableColumn fx:id="colUsuarioBitacora" text="User" prefWidth="130"/>
+                        <TableColumn fx:id="colCampoBitacora" text="Field" prefWidth="180"/>
+                        <TableColumn fx:id="colAnteriorBitacora" text="Previous value" prefWidth="190"/>
+                        <TableColumn fx:id="colNuevoBitacora" text="New value" prefWidth="220"/>
                     </columns>
                 </TableView>
             </VBox>

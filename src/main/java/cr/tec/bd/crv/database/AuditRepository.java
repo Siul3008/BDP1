@@ -34,10 +34,10 @@ public class AuditRepository {
             if (hasTable(connection, "JOURNAL")) {
                 addJournalRecords(connection, records);
             } else {
-                addAuditTableRecords(connection, records, "PET", "Mascotas", "name");
-                addAuditTableRecords(connection, records, "ADOPTION", "Adopciones", "TO_CHAR(id)");
-                addAuditTableRecords(connection, records, "DONATION", "Donaciones", "TO_CHAR(amount)");
-                addAuditTableRecords(connection, records, "ASSOCIATION", "Asociaciones", "name");
+                addAuditTableRecords(connection, records, "PET", "Pets", "name");
+                addAuditTableRecords(connection, records, "ADOPTION", "Adoptions", "TO_CHAR(id)");
+                addAuditTableRecords(connection, records, "DONATION", "Donations", "TO_CHAR(amount)");
+                addAuditTableRecords(connection, records, "ASSOCIATION", "Associations", "name");
                 addAuditTableRecords(connection, records, "PERSON", "Personas", "firstName || ' ' || firstLastName");
             }
 
@@ -131,7 +131,7 @@ public class AuditRepository {
                 records.add(new AuditRecord(
                         resultSet.getLong("id"),
                         moduleName,
-                        "Registro / actualizacion",
+                        "Create / update",
                         valueOrEmpty(resultSet.getString("previousValue")),
                         valueOrEmpty(resultSet.getString("currentValue")),
                         valueOrEmpty(resultSet.getString("changedBy")),

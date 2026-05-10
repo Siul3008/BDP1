@@ -34,11 +34,11 @@
                 </image>
             </ImageView>
             <VBox spacing="2.0">
-                <Label text="Estadisticas" styleClass="brand-title"/>
-                <Label text="Indicadores reales del sistema" styleClass="brand-subtitle"/>
+                <Label text="Statistics" styleClass="brand-title"/>
+                <Label text="System indicators" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button"/>
+            <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button"/>
         </HBox>
     </top>
     <center>
@@ -48,58 +48,58 @@
                     <Insets top="10" right="24" bottom="24" left="24"/>
                 </padding>
                 <VBox spacing="12.0" styleClass="card form-card">
-                    <Label text="Filtros de estadisticas" styleClass="title-lg"/>
+                    <Label text="Statistics filters" styleClass="title-lg"/>
                     <GridPane hgap="14.0" vgap="14.0">
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                            <Label text="Desde" styleClass="field-label"/>
+                            <Label text="From" styleClass="field-label"/>
                             <DatePicker fx:id="dpStatsFrom"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                            <Label text="Hasta" styleClass="field-label"/>
+                            <Label text="To" styleClass="field-label"/>
                             <DatePicker fx:id="dpStatsTo"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                            <Label text="Tipo de mascota" styleClass="field-label"/>
-                            <ComboBox fx:id="cbStatsPetType" promptText="Todos los tipos"/>
+                            <Label text="Pet type" styleClass="field-label"/>
+                            <ComboBox fx:id="cbStatsPetType" promptText="All types"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="3" GridPane.rowIndex="0">
-                            <Label text="Raza" styleClass="field-label"/>
-                            <ComboBox fx:id="cbStatsBreed" promptText="Todas las razas"/>
+                            <Label text="Breed" styleClass="field-label"/>
+                            <ComboBox fx:id="cbStatsBreed" promptText="All breeds"/>
                         </VBox>
                     </GridPane>
                     <HBox spacing="10.0">
-                        <Button text="Actualizar estadisticas" onAction="#actualizarEstadisticas" styleClass="primary-button">
+                        <Button text="Refresh statistics" onAction="#actualizarEstadisticas" styleClass="primary-button">
                             <tooltip>
-                                <Tooltip text="Recarga indicadores, porcentajes y graficas desde Oracle."/>
+                                <Tooltip text="Refreshes indicators, percentages, and charts."/>
                             </tooltip>
                         </Button>
-                        <Button text="Limpiar filtros" onAction="#limpiarFiltros" styleClass="secondary-button"/>
+                        <Button text="Clear filters" onAction="#limpiarFiltros" styleClass="secondary-button"/>
                     </HBox>
                 </VBox>
                 <FlowPane hgap="16.0" vgap="16.0" prefWrapLength="1000">
                     <VBox spacing="8.0" prefWidth="220" styleClass="card mini-stat">
                         <Label fx:id="lblMascotasRegistradas" text="0" styleClass="stat-number"/>
-                        <Label text="Mascotas registradas" styleClass="subtle-text"/>
+                        <Label text="Registered pets" styleClass="subtle-text"/>
                     </VBox>
                     <VBox spacing="8.0" prefWidth="220" styleClass="card mini-stat">
                         <Label fx:id="lblAdopcionesExitosas" text="0%" styleClass="stat-number"/>
-                        <Label text="Porcentaje adoptado" styleClass="subtle-text"/>
+                        <Label text="Adoption percentage" styleClass="subtle-text"/>
                     </VBox>
                     <VBox spacing="8.0" prefWidth="220" styleClass="card mini-stat">
                         <Label fx:id="lblDonacionesAcumuladas" text="0.00" styleClass="stat-number"/>
-                        <Label text="Donaciones acumuladas" styleClass="subtle-text"/>
+                        <Label text="Accumulated donations" styleClass="subtle-text"/>
                     </VBox>
                     <VBox spacing="8.0" prefWidth="220" styleClass="card mini-stat">
                         <Label fx:id="lblCasasCunaActivas" text="0" styleClass="stat-number"/>
-                        <Label text="Casas cuna activas" styleClass="subtle-text"/>
+                        <Label text="Active foster homes" styleClass="subtle-text"/>
                     </VBox>
                 </FlowPane>
                 <HBox spacing="18.0">
                     <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="card result-card">
-                        <Label text="Mascotas por estado" styleClass="section-title"/>
+                        <Label text="Pets by status" styleClass="section-title"/>
                         <BarChart fx:id="chartMascotasEstado" categoryGap="18.0" legendVisible="false" prefHeight="300">
                             <xAxis>
-                                <CategoryAxis label="Estado"/>
+                                <CategoryAxis label="Status"/>
                             </xAxis>
                             <yAxis>
                                 <NumberAxis label="Cantidad"/>
@@ -107,7 +107,7 @@
                         </BarChart>
                     </VBox>
                     <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="card result-card">
-                        <Label text="Mascotas por tipo" styleClass="section-title"/>
+                        <Label text="Pets by type" styleClass="section-title"/>
                         <BarChart fx:id="chartMascotasTipo" categoryGap="18.0" legendVisible="false" prefHeight="300">
                             <xAxis>
                                 <CategoryAxis label="Tipo"/>
@@ -120,10 +120,10 @@
                 </HBox>
                 <HBox spacing="18.0">
                     <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="card result-card">
-                        <Label text="Donaciones por asociacion" styleClass="section-title"/>
+                        <Label text="Donations by association" styleClass="section-title"/>
                         <BarChart fx:id="chartDonacionesAsociacion" categoryGap="18.0" legendVisible="false" prefHeight="300">
                             <xAxis>
-                                <CategoryAxis label="Asociacion"/>
+                                <CategoryAxis label="Association"/>
                             </xAxis>
                             <yAxis>
                                 <NumberAxis label="Monto"/>
@@ -131,7 +131,7 @@
                         </BarChart>
                     </VBox>
                     <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="card result-card">
-                        <Label text="Adopciones vs espera" styleClass="section-title"/>
+                        <Label text="Adoptions vs waiting" styleClass="section-title"/>
                         <BarChart fx:id="chartAdopciones" categoryGap="18.0" legendVisible="false" prefHeight="300">
                             <xAxis>
                                 <CategoryAxis label="Resultado"/>
@@ -144,7 +144,7 @@
                 </HBox>
                 <HBox spacing="18.0">
                     <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="card result-card">
-                        <Label text="Mascotas por rango de edad" styleClass="section-title"/>
+                        <Label text="Pets by age range" styleClass="section-title"/>
                         <BarChart fx:id="chartEdad" categoryGap="18.0" legendVisible="false" prefHeight="300">
                             <xAxis>
                                 <CategoryAxis label="Edad"/>
@@ -155,7 +155,7 @@
                         </BarChart>
                     </VBox>
                     <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="card result-card">
-                        <Label text="Adicional: criticas en adopcion" styleClass="section-title"/>
+                        <Label text="Additional: critical pets for adoption" styleClass="section-title"/>
                         <BarChart fx:id="chartCriticas" categoryGap="18.0" legendVisible="false" prefHeight="300">
                             <xAxis>
                                 <CategoryAxis label="Tipo"/>
@@ -167,7 +167,7 @@
                     </VBox>
                 </HBox>
                 <VBox spacing="12.0" styleClass="card form-card">
-                    <Label text="Resumen" styleClass="section-title"/>
+                    <Label text="Summary" styleClass="section-title"/>
                     <Label fx:id="lblResumenEstadisticas" text="" wrapText="true" styleClass="message-label"/>
                 </VBox>
             </VBox>

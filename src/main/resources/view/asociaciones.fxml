@@ -30,11 +30,11 @@
                 </image>
             </ImageView>
             <VBox spacing="2.0">
-                <Label text="Asociaciones" styleClass="brand-title"/>
-                <Label text="Gestion administrativa de organizaciones" styleClass="brand-subtitle"/>
+                <Label text="Associations" styleClass="brand-title"/>
+                <Label text="Administrative organization management" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al panel admin" onAction="#volverAdmin" styleClass="ghost-button"/>
+            <Button text="Back to admin panel" onAction="#volverAdmin" styleClass="ghost-button"/>
         </HBox>
     </top>
     <center>
@@ -44,43 +44,43 @@
             </padding>
             <HBox spacing="18.0">
                 <VBox spacing="12.0" prefWidth="420" styleClass="card form-card">
-                    <Label text="Datos de asociacion" styleClass="title-lg"/>
+                    <Label text="Association data" styleClass="title-lg"/>
                     <GridPane hgap="14.0" vgap="14.0">
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                            <Label text="Nombre" styleClass="field-label"/>
-                            <TextField fx:id="txtNombreAsociacion" promptText="Nombre de la asociacion"/>
+                            <Label text="Name" styleClass="field-label"/>
+                            <TextField fx:id="txtNombreAsociacion" promptText="Association name"/>
                         </VBox>
                     </GridPane>
                     <HBox spacing="10.0">
-                        <Button text="Guardar nueva" onAction="#guardarAsociacion" styleClass="primary-button">
+                        <Button text="Save new" onAction="#guardarAsociacion" styleClass="primary-button">
                             <tooltip>
-                                <Tooltip text="Registra una asociacion nueva."/>
+                                <Tooltip text="Registers a new association."/>
                             </tooltip>
                         </Button>
-                        <Button text="Actualizar nombre" onAction="#actualizarAsociacion" styleClass="secondary-button">
+                        <Button text="Update name" onAction="#actualizarAsociacion" styleClass="secondary-button">
                             <tooltip>
-                                <Tooltip text="Actualiza la asociacion seleccionada en la tabla."/>
+                                <Tooltip text="Updates the selected association."/>
                             </tooltip>
                         </Button>
                     </HBox>
                     <HBox spacing="10.0">
-                        <Button text="Limpiar" onAction="#limpiarFormulario" styleClass="ghost-button"/>
-                        <Button text="Recargar" onAction="#recargarAsociaciones" styleClass="ghost-button"/>
+                        <Button text="Clear" onAction="#limpiarFormulario" styleClass="ghost-button"/>
+                        <Button text="Reload" onAction="#recargarAsociaciones" styleClass="ghost-button"/>
                     </HBox>
                     <Label fx:id="lblMensajeAsociacion" text="" wrapText="true" styleClass="message-label"/>
                 </VBox>
                 <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="card result-card">
                     <HBox alignment="CENTER_LEFT">
-                        <Label text="Asociaciones registradas" styleClass="section-title"/>
+                        <Label text="Registered associations" styleClass="section-title"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="lblResumenAsociaciones" text="0 asociacion(es)" styleClass="message-label"/>
+                        <Label fx:id="lblResumenAsociaciones" text="0 association(s)" styleClass="message-label"/>
                     </HBox>
                     <TableView fx:id="tablaAsociaciones" prefHeight="420">
                         <columns>
                             <TableColumn fx:id="colAsociacionId" text="ID" prefWidth="70"/>
-                            <TableColumn fx:id="colAsociacionNombre" text="Nombre" prefWidth="260"/>
-                            <TableColumn fx:id="colAsociacionDonaciones" text="Donaciones" prefWidth="120"/>
-                            <TableColumn fx:id="colAsociacionTotal" text="Total donado" prefWidth="140"/>
+                            <TableColumn fx:id="colAsociacionNombre" text="Name" prefWidth="260"/>
+                            <TableColumn fx:id="colAsociacionDonaciones" text="Donations" prefWidth="120"/>
+                            <TableColumn fx:id="colAsociacionTotal" text="Total donated" prefWidth="140"/>
                         </columns>
                     </TableView>
                 </VBox>

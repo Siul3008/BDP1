@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Reads and updates the information shown in "Mi perfil".
+ * Reads and updates the information shown in "My profile".
  *
  * <p>The profile screen changes person names, contact data, and passwords. Each
  * update is kept separate so a user can edit one section without accidentally
@@ -45,7 +45,7 @@ public class UserProfileRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
-                    throw new IllegalArgumentException("No se encontro el perfil del usuario.");
+                    throw new IllegalArgumentException("User profile was not found.");
                 }
 
                 return new UserProfile(
@@ -88,7 +88,7 @@ public class UserProfileRepository {
                 statement.setString(4, emptyToNull(secondLastName));
                 statement.setLong(5, personId);
                 statement.executeUpdate();
-                auditRepository.log(connection, "Perfil", "Nombres", "person:" + personId, firstName.trim());
+                auditRepository.log(connection, "Perfil", "Names", "person:" + personId, firstName.trim());
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
                 connection.rollback();
@@ -113,7 +113,7 @@ public class UserProfileRepository {
                 updateAccountEmail(connection, personId, email.trim());
                 upsertPrimaryEmail(connection, personId, email.trim());
                 upsertPrimaryPhone(connection, personId, phone.trim());
-                auditRepository.log(connection, "Perfil", "Contacto", "person:" + personId, email.trim());
+                auditRepository.log(connection, "Profile", "Contact", "person:" + personId, email.trim());
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
                 connection.rollback();
@@ -136,7 +136,7 @@ public class UserProfileRepository {
 
             try {
                 if (!currentPasswordMatches(connection, personId, currentPassword)) {
-                    throw new IllegalArgumentException("La contrasena actual no coincide.");
+                    throw new IllegalArgumentException("Current password does not match.");
                 }
 
                 String sql = """
@@ -152,7 +152,7 @@ public class UserProfileRepository {
                     statement.setLong(2, personId);
                     statement.executeUpdate();
                 }
-                auditRepository.log(connection, "Perfil", "Contrasena", "person:" + personId, "actualizada");
+                auditRepository.log(connection, "Perfil", "Password", "person:" + personId, "actualizada");
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
                 connection.rollback();
@@ -199,7 +199,7 @@ public class UserProfileRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    throw new IllegalArgumentException("Ese correo ya esta usado por otra cuenta.");
+                    throw new IllegalArgumentException("That email is already used by another account.");
                 }
             }
         }
@@ -328,30 +328,30 @@ public class UserProfileRepository {
     }
 
     private void validateNames(String firstName, String secondName, String firstLastName, String secondLastName) {
-        requireValue(firstName, "El primer nombre es obligatorio.");
-        requireValue(firstLastName, "El primer apellido es obligatorio.");
-        validateLength(firstName, 20, "El primer nombre no puede superar 20 caracteres.");
-        validateOptionalLength(secondName, 20, "El segundo nombre no puede superar 20 caracteres.");
-        validateLength(firstLastName, 25, "El primer apellido no puede superar 25 caracteres.");
-        validateOptionalLength(secondLastName, 25, "El segundo apellido no puede superar 25 caracteres.");
+        requireValue(firstName, "First name is required.");
+        requireValue(firstLastName, "First last name is required.");
+        validateLength(firstName, 20, "First name cannot exceed 20 characters.");
+        validateOptionalLength(secondName, 20, "Middle name cannot exceed 20 characters.");
+        validateLength(firstLastName, 25, "First last name cannot exceed 25 characters.");
+        validateOptionalLength(secondLastName, 25, "Second last name cannot exceed 25 characters.");
     }
 
     private void validateContact(String email, String phone) {
-        requireValue(email, "El correo principal es obligatorio.");
-        requireValue(phone, "El telefono principal es obligatorio.");
+        requireValue(email, "Primary email is required.");
+        requireValue(phone, "Primary phone is required.");
         if (!email.trim().matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
-            throw new IllegalArgumentException("El correo principal no tiene un formato valido.");
+            throw new IllegalArgumentException("Primary email has an invalid format.");
         }
-        validateLength(email, 100, "El correo no puede superar 100 caracteres.");
+        validateLength(email, 100, "Email cannot exceed 100 characters.");
         if (!phone.trim().matches("\\d{8}")) {
-            throw new IllegalArgumentException("El telefono principal debe tener 8 digitos.");
+            throw new IllegalArgumentException("Primary phone must have 8 digits.");
         }
     }
 
     private void validatePasswordChange(String currentPassword, String newPassword, String confirmation) {
-        requireValue(currentPassword, "Digite la contrasena actual.");
-        requireValue(newPassword, "Digite la contrasena nueva.");
-        requireValue(confirmation, "Confirme la contrasena nueva.");
+        requireValue(currentPassword, "Enter the current password.");
+        requireValue(newPassword, "Enter the new password.");
+        requireValue(confirmation, "Confirm the new password.");
         if (!newPassword.trim().equals(confirmation.trim())) {
             throw new IllegalArgumentException("La confirmacion no coincide.");
         }
@@ -366,7 +366,7 @@ public class UserProfileRepository {
                 || !normalizedPassword.matches(".*\\d.*")
                 || !normalizedPassword.matches(".*[^A-Za-z0-9].*")) {
             throw new IllegalArgumentException(
-                    "La contrasena debe tener minimo 8 caracteres, mayuscula, minuscula, numero y caracter especial."
+                    "Password must have at least 8 characters, uppercase, lowercase, number, and special character."
             );
         }
     }

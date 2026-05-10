@@ -118,7 +118,7 @@ public class PerfilUsuarioController {
         // Names are separated because the database stores each part in its own column.
         Long personId = SessionContext.getCurrentPersonId();
         if (personId == null) {
-            lblMensajePerfil.setText("Debe iniciar sesion como usuario.");
+            lblMensajePerfil.setText("You must sign in as a user.");
             return;
         }
 
@@ -131,11 +131,11 @@ public class PerfilUsuarioController {
                     txtSegundoApellido.getText()
             );
             loadProfile();
-            lblMensajePerfil.setText("Datos personales actualizados.");
+            lblMensajePerfil.setText("Personal data updated.");
         } catch (IllegalArgumentException e) {
             lblMensajePerfil.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensajePerfil.setText("No se pudo actualizar la cuenta: " + e.getMessage());
+            lblMensajePerfil.setText("Could not update the account: " + e.getMessage());
         }
     }
 
@@ -144,7 +144,7 @@ public class PerfilUsuarioController {
         // Updating the main email also updates the active session so later audit rows use the new email.
         Long personId = SessionContext.getCurrentPersonId();
         if (personId == null) {
-            lblMensajePerfil.setText("Debe iniciar sesion como usuario.");
+            lblMensajePerfil.setText("You must sign in as a user.");
             return;
         }
 
@@ -156,11 +156,11 @@ public class PerfilUsuarioController {
             );
             SessionContext.updateCurrentEmail(txtCorreoPrincipal.getText().trim());
             loadProfile();
-            lblMensajePerfil.setText("Contacto actualizado.");
+            lblMensajePerfil.setText("Contact updated.");
         } catch (IllegalArgumentException e) {
             lblMensajePerfil.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensajePerfil.setText("No se pudo actualizar el contacto: " + e.getMessage());
+            lblMensajePerfil.setText("Could not update the contact: " + e.getMessage());
         }
     }
 
@@ -169,7 +169,7 @@ public class PerfilUsuarioController {
         // The repository checks the current password before replacing it with the new hash.
         Long personId = SessionContext.getCurrentPersonId();
         if (personId == null) {
-            lblMensajePerfil.setText("Debe iniciar sesion como usuario.");
+            lblMensajePerfil.setText("You must sign in as a user.");
             return;
         }
 
@@ -183,29 +183,29 @@ public class PerfilUsuarioController {
             txtContrasenaActual.clear();
             txtContrasenaNueva.clear();
             txtConfirmarContrasena.clear();
-            lblMensajePerfil.setText("Contrasena actualizada.");
+            lblMensajePerfil.setText("Password updated.");
         } catch (IllegalArgumentException e) {
             lblMensajePerfil.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensajePerfil.setText("No se pudo actualizar la contrasena: " + e.getMessage());
+            lblMensajePerfil.setText("Could not update the password: " + e.getMessage());
         }
     }
 
     @FXML
     public void abrirCasaCuna(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/casas_cuna.fxml", "Casa Cuna");
+        NavigationUtil.openWindow(event, "/view/casas_cuna.fxml", "Foster Home");
     }
 
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+        NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Animal Welfare");
     }
 
     private void loadProfile() {
         // Refreshing after each save keeps the labels and form fields synchronized with the database.
         Long personId = SessionContext.getCurrentPersonId();
         if (personId == null) {
-            lblMensajePerfil.setText("Debe iniciar sesion como usuario.");
+            lblMensajePerfil.setText("You must sign in as a user.");
             return;
         }
 
@@ -222,7 +222,7 @@ public class PerfilUsuarioController {
             txtTelefonoPrincipal.setText(valueOrEmpty(profile.getPrimaryPhone()));
             lblMensajePerfil.setText("");
         } catch (SQLException e) {
-            lblMensajePerfil.setText("No se pudo cargar el perfil: " + e.getMessage());
+            lblMensajePerfil.setText("Could not load the profile: " + e.getMessage());
         }
     }
 
@@ -231,11 +231,11 @@ public class PerfilUsuarioController {
             // The button text tells the user whether they are activating or editing foster home settings.
             boolean active = fosterHomeRepository.isFosterHome(SessionContext.getCurrentPersonId());
             lblEstadoCasaCuna.setText(active
-                    ? "Tu perfil ya esta activo como casa cuna."
-                    : "Activa casa cuna solo si puedes albergar mascotas temporalmente.");
-            btnCasaCuna.setText(active ? "Configurar casa cuna" : "Activar casa cuna");
+                    ? "Your profile is already active as a foster home."
+                    : "Activate foster home only if you can host pets temporarily.");
+            btnCasaCuna.setText(active ? "Configure foster home" : "Activate foster home");
         } catch (SQLException e) {
-            lblEstadoCasaCuna.setText("No se pudo revisar casa cuna: " + e.getMessage());
+            lblEstadoCasaCuna.setText("Could not check foster home: " + e.getMessage());
         }
     }
 

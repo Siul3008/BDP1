@@ -23,7 +23,7 @@
             fx:controller="cr.tec.bd.crv.controller.AdoptionController"
             styleClass="screen">
     <top>
-        <HBox alignment="CENTER_LEFT" styleClass="top-bar">
+        <HBox alignment="CENTER_LEFT" minHeight="92" styleClass="top-bar adoption-header">
             <padding>
                 <Insets top="18" right="24" bottom="10" left="24"/>
             </padding>
@@ -32,115 +32,115 @@
                     <Image url="@/images/logo.png"/>
                 </image>
             </ImageView>
-            <VBox spacing="2.0">
-                <Label text="Adopciones" styleClass="brand-title"/>
-                <Label text="Registro de adopcion, solicitud y seguimiento" styleClass="brand-subtitle"/>
+            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                <Label text="Adoptions" styleClass="brand-title"/>
+                <Label text="Adoption registration, request, and follow-up" wrapText="true" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button">
+            <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button">
                 <tooltip>
-                    <Tooltip text="Regresa al menu principal de la cuenta activa."/>
+                    <Tooltip text="Returns to the active account menu."/>
                 </tooltip>
             </Button>
         </HBox>
     </top>
     <center>
-        <VBox spacing="18.0">
+        <VBox spacing="18.0" styleClass="adoption-content">
             <padding>
-                <Insets top="10" right="24" bottom="24" left="24"/>
+                <Insets top="22" right="24" bottom="24" left="24"/>
             </padding>
             <HBox spacing="18.0">
                 <VBox spacing="12.0" prefWidth="560" styleClass="card form-card">
-                    <Label text="Nueva adopcion" styleClass="title-lg"/>
-                    <Label text="Seleccione una mascota bajo su control y registre el usuario que la adopta." wrapText="true" styleClass="subtle-text"/>
+                    <Label text="New adoption" styleClass="title-lg"/>
+                    <Label text="Select a pet under your control and register the adopting user." wrapText="true" styleClass="subtle-text"/>
                     <GridPane hgap="14.0" vgap="14.0">
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">
-                            <Label text="Mascota" styleClass="field-label"/>
-                            <ComboBox fx:id="cbMascotaAdopcion" promptText="Seleccione mascota disponible" maxWidth="Infinity"/>
+                            <Label text="Pet" styleClass="field-label"/>
+                            <ComboBox fx:id="cbMascotaAdopcion" promptText="Select available pet" maxWidth="Infinity"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                            <Label text="Correo del adoptante" styleClass="field-label"/>
-                            <TextField fx:id="txtCorreoAdoptante" promptText="correo@ejemplo.com"/>
+                            <Label text="Adopter email" styleClass="field-label"/>
+                            <TextField fx:id="txtCorreoAdoptante" promptText="email@example.com"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                            <Label text="Fecha de adopcion" styleClass="field-label"/>
+                            <Label text="Adoption date" styleClass="field-label"/>
                             <DatePicker fx:id="dpFechaAdopcion"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                            <Label fx:id="lblPatio" text="Patio" styleClass="field-label"/>
-                            <TextField fx:id="txtPatio" promptText="Si / No / Detalle"/>
+                            <Label fx:id="lblPatio" text="Yard" styleClass="field-label"/>
+                            <TextField fx:id="txtPatio" promptText="Yes / No / Detail"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                            <Label fx:id="lblTipoVivienda" text="Tipo de vivienda" styleClass="field-label"/>
-                            <TextField fx:id="txtTipoVivienda" promptText="Casa, apartamento, finca"/>
+                            <Label fx:id="lblTipoVivienda" text="Housing type" styleClass="field-label"/>
+                            <TextField fx:id="txtTipoVivienda" promptText="House, apartment, farm"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
-                            <Label fx:id="lblEjercicio" text="Tiempo de ejercicio" styleClass="field-label"/>
-                            <TextField fx:id="txtEjercicio" promptText="Ej. 30 min diarios"/>
+                            <Label fx:id="lblEjercicio" text="Exercise time" styleClass="field-label"/>
+                            <TextField fx:id="txtEjercicio" promptText="Example: 30 minutes daily"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                            <Label fx:id="lblOtrasMascotas" text="Otras mascotas" styleClass="field-label"/>
-                            <TextField fx:id="txtOtrasMascotas" promptText="No / Si, detalle"/>
+                            <Label fx:id="lblOtrasMascotas" text="Other pets" styleClass="field-label"/>
+                            <TextField fx:id="txtOtrasMascotas" promptText="No / Yes, detail"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="4">
-                            <Label text="Calificacion del adoptante" styleClass="field-label"/>
-                            <ComboBox fx:id="cbCalificacion" promptText="1 a 5"/>
+                            <Label text="Adopter rating" styleClass="field-label"/>
+                            <ComboBox fx:id="cbCalificacion" promptText="1 to 5"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                            <Label text="Foto de adopcion" styleClass="field-label"/>
-                            <TextField fx:id="txtFotoAdopcion" promptText="Ruta o referencia"/>
+                            <Label text="Adoption photo" styleClass="field-label"/>
+                            <TextField fx:id="txtFotoAdopcion" promptText="Path or reference"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="2">
-                            <Label fx:id="lblRespuestas" text="Respuestas de solicitud" styleClass="field-label"/>
-                            <TextArea fx:id="txtRespuestas" prefRowCount="3" promptText="Resumen de respuestas del formulario de adopcion"/>
+                            <Label fx:id="lblRespuestas" text="Application answers" styleClass="field-label"/>
+                            <TextArea fx:id="txtRespuestas" prefRowCount="3" promptText="Summary of adoption form answers"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="6">
-                            <Label text="Notas del adoptante" styleClass="field-label"/>
-                            <TextArea fx:id="txtNotasAdoptante" prefRowCount="3" promptText="Notas internas"/>
+                            <Label text="Adopter notes" styleClass="field-label"/>
+                            <TextArea fx:id="txtNotasAdoptante" prefRowCount="3" promptText="Internal notes"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
-                            <Label text="Seguimiento" styleClass="field-label"/>
-                            <TextArea fx:id="txtSeguimiento" prefRowCount="3" promptText="Notas de seguimiento"/>
+                            <Label text="Follow-up" styleClass="field-label"/>
+                            <TextArea fx:id="txtSeguimiento" prefRowCount="3" promptText="Follow-up notes"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="7" GridPane.columnSpan="2">
-                            <Label text="Foto de seguimiento" styleClass="field-label"/>
-                            <TextField fx:id="txtFotoSeguimiento" promptText="Ruta o referencia opcional"/>
+                            <Label text="Follow-up photo" styleClass="field-label"/>
+                            <TextField fx:id="txtFotoSeguimiento" promptText="Optional path or reference"/>
                         </VBox>
                     </GridPane>
                     <HBox spacing="10.0">
-                        <Button text="Registrar adopcion" onAction="#registrarAdopcion" styleClass="primary-button">
+                        <Button text="Register adoption" onAction="#registrarAdopcion" styleClass="primary-button">
                             <tooltip>
-                                <Tooltip text="Guarda la adopcion y cambia la mascota a estado Adopted."/>
+                                <Tooltip text="Saves the adoption and changes the pet status to Adopted."/>
                             </tooltip>
                         </Button>
-                        <Button text="Limpiar" onAction="#limpiarFormularioAdopcion" styleClass="secondary-button">
+                        <Button text="Clear" onAction="#limpiarFormularioAdopcion" styleClass="secondary-button">
                             <tooltip>
-                                <Tooltip text="Limpia el formulario sin borrar datos guardados."/>
+                                <Tooltip text="Clears the form without deleting saved data."/>
                             </tooltip>
                         </Button>
-                        <Button text="Actualizar" onAction="#recargarAdopciones" styleClass="ghost-button">
+                        <Button text="Update" onAction="#recargarAdopciones" styleClass="ghost-button">
                             <tooltip>
-                                <Tooltip text="Recarga mascotas disponibles e historial de adopciones."/>
+                                <Tooltip text="Reloads available pets and adoption history."/>
                             </tooltip>
                         </Button>
-                        <Button text="Actualizar seguimiento" onAction="#actualizarSeguimiento" styleClass="secondary-button">
+                        <Button text="Update follow-up" onAction="#actualizarSeguimiento" styleClass="secondary-button">
                             <tooltip>
-                                <Tooltip text="Actualiza las notas de seguimiento de la adopcion seleccionada."/>
+                                <Tooltip text="Updates follow-up notes for the selected adoption."/>
                             </tooltip>
                         </Button>
                     </HBox>
                     <Label fx:id="lblMensajeAdopcion" text="" wrapText="true" styleClass="message-label"/>
                 </VBox>
                 <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="card result-card">
-                    <Label text="Historial de adopciones" styleClass="title-lg"/>
-                    <Label fx:id="lblTotalAdopciones" text="0 registro(s)" styleClass="section-title"/>
+                    <Label text="Adoption history" styleClass="title-lg"/>
+                    <Label fx:id="lblTotalAdopciones" text="0 record(s)" styleClass="section-title"/>
                     <TableView fx:id="tablaAdopciones" prefHeight="520">
                         <columns>
-                            <TableColumn fx:id="colAdoptante" text="Adoptante" prefWidth="190"/>
-                            <TableColumn fx:id="colMascota" text="Mascota" prefWidth="150"/>
-                            <TableColumn fx:id="colFecha" text="Fecha" prefWidth="100"/>
-                            <TableColumn fx:id="colCalificacion" text="Calif." prefWidth="70"/>
-                            <TableColumn fx:id="colSeguimiento" text="Seguimiento" prefWidth="260"/>
+                            <TableColumn fx:id="colAdoptante" text="Adopter" prefWidth="190"/>
+                            <TableColumn fx:id="colMascota" text="Pet" prefWidth="150"/>
+                            <TableColumn fx:id="colFecha" text="Date" prefWidth="100"/>
+                            <TableColumn fx:id="colCalificacion" text="Rating" prefWidth="70"/>
+                            <TableColumn fx:id="colSeguimiento" text="Follow-up" prefWidth="260"/>
                         </columns>
                     </TableView>
                 </VBox>

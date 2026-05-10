@@ -27,16 +27,16 @@
                     <Image url="@/images/logo.png"/>
                 </image>
             </ImageView>
-            <Label text="Bienestar Animal" styleClass="brand-title"/>
+            <Label text="Animal Welfare" styleClass="brand-title"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Probar conexion BD"
+            <Button text="Check connection"
                     onAction="#probarConexion"
                     styleClass="secondary-button">
                 <tooltip>
-                    <Tooltip text="Verifica si la aplicacion puede entrar a Oracle."/>
+                    <Tooltip text="Checks whether the application can reach its services."/>
                 </tooltip>
             </Button>
-            <Label text="Acceso" styleClass="chip"/>
+            <Label text="Access" styleClass="chip"/>
         </HBox>
     </top>
     <center>
@@ -45,35 +45,35 @@
                 <Insets top="30" right="40" bottom="40" left="40"/>
             </padding>
             <VBox spacing="16.0" prefWidth="430" styleClass="card form-card">
-                <Label text="Iniciar sesion" styleClass="title-lg"/>
+                <Label text="Sign in" styleClass="title-lg"/>
                 <VBox spacing="6.0">
-                    <Label text="Correo" styleClass="field-label"/>
-                    <TextField fx:id="txtCorreoLoginUsuario" promptText="correo@ejemplo.com"/>
+                    <Label text="Email" styleClass="field-label"/>
+                    <TextField fx:id="txtCorreoLoginUsuario" promptText="email@example.com"/>
                 </VBox>
                 <VBox spacing="6.0">
-                    <Label text="Contrasena" styleClass="field-label"/>
-                    <PasswordField fx:id="txtContrasenaLoginUsuario" promptText="Contrasena"/>
+                    <Label text="Password" styleClass="field-label"/>
+                    <PasswordField fx:id="txtContrasenaLoginUsuario" promptText="Password"/>
                 </VBox>
                 <HBox spacing="10.0">
-                    <Button text="Iniciar sesion"
+                    <Button text="Sign in"
                             onAction="#iniciarSesion"
                             styleClass="primary-button">
                         <tooltip>
-                            <Tooltip text="Valida la cuenta y abre el menu de usuario o administracion."/>
+                            <Tooltip text="Validates the account and opens the user or admin menu."/>
                         </tooltip>
                     </Button>
-                    <Button text="Crear cuenta"
+                    <Button text="Create account"
                             onAction="#abrirRegistroUsuario"
                             styleClass="secondary-button">
                         <tooltip>
-                            <Tooltip text="Abre el formulario para registrar un usuario."/>
+                            <Tooltip text="Opens the user registration form."/>
                         </tooltip>
                     </Button>
-                    <Button text="Limpiar"
+                    <Button text="Clear"
                             onAction="#limpiarUsuario"
                             styleClass="ghost-button">
                         <tooltip>
-                            <Tooltip text="Borra los datos escritos."/>
+                            <Tooltip text="Clears the entered data."/>
                         </tooltip>
                     </Button>
                 </HBox>

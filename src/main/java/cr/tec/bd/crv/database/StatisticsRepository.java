@@ -171,10 +171,10 @@ public class StatisticsRepository {
                     SELECT CASE
                         WHEN LOWER(NVL(ps.status, '')) IN ('for adoption', 'en adopcion')
                             OR LOWER(NVL(ps.status, '')) LIKE 'en adopci%'
-                            THEN 'En espera'
+                            THEN 'Waiting'
                         WHEN LOWER(NVL(ps.status, '')) IN ('adopted', 'adoptado', 'adoptada')
-                            THEN 'Adoptadas'
-                        ELSE 'Otros estados'
+                            THEN 'Adopted'
+                        ELSE 'Other statuses'
                     END AS outcome
                     FROM pet p
                     LEFT JOIN petStatus ps

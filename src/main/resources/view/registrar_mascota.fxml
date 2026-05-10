@@ -31,13 +31,13 @@
                     <Image url="@/images/logo.png"/>
                 </image>
             </ImageView>
-            <Label text="Registro de mascotas" styleClass="brand-title"/>
+            <Label text="Pet registration" styleClass="brand-title"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Ver lista" onAction="#abrirListaMascotas" styleClass="secondary-button">
-                <tooltip><Tooltip text="Abre la tabla general de mascotas registradas."/></tooltip>
+            <Button text="View list" onAction="#abrirListaMascotas" styleClass="secondary-button">
+                <tooltip><Tooltip text="Opens the full list of registered pets."/></tooltip>
             </Button>
-            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button">
-                <tooltip><Tooltip text="Regresa a la pantalla principal del sistema."/></tooltip>
+            <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button">
+                <tooltip><Tooltip text="Returns to the main screen."/></tooltip>
             </Button>
         </HBox>
     </top>
@@ -50,149 +50,149 @@
                     </padding>
                     <GridPane hgap="16.0" vgap="16.0">
                         <VBox spacing="14.0" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="card form-card">
-                            <Label text="Datos generales" styleClass="section-title"/>
+                            <Label text="General information" styleClass="section-title"/>
                             <GridPane hgap="14.0" vgap="14.0">
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                    <Label text="Nombre" styleClass="field-label"/>
-                                    <TextField fx:id="txtNombre" promptText="Nombre de la mascota"/>
+                                    <Label text="Name" styleClass="field-label"/>
+                                    <TextField fx:id="txtNombre" promptText="Pet name"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                    <Label text="Tipo" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbTipo" promptText="Tipo de mascota"/>
+                                    <Label text="Type" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbTipo" promptText="Pet type"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                    <Label text="Raza" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbRaza" promptText="Raza registrada"/>
+                                    <Label text="Breed" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbRaza" promptText="Registered breed"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                    <Label text="Estado" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbEstado" promptText="Estado actual">
-                                        <tooltip><Tooltip text="Solo el autor de la publicacion debe cambiar estados sensibles."/></tooltip>
+                                    <Label text="Status" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbEstado" promptText="Current status">
+                                        <tooltip><Tooltip text="Only the publication owner should change sensitive statuses."/></tooltip>
                                     </ComboBox>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
                                     <Label text="Color" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbColor" promptText="Color principal"/>
+                                    <ComboBox fx:id="cbColor" promptText="Main color"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                    <Label text="Chip de identificacion" styleClass="field-label"/>
-                                    <TextField fx:id="txtChip" promptText="Numero de chip"/>
+                                    <Label text="Identification chip" styleClass="field-label"/>
+                                    <TextField fx:id="txtChip" promptText="Chip number"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
-                                    <Label text="Tamano" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbTamano" promptText="Tamano registrado"/>
+                                    <Label text="Size" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbTamano" promptText="Registered size"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                    <Label text="Nivel de energia" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbEnergia" promptText="Seleccione nivel"/>
+                                    <Label text="Energy level" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbEnergia" promptText="Select level"/>
                                 </VBox>
                             </GridPane>
                         </VBox>
                         <VBox spacing="14.0" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="card form-card">
-                            <Label text="Ubicacion y contacto" styleClass="section-title"/>
+                            <Label text="Location and contact" styleClass="section-title"/>
                             <GridPane hgap="14.0" vgap="14.0">
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                    <Label text="Provincia" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbProvincia" promptText="Seleccione provincia"/>
+                                    <Label text="Province" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbProvincia" promptText="Select province"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                    <Label text="Fecha" styleClass="field-label"/>
+                                    <Label text="Date" styleClass="field-label"/>
                                     <DatePicker fx:id="dpEvento"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
                                     <Label text="Canton" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbCanton" promptText="Seleccione canton"/>
+                                    <ComboBox fx:id="cbCanton" promptText="Select canton"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                    <Label text="Distrito" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbDistrito" promptText="Seleccione distrito"/>
+                                    <Label text="District" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbDistrito" promptText="Select district"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                                    <Label text="Telefono de contacto" styleClass="field-label"/>
-                                    <TextField fx:id="txtTelefonoContacto" promptText="Numero principal"/>
+                                    <Label text="Contact phone" styleClass="field-label"/>
+                                    <TextField fx:id="txtTelefonoContacto" promptText="Primary number"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                    <Label text="Correo de contacto" styleClass="field-label"/>
-                                    <TextField fx:id="txtCorreoContacto" promptText="correo@ejemplo.com"/>
+                                    <Label text="Contact email" styleClass="field-label"/>
+                                    <TextField fx:id="txtCorreoContacto" promptText="email@example.com"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
-                                    <Label text="Veterinario de contacto" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbVeterinario" promptText="Veterinario registrado"/>
+                                    <Label text="Contact veterinarian" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbVeterinario" promptText="Registered veterinarian"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                    <Label text="Requiere mucho espacio" styleClass="field-label"/>
-                                    <TextField fx:id="txtEspacio" promptText="Si / No / Observaciones"/>
+                                    <Label text="Needs plenty of space" styleClass="field-label"/>
+                                    <TextField fx:id="txtEspacio" promptText="Yes / No / Notes"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="4">
-                                    <Label text="Moneda de recompensa" styleClass="field-label"/>
+                                    <Label text="Reward currency" styleClass="field-label"/>
                                     <ComboBox fx:id="cbMoneda" promptText="CRC o USD"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                                    <Label text="Monto de recompensa" styleClass="field-label"/>
+                                    <Label text="Reward amount" styleClass="field-label"/>
                                     <TextField fx:id="txtRecompensa" promptText="0.00"/>
                                 </VBox>
                             </GridPane>
                         </VBox>
                         <VBox spacing="14.0" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="card form-card">
-                            <Label text="Condicion y seguimiento" styleClass="section-title"/>
+                            <Label text="Condition and follow-up" styleClass="section-title"/>
                             <GridPane hgap="14.0" vgap="14.0">
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                    <Label text="Severidad" styleClass="field-label"/>
-                                    <TextField fx:id="txtEstadoSalud" promptText="Critico, estable, recuperado"/>
+                                    <Label text="Severity" styleClass="field-label"/>
+                                    <TextField fx:id="txtEstadoSalud" promptText="Critical, stable, recovered"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                    <Label text="Entrenamiento" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbEntrenamiento" promptText="Facilidad o nivel"/>
+                                    <Label text="Training" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbEntrenamiento" promptText="Ease or level"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                    <Label text="Enfermedades" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbEnfermedad" promptText="Seleccione enfermedad"/>
+                                    <Label text="Diseases" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbEnfermedad" promptText="Select disease"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                    <Label text="Tratamientos y medicamentos" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbTratamiento" promptText="Seleccione tratamiento"/>
+                                    <Label text="Treatments and medicines" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbTratamiento" promptText="Select treatment"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                                    <Label text="Medicamento" styleClass="field-label"/>
-                                    <ComboBox fx:id="cbMedicamento" promptText="Seleccione medicamento"/>
+                                    <Label text="Medicine" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbMedicamento" promptText="Select medicine"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                    <Label text="Dosis / indicacion" styleClass="field-label"/>
-                                    <TextField fx:id="txtDosisMedicamento" promptText="Segun veterinario"/>
+                                    <Label text="Dose / instruction" styleClass="field-label"/>
+                                    <TextField fx:id="txtDosisMedicamento" promptText="As prescribed by veterinarian"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2">
-                                    <Label text="Detalle de salud" styleClass="field-label"/>
-                                    <TextArea fx:id="txtDetalleSalud" prefRowCount="3" promptText="Observaciones del estado de salud"/>
+                                    <Label text="Health detail" styleClass="field-label"/>
+                                    <TextArea fx:id="txtDetalleSalud" prefRowCount="3" promptText="Health status notes"/>
                                 </VBox>
                             </GridPane>
                         </VBox>
                         <VBox spacing="14.0" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="card form-card">
-                            <Label text="Fotos y descripcion" styleClass="section-title"/>
+                            <Label text="Photos and description" styleClass="section-title"/>
                             <GridPane hgap="14.0" vgap="14.0">
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                    <Label text="Foto antes" styleClass="field-label"/>
-                                    <TextField fx:id="txtFotoAntes" promptText="Ruta o referencia de imagen"/>
+                                    <Label text="Before photo" styleClass="field-label"/>
+                                    <TextField fx:id="txtFotoAntes" promptText="Image path or reference"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                    <Label text="Foto despues" styleClass="field-label"/>
-                                    <TextField fx:id="txtFotoDespues" promptText="Ruta o referencia de imagen"/>
+                                    <Label text="After photo" styleClass="field-label"/>
+                                    <TextField fx:id="txtFotoDespues" promptText="Image path or reference"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2">
-                                    <Label text="Descripcion de la situacion" styleClass="field-label"/>
-                                    <TextArea fx:id="txtDescripcion" prefRowCount="6" promptText="Descripcion libre de abandono, rescate o condiciones observadas"/>
+                                    <Label text="Situation description" styleClass="field-label"/>
+                                    <TextArea fx:id="txtDescripcion" prefRowCount="6" promptText="Free description of abandonment, rescue, or observed conditions"/>
                                 </VBox>
                             </GridPane>
                         </VBox>
                     </GridPane>
                     <HBox spacing="10.0">
-                        <Button text="Guardar" onAction="#guardarMascota" styleClass="primary-button">
-                            <tooltip><Tooltip text="Guarda la informacion ingresada en el formulario."/></tooltip>
+                        <Button text="Save" onAction="#guardarMascota" styleClass="primary-button">
+                            <tooltip><Tooltip text="Saves the information entered in the form."/></tooltip>
                         </Button>
-                        <Button text="Limpiar" onAction="#limpiarFormulario" styleClass="secondary-button">
-                            <tooltip><Tooltip text="Limpia los datos escritos en esta vista."/></tooltip>
+                        <Button text="Clear" onAction="#limpiarFormulario" styleClass="secondary-button">
+                            <tooltip><Tooltip text="Clears the data entered in this view."/></tooltip>
                         </Button>
-                        <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button">
-                            <tooltip><Tooltip text="Regresa al menu principal sin salir de la aplicacion."/></tooltip>
+                        <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button">
+                            <tooltip><Tooltip text="Returns to the main menu without closing the app."/></tooltip>
                         </Button>
                     </HBox>
                     <Label fx:id="lblMensaje" text="" wrapText="true" styleClass="message-label"/>

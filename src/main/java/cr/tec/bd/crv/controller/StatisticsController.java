@@ -99,18 +99,18 @@ public class StatisticsController {
             lblDonacionesAcumuladas.setText(summary.getDonationTotalText());
             lblCasasCunaActivas.setText(String.valueOf(summary.getActiveFosterHomes()));
             lblResumenEstadisticas.setText(
-                    summary.getAdoptedPets() + " mascota(s) adoptada(s) de "
-                            + summary.getTotalPets() + " registrada(s)."
+                    summary.getAdoptedPets() + " adopted pet(s) out of "
+                            + summary.getTotalPets() + " registered."
             );
 
-            loadChart(chartMascotasEstado, "Estados", summary.getPetsByStatus());
-            loadChart(chartMascotasTipo, "Tipos", summary.getPetsByType());
-            loadChart(chartDonacionesAsociacion, "Donaciones", summary.getDonationsByAssociation());
-            loadChart(chartAdopciones, "Adopciones", summary.getAdoptionOutcome());
+            loadChart(chartMascotasEstado, "Statuses", summary.getPetsByStatus());
+            loadChart(chartMascotasTipo, "Types", summary.getPetsByType());
+            loadChart(chartDonacionesAsociacion, "Donations", summary.getDonationsByAssociation());
+            loadChart(chartAdopciones, "Adoptions", summary.getAdoptionOutcome());
             loadChart(chartEdad, "Edades", summary.getPetsByAgeRange());
             loadChart(chartCriticas, "Criticas", summary.getCriticalAdoptionPetsByType());
         } catch (SQLException e) {
-            lblResumenEstadisticas.setText("No se pudieron cargar estadisticas: " + e.getMessage());
+            lblResumenEstadisticas.setText("Could not load statistics: " + e.getMessage());
         }
     }
 
@@ -125,7 +125,7 @@ public class StatisticsController {
 
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
+        NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administration");
     }
 
     private void loadChart(BarChart<String, Number> chart, String seriesName, Iterable<ChartDataPoint> values) {
@@ -146,7 +146,7 @@ public class StatisticsController {
             cbStatsPetType.setItems(FXCollections.observableArrayList(catalogRepository.findPetTypes()));
             cbStatsBreed.setItems(FXCollections.observableArrayList(catalogRepository.findBreeds()));
         } catch (SQLException e) {
-            lblResumenEstadisticas.setText("No se pudieron cargar filtros: " + e.getMessage());
+            lblResumenEstadisticas.setText("Could not load filters: " + e.getMessage());
         }
     }
 
@@ -163,7 +163,7 @@ public class StatisticsController {
                     ));
                 }
             } catch (SQLException e) {
-                lblResumenEstadisticas.setText("No se pudieron cargar razas: " + e.getMessage());
+                lblResumenEstadisticas.setText("Could not load breeds: " + e.getMessage());
             }
         });
     }

@@ -33,11 +33,11 @@
                 </image>
             </ImageView>
             <VBox spacing="2.0">
-                <Label text="Lista negra" styleClass="brand-title"/>
-                <Label text="Registro y revision de reportes de personas" styleClass="brand-subtitle"/>
+                <Label text="Blacklist" styleClass="brand-title"/>
+                <Label text="People report registration and review" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menu" onAction="#backToMenu" styleClass="ghost-button"/>
+            <Button text="Back to menu" onAction="#backToMenu" styleClass="ghost-button"/>
         </HBox>
     </top>
     <center>
@@ -46,83 +46,83 @@
                 <Insets top="10" right="24" bottom="24" left="24"/>
             </padding>
             <VBox spacing="12.0" styleClass="card form-card">
-                <Label text="Nuevo reporte" styleClass="title-lg"/>
+                <Label text="New report" styleClass="title-lg"/>
                 <Label fx:id="lblReporterInfo" text="" wrapText="true" styleClass="subtle-text"/>
                 <GridPane hgap="14.0" vgap="14.0">
                     <VBox fx:id="boxReporter" spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                        <Label text="Reportante" styleClass="field-label"/>
-                        <ComboBox fx:id="cbReporter" promptText="Persona que reporta" maxWidth="Infinity"/>
+                        <Label text="Reporter" styleClass="field-label"/>
+                        <ComboBox fx:id="cbReporter" promptText="Reporting person" maxWidth="Infinity"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <Label text="Persona reportada" styleClass="field-label"/>
-                        <ComboBox fx:id="cbReportee" promptText="Persona a revisar" maxWidth="Infinity"/>
+                        <Label text="Reported person" styleClass="field-label"/>
+                        <ComboBox fx:id="cbReportee" promptText="Person to review" maxWidth="Infinity"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                        <Label text="Calificacion" styleClass="field-label"/>
-                        <ComboBox fx:id="cbRating" promptText="1 a 5"/>
+                        <Label text="Rating" styleClass="field-label"/>
+                        <ComboBox fx:id="cbRating" promptText="1 to 5"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="3" GridPane.rowIndex="0">
-                        <Label text="Fecha" styleClass="field-label"/>
+                        <Label text="Date" styleClass="field-label"/>
                         <DatePicker fx:id="dpReportDate"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="4">
-                        <Label text="Razon del reporte" styleClass="field-label"/>
-                        <TextArea fx:id="txtReason" prefRowCount="3" promptText="Explique el motivo de la alerta"/>
+                        <Label text="Report reason" styleClass="field-label"/>
+                        <TextArea fx:id="txtReason" prefRowCount="3" promptText="Explain the alert reason"/>
                     </VBox>
                 </GridPane>
                 <HBox spacing="10.0">
-                    <Button text="Guardar reporte" onAction="#saveReport" styleClass="primary-button">
+                    <Button text="Save report" onAction="#saveReport" styleClass="primary-button">
                         <tooltip>
-                            <Tooltip text="Registra la persona en lista negra con calificacion y motivo."/>
+                            <Tooltip text="Adds the person to the blacklist with rating and reason."/>
                         </tooltip>
                     </Button>
-                    <Button text="Limpiar formulario" onAction="#clearForm" styleClass="secondary-button"/>
+                    <Button text="Clear form" onAction="#clearForm" styleClass="secondary-button"/>
                 </HBox>
                 <Label fx:id="lblMessage" text="" wrapText="true" styleClass="message-label"/>
             </VBox>
             <VBox spacing="12.0" styleClass="card result-card">
                 <HBox alignment="CENTER_LEFT">
-                    <Label text="Reportes registrados" styleClass="section-title"/>
+                    <Label text="Registered reports" styleClass="section-title"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="lblSummary" text="0 registro(s)" styleClass="message-label"/>
+                    <Label fx:id="lblSummary" text="0 record(s)" styleClass="message-label"/>
                 </HBox>
                 <HBox spacing="10.0" alignment="CENTER_LEFT">
-                    <TextField fx:id="txtFilter" promptText="Buscar por persona, razon o calificacion" prefWidth="340"/>
-                    <Button text="Consultar" onAction="#loadReports" styleClass="primary-button"/>
-                    <Button text="Limpiar filtros" onAction="#clearFilters" styleClass="secondary-button"/>
+                    <TextField fx:id="txtFilter" promptText="Search by person, reason, or rating" prefWidth="340"/>
+                    <Button text="Search" onAction="#loadReports" styleClass="primary-button"/>
+                    <Button text="Clear filters" onAction="#clearFilters" styleClass="secondary-button"/>
                 </HBox>
                 <TableView fx:id="tableBlacklist" prefHeight="360">
                     <columns>
-                        <TableColumn fx:id="colDate" text="Fecha" prefWidth="105"/>
-                        <TableColumn fx:id="colReporter" text="Reportante" prefWidth="160"/>
-                        <TableColumn fx:id="colReportee" text="Reportado" prefWidth="165"/>
-                        <TableColumn fx:id="colRating" text="Calif." prefWidth="70"/>
-                        <TableColumn fx:id="colAverage" text="Promedio" prefWidth="90"/>
-                        <TableColumn fx:id="colStatus" text="Estado" prefWidth="90"/>
-                        <TableColumn fx:id="colReason" text="Razon" prefWidth="370"/>
+                        <TableColumn fx:id="colDate" text="Date" prefWidth="105"/>
+                        <TableColumn fx:id="colReporter" text="Reporter" prefWidth="160"/>
+                        <TableColumn fx:id="colReportee" text="Reported person" prefWidth="165"/>
+                        <TableColumn fx:id="colRating" text="Rating" prefWidth="70"/>
+                        <TableColumn fx:id="colAverage" text="Average" prefWidth="90"/>
+                        <TableColumn fx:id="colStatus" text="Status" prefWidth="90"/>
+                        <TableColumn fx:id="colReason" text="Reason" prefWidth="370"/>
                     </columns>
                 </TableView>
                 <VBox spacing="10.0" styleClass="card">
-                    <Label text="Detalle del reporte seleccionado" styleClass="section-title"/>
+                    <Label text="Selected report details" styleClass="section-title"/>
                     <GridPane hgap="14.0" vgap="8.0">
                         <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                            <Label text="Reportante" styleClass="field-label"/>
+                            <Label text="Reporter" styleClass="field-label"/>
                             <Label fx:id="lblDetalleReportante" text="-"/>
                         </VBox>
                         <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                            <Label text="Reportado" styleClass="field-label"/>
+                            <Label text="Reported person" styleClass="field-label"/>
                             <Label fx:id="lblDetalleReportado" text="-"/>
                         </VBox>
                         <VBox spacing="4.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                            <Label text="Calificacion" styleClass="field-label"/>
+                            <Label text="Rating" styleClass="field-label"/>
                             <Label fx:id="lblDetalleCalificacion" text="-"/>
                         </VBox>
                         <VBox spacing="4.0" GridPane.columnIndex="3" GridPane.rowIndex="0">
-                            <Label text="Promedio" styleClass="field-label"/>
+                            <Label text="Average" styleClass="field-label"/>
                             <Label fx:id="lblDetallePromedio" text="-"/>
                         </VBox>
                         <VBox spacing="4.0" GridPane.columnIndex="4" GridPane.rowIndex="0">
-                            <Label text="Estado" styleClass="field-label"/>
+                            <Label text="Status" styleClass="field-label"/>
                             <Label fx:id="lblDetalleEstado" text="-"/>
                         </VBox>
                     </GridPane>
@@ -130,7 +130,7 @@
                               prefRowCount="3"
                               editable="false"
                               wrapText="true"
-                              promptText="Seleccione una fila para ver la razon completa."/>
+                              promptText="Select a row to see the full reason."/>
                 </VBox>
             </VBox>
         </VBox>

@@ -29,9 +29,9 @@
                     <Image url="@/images/logo.png"/>
                 </image>
             </ImageView>
-            <Label text="Bienestar Animal" styleClass="brand-title"/>
+            <Label text="Animal Welfare" styleClass="brand-title"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label text="Registro de usuario" styleClass="chip"/>
+            <Label text="User registration" styleClass="chip"/>
         </HBox>
     </top>
     <center>
@@ -42,69 +42,69 @@
                         <Insets top="30" right="40" bottom="40" left="40"/>
                     </padding>
                     <VBox spacing="16.0" prefWidth="650" styleClass="card form-card">
-                        <Label text="Crear cuenta de usuario" styleClass="title-lg"/>
+                        <Label text="Create user account" styleClass="title-lg"/>
                         <GridPane hgap="12.0" vgap="12.0">
                             <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                <Label text="Primer nombre" styleClass="field-label"/>
-                                <TextField fx:id="txtPrimerNombreUsuario" promptText="Primer nombre"/>
+                                <Label text="First name" styleClass="field-label"/>
+                                <TextField fx:id="txtPrimerNombreUsuario" promptText="First name"/>
                             </VBox>
                             <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                <Label text="Segundo nombre" styleClass="field-label"/>
-                                <TextField fx:id="txtSegundoNombreUsuario" promptText="Opcional"/>
+                                <Label text="Middle name" styleClass="field-label"/>
+                                <TextField fx:id="txtSegundoNombreUsuario" promptText="Optional"/>
                             </VBox>
                             <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                <Label text="Primer apellido" styleClass="field-label"/>
-                                <TextField fx:id="txtPrimerApellidoUsuario" promptText="Primer apellido"/>
+                                <Label text="First last name" styleClass="field-label"/>
+                                <TextField fx:id="txtPrimerApellidoUsuario" promptText="First last name"/>
                             </VBox>
                             <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                <Label text="Segundo apellido" styleClass="field-label"/>
-                                <TextField fx:id="txtSegundoApellidoUsuario" promptText="Opcional"/>
+                                <Label text="Second last name" styleClass="field-label"/>
+                                <TextField fx:id="txtSegundoApellidoUsuario" promptText="Optional"/>
                             </VBox>
                             <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                                <Label text="Identificación" styleClass="field-label"/>
-                                <TextField fx:id="txtIdentificacionUsuario" promptText="Número de identificación"/>
+                                <Label text="Identification" styleClass="field-label"/>
+                                <TextField fx:id="txtIdentificacionUsuario" promptText="Identification number"/>
                             </VBox>
                             <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                <Label text="Teléfono principal" styleClass="field-label"/>
+                                <Label text="Primary phone" styleClass="field-label"/>
                                 <TextField fx:id="txtTelefonoUsuario" promptText="88888888"/>
                             </VBox>
                             <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
-                                <Label text="Correo principal" styleClass="field-label"/>
-                                <TextField fx:id="txtCorreoLoginUsuario" promptText="correo@ejemplo.com"/>
+                                <Label text="Primary email" styleClass="field-label"/>
+                                <TextField fx:id="txtCorreoLoginUsuario" promptText="email@example.com"/>
                             </VBox>
                             <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                <Label text="Correo adicional" styleClass="field-label"/>
-                                <TextField fx:id="txtCorreoSecundarioUsuario" promptText="Opcional"/>
+                                <Label text="Additional email" styleClass="field-label"/>
+                                <TextField fx:id="txtCorreoSecundarioUsuario" promptText="Optional"/>
                             </VBox>
                             <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="4">
-                                <Label text="Teléfono adicional" styleClass="field-label"/>
-                                <TextField fx:id="txtTelefonoSecundarioUsuario" promptText="Opcional"/>
+                                <Label text="Additional phone" styleClass="field-label"/>
+                                <TextField fx:id="txtTelefonoSecundarioUsuario" promptText="Optional"/>
                             </VBox>
                             <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                                <Label text="Contraseña" styleClass="field-label"/>
-                                <PasswordField fx:id="txtContrasenaLoginUsuario" promptText="Contraseña"/>
+                                <Label text="Password" styleClass="field-label"/>
+                                <PasswordField fx:id="txtContrasenaLoginUsuario" promptText="Password"/>
                             </VBox>
                         </GridPane>
                         <HBox spacing="10.0">
-                            <Button text="Crear cuenta"
+                            <Button text="Create account"
                                     onAction="#registrarUsuario"
                                     styleClass="primary-button">
                                 <tooltip>
                                     <Tooltip text="Guarda la cuenta y entra al sistema."/>
                                 </tooltip>
                             </Button>
-                            <Button text="Limpiar"
+                            <Button text="Clear"
                                     onAction="#limpiarUsuario"
                                     styleClass="secondary-button">
                                 <tooltip>
-                                    <Tooltip text="Borra los datos escritos."/>
+                                    <Tooltip text="Clears the entered data."/>
                                 </tooltip>
                             </Button>
-                            <Button text="Volver"
+                            <Button text="Back"
                                     onAction="#volverSeleccion"
                                     styleClass="ghost-button">
                                 <tooltip>
-                                    <Tooltip text="Regresar al inicio de sesión de usuario."/>
+                                    <Tooltip text="Returns to the sign-in screen."/>
                                 </tooltip>
                             </Button>
                         </HBox>

@@ -29,7 +29,7 @@ public class ConexionBD {
      */
     public static Connection conectar() throws SQLException {
         if (PASSWORD == null || PASSWORD.isBlank()) {
-            throw new SQLException("La contrasena de la base de datos no esta configurada.");
+            throw new SQLException("The system connection is not configured.");
         }
 
         // OracleDataSource is used instead of DriverManager because it sends Oracle-specific

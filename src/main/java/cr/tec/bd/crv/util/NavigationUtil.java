@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ScrollPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.io.IOException;
  * Shared navigation helper for all JavaFX screens.
  *
  * <p>Controllers call this class when the user presses buttons such as
- * "Volver", "Mi perfil", or "Donaciones". Keeping the navigation code here
+ * "Back", "My profile", or "Donations". Keeping the navigation code here
  * avoids copying the same window-loading steps in every controller.</p>
  */
 public final class NavigationUtil {
@@ -39,11 +40,25 @@ public final class NavigationUtil {
             throws IOException {
         Parent root = FXMLLoader.load(Main.class.getResource(fxmlPath));
         Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root, width, height);
+        Scene scene = new Scene(wrapScrollable(root), width, height);
         scene.getStylesheets().add(Main.class.getResource("/styles/style.css").toExternalForm());
         stage.setTitle(title);
         stage.setScene(scene);
         stage.show();
+    }
+
+    /**
+     * Gives every screen a scrollable shell so controls stay reachable in small windows.
+     */
+    public static ScrollPane wrapScrollable(Parent root) {
+        root.getStyleClass().add("app-content");
+
+        ScrollPane scrollPane = new ScrollPane(root);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setPannable(true);
+        scrollPane.getStyleClass().add("app-scroll");
+        return scrollPane;
     }
 
     /**

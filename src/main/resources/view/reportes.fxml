@@ -32,11 +32,11 @@
                 </image>
             </ImageView>
             <VBox spacing="2.0">
-                <Label text="Consultas y reportes" styleClass="brand-title"/>
-                <Label text="Reportes administrativos con filtros y totales" styleClass="brand-subtitle"/>
+                <Label text="Queries and reports" styleClass="brand-title"/>
+                <Label text="Administrative reports with filters and totals" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button"/>
+            <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button"/>
         </HBox>
     </top>
     <center>
@@ -45,48 +45,48 @@
                 <Insets top="10" right="24" bottom="24" left="24"/>
             </padding>
             <VBox spacing="12.0" styleClass="card form-card">
-                <Label text="Parametros del reporte" styleClass="title-lg"/>
+                <Label text="Report parameters" styleClass="title-lg"/>
                 <GridPane hgap="14.0" vgap="14.0">
                     <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                        <Label text="Tipo de reporte" styleClass="field-label"/>
-                        <ComboBox fx:id="cbTipoReporte" promptText="Seleccione reporte" maxWidth="Infinity"/>
+                        <Label text="Report type" styleClass="field-label"/>
+                        <ComboBox fx:id="cbTipoReporte" promptText="Select report" maxWidth="Infinity"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <Label text="Filtro de texto" styleClass="field-label"/>
-                        <TextField fx:id="txtFiltroReporte" promptText="Nombre, estado, raza, asociacion"/>
+                        <Label text="Text filter" styleClass="field-label"/>
+                        <TextField fx:id="txtFiltroReporte" promptText="Name, status, breed, association"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                        <Label text="Desde" styleClass="field-label"/>
+                        <Label text="From" styleClass="field-label"/>
                         <DatePicker fx:id="dpReporteDesde"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="3" GridPane.rowIndex="0">
-                        <Label text="Hasta" styleClass="field-label"/>
+                        <Label text="To" styleClass="field-label"/>
                         <DatePicker fx:id="dpReporteHasta"/>
                     </VBox>
                 </GridPane>
                 <HBox spacing="10.0">
-                    <Button text="Generar reporte" onAction="#generarReporte" styleClass="primary-button">
+                    <Button text="Generate report" onAction="#generarReporte" styleClass="primary-button">
                         <tooltip>
-                            <Tooltip text="Ejecuta el reporte seleccionado con los filtros indicados."/>
+                            <Tooltip text="Runs the selected report with the indicated filters."/>
                         </tooltip>
                     </Button>
-                    <Button text="Limpiar filtros" onAction="#limpiarReporte" styleClass="secondary-button"/>
+                    <Button text="Clear filters" onAction="#limpiarReporte" styleClass="secondary-button"/>
                 </HBox>
                 <Label fx:id="lblMensajeReporte" text="" wrapText="true" styleClass="message-label"/>
             </VBox>
             <VBox spacing="12.0" styleClass="card result-card">
                 <HBox alignment="CENTER_LEFT">
-                    <Label text="Resultados" styleClass="section-title"/>
+                    <Label text="Results" styleClass="section-title"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="lblResumenReporte" text="0 registro(s)" styleClass="message-label"/>
+                    <Label fx:id="lblResumenReporte" text="0 record(s)" styleClass="message-label"/>
                 </HBox>
                 <TableView fx:id="tablaReportes" prefHeight="430">
                     <columns>
-                        <TableColumn fx:id="colReporte1" text="Campo 1" prefWidth="220"/>
-                        <TableColumn fx:id="colReporte2" text="Campo 2" prefWidth="190"/>
-                        <TableColumn fx:id="colReporte3" text="Campo 3" prefWidth="160"/>
-                        <TableColumn fx:id="colReporte4" text="Campo 4" prefWidth="170"/>
-                        <TableColumn fx:id="colReporte5" text="Campo 5" prefWidth="170"/>
+                        <TableColumn fx:id="colReporte1" text="Field 1" prefWidth="220"/>
+                        <TableColumn fx:id="colReporte2" text="Field 2" prefWidth="190"/>
+                        <TableColumn fx:id="colReporte3" text="Field 3" prefWidth="160"/>
+                        <TableColumn fx:id="colReporte4" text="Field 4" prefWidth="170"/>
+                        <TableColumn fx:id="colReporte5" text="Field 5" prefWidth="170"/>
                     </columns>
                 </TableView>
             </VBox>

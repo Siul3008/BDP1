@@ -133,13 +133,13 @@ public class BlacklistController {
                     dpReportDate.getValue()
             );
 
-            lblMessage.setText("Reporte agregado a lista negra.");
+            lblMessage.setText("Report added to blacklist.");
             clearFormOnly();
             loadReports();
         } catch (IllegalArgumentException | IllegalStateException e) {
             lblMessage.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMessage.setText("No se pudo guardar el reporte: " + e.getMessage());
+            lblMessage.setText("Could not save the report: " + e.getMessage());
         }
     }
 
@@ -148,12 +148,12 @@ public class BlacklistController {
         try {
             List<BlacklistRecord> records = blacklistRepository.findReports(txtFilter.getText());
             tableBlacklist.setItems(FXCollections.observableArrayList(records));
-            lblSummary.setText(records.size() + " registro(s)");
+            lblSummary.setText(records.size() + " record(s)");
             if (records.isEmpty() && lblMessage.getText().isEmpty()) {
-                lblMessage.setText("No hay reportes registrados con esos filtros.");
+                lblMessage.setText("No reports were found with those filters.");
             }
         } catch (SQLException | IllegalStateException e) {
-            lblMessage.setText("No se pudo consultar lista negra: " + e.getMessage());
+            lblMessage.setText("Could not search blacklist: " + e.getMessage());
         }
     }
 
@@ -173,9 +173,9 @@ public class BlacklistController {
     @FXML
     public void backToMenu(ActionEvent event) throws IOException {
         if (SessionContext.isAdmin()) {
-            NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
+            NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administration");
         } else {
-            NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
+            NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Animal Welfare");
         }
     }
 
@@ -220,8 +220,8 @@ public class BlacklistController {
         boxReporter.setVisible(admin);
         boxReporter.setManaged(admin);
         lblReporterInfo.setText(admin
-                ? "Seleccione quien realiza el reporte."
-                : "El reporte se registrara con el usuario que inicio sesion.");
+                ? "Select who is making the report."
+                : "The report will be registered with the signed-in user.");
     }
 
     private void loadPeople() {
@@ -230,7 +230,7 @@ public class BlacklistController {
             cbReporter.setItems(FXCollections.observableArrayList(people));
             cbReportee.setItems(FXCollections.observableArrayList(people));
         } catch (SQLException e) {
-            lblMessage.setText("No se pudieron cargar personas: " + e.getMessage());
+            lblMessage.setText("Could not load people: " + e.getMessage());
         }
     }
 

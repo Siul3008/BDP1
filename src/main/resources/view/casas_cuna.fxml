@@ -32,11 +32,11 @@
                 </image>
             </ImageView>
             <VBox spacing="2.0">
-                <Label text="Casa cuna" styleClass="brand-title"/>
-                <Label text="Condiciones de alojamiento temporal" styleClass="brand-subtitle"/>
+                <Label text="Foster home" styleClass="brand-title"/>
+                <Label text="Temporary foster conditions" styleClass="brand-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button"/>
+            <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button"/>
         </HBox>
     </top>
     <center>
@@ -46,14 +46,14 @@
             </padding>
             <HBox spacing="18.0">
                 <VBox spacing="14.0" HBox.hgrow="ALWAYS" styleClass="card form-card">
-                    <Label text="Configurar casa cuna" styleClass="title-lg"/>
+                    <Label text="Configure foster home" styleClass="title-lg"/>
                     <Label fx:id="lblEstadoCasaCuna"
-                           text="Completa estas condiciones para activar casa cuna."
+                           text="Complete these conditions to activate foster home."
                            wrapText="true"
                            styleClass="subtle-text"/>
                     <GridPane hgap="16.0" vgap="14.0">
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                            <Label text="Tipos aceptados" styleClass="field-label"/>
+                            <Label text="Accepted types" styleClass="field-label"/>
                             <ScrollPane fitToWidth="true" prefHeight="210" prefWidth="280" styleClass="check-scroll">
                                 <content>
                                     <VBox fx:id="boxTiposAceptados" spacing="8.0" styleClass="check-list"/>
@@ -61,7 +61,7 @@
                             </ScrollPane>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                            <Label text="Tamanos aceptados" styleClass="field-label"/>
+                            <Label text="Accepted sizes" styleClass="field-label"/>
                             <ScrollPane fitToWidth="true" prefHeight="210" prefWidth="280" styleClass="check-scroll">
                                 <content>
                                     <VBox fx:id="boxTamanosAceptados" spacing="8.0" styleClass="check-list"/>
@@ -69,25 +69,25 @@
                             </ScrollPane>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                            <Label text="Donacion de alimento" styleClass="field-label"/>
+                            <Label text="Food donation" styleClass="field-label"/>
                             <ComboBox fx:id="cbDonacionAlimento"
-                                      promptText="Seleccione una opcion"
+                                      promptText="Select an option"
                                       prefWidth="280"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2">
-                            <Label text="Notas adicionales" styleClass="field-label"/>
+                            <Label text="Additional notes" styleClass="field-label"/>
                             <TextArea fx:id="txtNotasCasaCuna"
                                       prefRowCount="4"
                                       wrapText="true"
-                                      promptText="Ejemplo: horario, espacio disponible, restricciones o cuidados especiales."/>
+                                      promptText="Example: schedule, available space, restrictions, or special care."/>
                         </VBox>
                     </GridPane>
                     <HBox spacing="10.0">
-                        <Button text="Guardar casa cuna"
+                        <Button text="Save foster home"
                                 onAction="#guardarCasaCuna"
                                 styleClass="primary-button">
                             <tooltip>
-                                <Tooltip text="Guarda las condiciones y activa el perfil como casa cuna."/>
+                                <Tooltip text="Saves conditions and activates the profile as a foster home."/>
                             </tooltip>
                         </Button>
                     </HBox>
@@ -95,25 +95,25 @@
                 </VBox>
                 <VBox spacing="12.0" prefWidth="620" styleClass="card result-card">
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
-                        <Label text="Casas cuna activas" styleClass="section-title"/>
+                        <Label text="Active foster homes" styleClass="section-title"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Button text="Actualizar" onAction="#recargarCasasCuna" styleClass="secondary-button">
+                        <Button text="Update" onAction="#recargarCasasCuna" styleClass="secondary-button">
                             <tooltip>
-                                <Tooltip text="Recarga la lista de usuarios que aceptan alojamiento temporal."/>
+                                <Tooltip text="Reloads users who accept temporary housing."/>
                             </tooltip>
                         </Button>
                     </HBox>
-                    <Label text="Use estos contactos cuando una mascota en adopcion necesita alojamiento temporal."
+                    <Label text="Use these contacts when a pet for adoption needs temporary housing."
                            wrapText="true"
                            styleClass="subtle-text"/>
                     <TableView fx:id="tablaCasasCuna" prefHeight="430">
                         <columns>
-                            <TableColumn fx:id="colCasaNombre" text="Casa cuna" prefWidth="135"/>
-                            <TableColumn fx:id="colCasaContacto" text="Contacto" prefWidth="170"/>
-                            <TableColumn fx:id="colCasaTipos" text="Tipos" prefWidth="120"/>
-                            <TableColumn fx:id="colCasaTamanos" text="Tamanos" prefWidth="100"/>
-                            <TableColumn fx:id="colCasaAlimento" text="Alimento" prefWidth="90"/>
-                            <TableColumn fx:id="colCasaNotas" text="Notas" prefWidth="180"/>
+                            <TableColumn fx:id="colCasaNombre" text="Foster home" prefWidth="135"/>
+                            <TableColumn fx:id="colCasaContacto" text="Contact" prefWidth="170"/>
+                            <TableColumn fx:id="colCasaTipos" text="Types" prefWidth="120"/>
+                            <TableColumn fx:id="colCasaTamanos" text="Sizes" prefWidth="100"/>
+                            <TableColumn fx:id="colCasaAlimento" text="Food" prefWidth="90"/>
+                            <TableColumn fx:id="colCasaNotas" text="Notes" prefWidth="180"/>
                         </columns>
                     </TableView>
                 </VBox>

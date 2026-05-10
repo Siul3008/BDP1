@@ -40,28 +40,28 @@ public class MenuController {
      * Opens the form used to publish or edit a pet.
      */
     public void abrirRegistrarMascota(ActionEvent event) throws IOException {
-        openModule(event, "/view/registrar_mascota.fxml", "Registrar Mascota");
+        openModule(event, "/view/registrar_mascota.fxml", "Register Pet");
     }
 
     /**
      * Opens the search screen, where pets can be filtered by status and text.
      */
     public void abrirBuscarMascota(ActionEvent event) throws IOException {
-        openModule(event, "/view/buscar_mascota.fxml", "Buscar Mascota");
+        openModule(event, "/view/buscar_mascota.fxml", "Pet Search");
     }
 
     /**
      * Opens the list used to review pets and change allowed statuses.
      */
     public void abrirListaMascotas(ActionEvent event) throws IOException {
-        openModule(event, "/view/lista_mascotas.fxml", "Lista de Mascotas");
+        openModule(event, "/view/lista_mascotas.fxml", "Pet List");
     }
 
     /**
      * Opens the account profile for the signed-in user.
      */
     public void abrirPerfil(ActionEvent event) throws IOException {
-        openModule(event, "/view/perfil_usuario.fxml", "Mi Perfil");
+        openModule(event, "/view/perfil_usuario.fxml", "My Profile");
     }
 
     /**
@@ -75,56 +75,56 @@ public class MenuController {
      * Opens the adoption registration and follow-up screen.
      */
     public void abrirAdopciones(ActionEvent event) throws IOException {
-        openModule(event, "/view/adopciones.fxml", "Adopciones");
+        openModule(event, "/view/adopciones.fxml", "Adoptions");
     }
 
     /**
      * Opens donations. Normal users can donate; admins can also review records.
      */
     public void abrirDonaciones(ActionEvent event) throws IOException {
-        openModule(event, "/view/donaciones.fxml", "Donaciones");
+        openModule(event, "/view/donaciones.fxml", "Donations");
     }
 
     /**
      * Opens the blacklist report administration screen.
      */
     public void abrirListaNegra(ActionEvent event) throws IOException {
-        openModule(event, "/view/lista_negra.fxml", "Lista Negra");
+        openModule(event, "/view/lista_negra.fxml", "Blacklist");
     }
 
     /**
      * Opens the catalog maintenance screen for admin-managed values.
      */
     public void abrirParametros(ActionEvent event) throws IOException {
-        openModule(event, "/view/parametros.fxml", "Parametros");
+        openModule(event, "/view/parametros.fxml", "Parameters");
     }
 
     /**
      * Opens the association management screen.
      */
     public void abrirAsociaciones(ActionEvent event) throws IOException {
-        openModule(event, "/view/asociaciones.fxml", "Asociaciones");
+        openModule(event, "/view/asociaciones.fxml", "Associations");
     }
 
     /**
      * Opens the audit log, where system changes can be reviewed.
      */
     public void abrirBitacora(ActionEvent event) throws IOException {
-        openModule(event, "/view/bitacora.fxml", "Bitácora");
+        openModule(event, "/view/bitacora.fxml", "Audit log");
     }
 
     /**
      * Opens charts and summarized numbers about the system.
      */
     public void abrirEstadisticas(ActionEvent event) throws IOException {
-        openModule(event, "/view/estadisticas.fxml", "Estadísticas");
+        openModule(event, "/view/estadisticas.fxml", "Statistics");
     }
 
     /**
      * Opens predefined database reports.
      */
     public void abrirReportes(ActionEvent event) throws IOException {
-        openModule(event, "/view/reportes.fxml", "Consultas y Reportes");
+        openModule(event, "/view/reportes.fxml", "Queries and Reports");
     }
 
     /**
@@ -132,7 +132,7 @@ public class MenuController {
      */
     public void cerrarSesion(ActionEvent event) throws IOException {
         SessionContext.clear();
-        NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
+        NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Animal Welfare");
     }
 
     /**
@@ -141,14 +141,14 @@ public class MenuController {
     public void probarConexion() {
         try (Connection connection = ConexionBD.conectar()) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Conexión");
+            alert.setTitle("Connection");
             alert.setHeaderText(null);
-            alert.setContentText("Conexión exitosa con Oracle");
+            alert.setContentText("Connection is working.");
             alert.showAndWait();
         } catch (SQLException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error de conexión");
-            alert.setHeaderText("No se pudo conectar a la base de datos");
+            alert.setTitle("Connection error");
+            alert.setHeaderText("Could not connect to the system service");
             alert.setContentText(e.getMessage());
             alert.showAndWait();
         }

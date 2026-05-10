@@ -122,14 +122,14 @@ public class ParameterController {
                 parameterRepository.saveSimple(category, selectedId, txtName.getText());
             }
 
-            lblMessage.setText("Parametro guardado correctamente.");
+            lblMessage.setText("Parameter saved successfully.");
             selectedId = null;
             clearFields();
             loadRecords();
         } catch (IllegalArgumentException e) {
             lblMessage.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMessage.setText("No se pudo guardar el parametro: " + e.getMessage());
+            lblMessage.setText("Could not save the parameter: " + e.getMessage());
         }
     }
 
@@ -146,16 +146,16 @@ public class ParameterController {
         try {
             var records = parameterRepository.findRecords(cbCategory.getValue());
             tableParameters.setItems(FXCollections.observableArrayList(records));
-            lblSummary.setText(records.size() + " registro(s)");
+            lblSummary.setText(records.size() + " record(s)");
             lblMessage.setText("");
         } catch (SQLException e) {
-            lblMessage.setText("No se pudieron cargar parametros: " + e.getMessage());
+            lblMessage.setText("Could not load parameters: " + e.getMessage());
         }
     }
 
     @FXML
     public void backToMenu(ActionEvent event) throws IOException {
-        NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administracion");
+        NavigationUtil.openWindow(event, "/view/admin_menu.fxml", "BDP1 - Administration");
     }
 
     private void configureColumns() {
@@ -177,9 +177,9 @@ public class ParameterController {
         boxDescription.setVisible(systemParameter);
         boxDescription.setManaged(systemParameter);
 
-        lblName.setText(systemParameter ? "Nombre del parametro" : "Nombre");
-        lblExtra.setText(currency ? "Acronimo" : "Valor");
-        colExtra.setText(breed ? "Tipo" : currency ? "Acronimo" : systemParameter ? "Valor" : "Detalle");
+        lblName.setText(systemParameter ? "Parameter name" : "Name");
+        lblExtra.setText(currency ? "Acronimo" : "Value");
+        colExtra.setText(breed ? "Type" : currency ? "Acronimo" : systemParameter ? "Value" : "Detail");
     }
 
     private void loadSelectedRecord(ParameterRecord record) {
@@ -191,14 +191,14 @@ public class ParameterController {
         if (ParameterRepository.BREEDS.equals(cbCategory.getValue())) {
             selectPetTypeByLabel(record.getExtra());
         }
-        lblMessage.setText("Editando registro #" + selectedId + ".");
+        lblMessage.setText("Editing record #" + selectedId + ".");
     }
 
     private void loadPetTypes() {
         try {
             cbPetType.setItems(FXCollections.observableArrayList(catalogRepository.findPetTypes()));
         } catch (SQLException e) {
-            lblMessage.setText("No se pudieron cargar tipos de mascota: " + e.getMessage());
+            lblMessage.setText("Could not load pet types: " + e.getMessage());
         }
     }
 

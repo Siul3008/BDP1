@@ -122,13 +122,13 @@ public class DonationController {
                     dpFechaDonacion.getValue()
             );
 
-            lblMensajeDonacion.setText("Donacion registrada correctamente.");
+            lblMensajeDonacion.setText("Donation registered successfully.");
             limpiarFormularioDonacion();
             buscarDonaciones();
         } catch (IllegalArgumentException e) {
             lblMensajeDonacion.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensajeDonacion.setText("No se pudo registrar la donacion: " + e.getMessage());
+            lblMensajeDonacion.setText("Could not register the donation: " + e.getMessage());
         }
     }
 
@@ -152,7 +152,7 @@ public class DonationController {
         } catch (IllegalArgumentException e) {
             lblMensajeDonacion.setText(e.getMessage());
         } catch (SQLException e) {
-            lblMensajeDonacion.setText("No se pudieron consultar donaciones: " + e.getMessage());
+            lblMensajeDonacion.setText("Could not search donations: " + e.getMessage());
         }
     }
 
@@ -178,20 +178,20 @@ public class DonationController {
     public void eliminarDonacionSeleccionada() {
         // Deleting a donation is restricted to admins because it changes historical money records.
         if (!SessionContext.isAdmin()) {
-            lblMensajeDonacion.setText("Solo el administrador puede eliminar donaciones.");
+            lblMensajeDonacion.setText("Only an admin can delete donations.");
             return;
         }
 
         DonationRecord selectedDonation = tablaDonaciones.getSelectionModel().getSelectedItem();
         if (selectedDonation == null) {
-            lblMensajeDonacion.setText("Seleccione una donacion de la tabla.");
+            lblMensajeDonacion.setText("Select a donation from the list.");
             return;
         }
 
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Confirmar eliminacion");
         confirmation.setHeaderText(null);
-        confirmation.setContentText("Desea eliminar la donacion seleccionada?");
+        confirmation.setContentText("Do you want to delete the selected donation?");
 
         if (confirmation.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
             return;
@@ -199,17 +199,17 @@ public class DonationController {
 
         try {
             donationRepository.deleteDonation(selectedDonation.getId());
-            lblMensajeDonacion.setText("Donacion eliminada correctamente.");
+            lblMensajeDonacion.setText("Donation deleted successfully.");
             buscarDonaciones();
         } catch (SQLException e) {
-            lblMensajeDonacion.setText("No se pudo eliminar la donacion: " + e.getMessage());
+            lblMensajeDonacion.setText("Could not delete the donation: " + e.getMessage());
         }
     }
 
     @FXML
     public void volverMenu(ActionEvent event) throws IOException {
         String menuPath = SessionContext.isAdmin() ? "/view/admin_menu.fxml" : "/view/menu.fxml";
-        NavigationUtil.openWindow(event, menuPath, "BDP1 - Bienestar Animal");
+        NavigationUtil.openWindow(event, menuPath, "BDP1 - Animal Welfare");
     }
 
     private void configureColumns() {
@@ -228,9 +228,9 @@ public class DonationController {
         btnEliminarDonacion.setManaged(admin);
 
         if (admin) {
-            lblModoDonacion.setText("Modo administrador: consulta y administra donaciones registradas.");
+            lblModoDonacion.setText("Admin mode: search and manage registered donations.");
         } else {
-            lblModoDonacion.setText("Su donacion quedara asociada a la cuenta con la que inicio sesion.");
+            lblModoDonacion.setText("Your donation will be linked to the account you signed in with.");
         }
     }
 
@@ -241,7 +241,7 @@ public class DonationController {
             cbFiltroAsociacion.setItems(FXCollections.observableArrayList(associations));
             cbMonedaDonacion.setItems(FXCollections.observableArrayList(catalogRepository.findCurrencies()));
         } catch (SQLException e) {
-            lblMensajeDonacion.setText("No se pudieron cargar catalogos de donaciones: " + e.getMessage());
+            lblMensajeDonacion.setText("Could not load donation catalogs: " + e.getMessage());
         }
     }
 
@@ -254,7 +254,7 @@ public class DonationController {
         }
 
         StringBuilder summary = new StringBuilder();
-        summary.append(donations.size()).append(" registro(s)");
+        summary.append(donations.size()).append(" record(s)");
 
         if (!totalsByCurrency.isEmpty()) {
             summary.append(" | Total: ");
@@ -273,7 +273,7 @@ public class DonationController {
 
     private void clearMessageIfNeeded() {
         String message = lblMensajeDonacion.getText();
-        if (message != null && message.startsWith("No se pudieron consultar")) {
+        if (message != null && message.startsWith("Could not search")) {
             lblMensajeDonacion.setText("");
         }
     }
@@ -291,7 +291,7 @@ public class DonationController {
         try {
             return new BigDecimal(rawAmount.trim().replace(",", "."));
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("El monto debe ser numerico.");
+            throw new IllegalArgumentException("Amount must be numeric.");
         }
     }
 
