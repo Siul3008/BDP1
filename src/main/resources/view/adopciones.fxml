@@ -51,7 +51,6 @@
             </padding>
             <HBox spacing="18.0">
                 <VBox spacing="12.0" prefWidth="560" styleClass="card form-card">
-                    <Label text="New adoption" styleClass="title-lg"/>
                     <Label text="Select a pet under your control and register the adopting user." wrapText="true" styleClass="subtle-text"/>
                     <GridPane hgap="14.0" vgap="14.0">
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">

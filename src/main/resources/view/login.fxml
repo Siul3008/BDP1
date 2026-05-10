@@ -29,13 +29,6 @@
             </ImageView>
             <Label text="Animal Welfare" styleClass="brand-title"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Check connection"
-                    onAction="#probarConexion"
-                    styleClass="secondary-button">
-                <tooltip>
-                    <Tooltip text="Checks whether the application can reach its services."/>
-                </tooltip>
-            </Button>
             <Label text="Access" styleClass="chip"/>
         </HBox>
     </top>
