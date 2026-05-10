@@ -10,11 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data access class for association records managed by admins.
+ * Reads and writes association information.
+ *
+ * <p>Associations are organizations that can receive donations. This repository
+ * keeps the admin screen from dealing directly with SQL.</p>
  */
 public class AssociationRepository {
 
-    // Associations are registered by an admin; they no longer have their own login account.
+    private final ApplicationAuditRepository auditRepository = new ApplicationAuditRepository();
+
+    /**
+     * Creates a new association. Associations are registered by an admin and do not log in.
+     */
     public void registerAssociation(String name) throws SQLException {
         requireValue(name, "El nombre de la asociacion es obligatorio.");
 
@@ -26,10 +33,14 @@ public class AssociationRepository {
                 statement.setLong(1, associationId);
                 statement.setString(2, name.trim());
                 statement.executeUpdate();
+                auditRepository.log(connection, "Asociaciones", "Crear", "-", name.trim());
             }
         }
     }
 
+    /**
+     * Lists associations together with donation totals used by the admin table.
+     */
     public List<AssociationRecord> findAssociationRecords() throws SQLException {
         String sql = """
                 SELECT
@@ -62,6 +73,9 @@ public class AssociationRepository {
         }
     }
 
+    /**
+     * Renames an existing association.
+     */
     public void updateAssociationName(long associationId, String name) throws SQLException {
         requireValue(name, "El nombre de la asociacion es obligatorio.");
 
@@ -74,6 +88,7 @@ public class AssociationRepository {
             if (updatedRows == 0) {
                 throw new IllegalArgumentException("La asociacion seleccionada no existe.");
             }
+            auditRepository.log(connection, "Asociaciones", "Nombre", "id:" + associationId, name.trim());
         }
     }
 

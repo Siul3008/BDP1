@@ -1,7 +1,10 @@
 package cr.tec.bd.crv.model;
 
 /**
- * Immutable data transfer object for user registration form values.
+ * Carries user registration values from the screen to the repository.
+ *
+ * <p>It does not save anything by itself. It simply groups the typed values so
+ * the controller does not need to pass ten separate parameters.</p>
  */
 public class UserRegistrationData {
 

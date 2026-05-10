@@ -3,6 +3,7 @@ package cr.tec.bd.crv.controller;
 import cr.tec.bd.crv.database.CatalogRepository;
 import cr.tec.bd.crv.database.FosterHomeRepository;
 import cr.tec.bd.crv.model.CatalogOption;
+import cr.tec.bd.crv.model.FosterHomeDirectoryRecord;
 import cr.tec.bd.crv.model.FosterHomeProfile;
 import cr.tec.bd.crv.util.NavigationUtil;
 import cr.tec.bd.crv.util.SessionContext;
@@ -13,7 +14,10 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -21,7 +25,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Controller for foster home activation and condition management.
+ * Controls foster home activation and accepted conditions.
+ *
+ * <p>A user becomes a foster home by saving what they can temporarily receive:
+ * accepted pet types, accepted pet sizes, food donation preference, and notes.
+ * Check boxes are used instead of multi-select lists so the user does not need
+ * special keyboard shortcuts.</p>
  */
 public class CasaCunaController {
 
@@ -47,13 +56,37 @@ public class CasaCunaController {
     private Label lblMensajeCasaCuna;
 
     @FXML
+    private TableView<FosterHomeDirectoryRecord> tablaCasasCuna;
+
+    @FXML
+    private TableColumn<FosterHomeDirectoryRecord, String> colCasaNombre;
+
+    @FXML
+    private TableColumn<FosterHomeDirectoryRecord, String> colCasaContacto;
+
+    @FXML
+    private TableColumn<FosterHomeDirectoryRecord, String> colCasaTipos;
+
+    @FXML
+    private TableColumn<FosterHomeDirectoryRecord, String> colCasaTamanos;
+
+    @FXML
+    private TableColumn<FosterHomeDirectoryRecord, String> colCasaAlimento;
+
+    @FXML
+    private TableColumn<FosterHomeDirectoryRecord, String> colCasaNotas;
+
+    @FXML
     public void initialize() {
+        configureDirectoryColumns();
         loadCatalogsAndProfile();
+        loadDirectory();
     }
 
     @FXML
     public void guardarCasaCuna() {
         try {
+            // Saving the profile creates the foster home if it does not exist yet.
             fosterHomeRepository.saveProfile(
                     SessionContext.getCurrentPersonId(),
                     idOf(cbDonacionAlimento),
@@ -63,6 +96,7 @@ public class CasaCunaController {
             );
             lblEstadoCasaCuna.setText("Casa cuna activa.");
             lblMensajeCasaCuna.setText("Condiciones guardadas correctamente.");
+            loadDirectory();
         } catch (IllegalArgumentException e) {
             lblMensajeCasaCuna.setText(e.getMessage());
         } catch (SQLException e) {
@@ -75,8 +109,23 @@ public class CasaCunaController {
         NavigationUtil.openWindow(event, "/view/menu.fxml", "BDP1 - Bienestar Animal");
     }
 
+    @FXML
+    public void recargarCasasCuna() {
+        loadDirectory();
+    }
+
+    private void configureDirectoryColumns() {
+        colCasaNombre.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colCasaContacto.setCellValueFactory(new PropertyValueFactory<>("contact"));
+        colCasaTipos.setCellValueFactory(new PropertyValueFactory<>("acceptedTypes"));
+        colCasaTamanos.setCellValueFactory(new PropertyValueFactory<>("acceptedSizes"));
+        colCasaAlimento.setCellValueFactory(new PropertyValueFactory<>("foodDonation"));
+        colCasaNotas.setCellValueFactory(new PropertyValueFactory<>("notes"));
+    }
+
     private void loadCatalogsAndProfile() {
         try {
+            // Catalog values come from the database so foster home conditions match real pet options.
             loadCheckOptions(boxTiposAceptados, catalogRepository.findPetTypes());
             loadCheckOptions(boxTamanosAceptados, catalogRepository.findPetSizes());
             cbDonacionAlimento.setItems(FXCollections.observableArrayList(catalogRepository.findFoodDonationOptions()));
@@ -95,7 +144,16 @@ public class CasaCunaController {
         }
     }
 
+    private void loadDirectory() {
+        try {
+            tablaCasasCuna.setItems(FXCollections.observableArrayList(fosterHomeRepository.findDirectory()));
+        } catch (SQLException e) {
+            lblMensajeCasaCuna.setText("No se pudieron cargar casas cuna activas: " + e.getMessage());
+        }
+    }
+
     private void loadCheckOptions(VBox container, List<CatalogOption> options) {
+        // Each database option becomes one visible check box.
         container.getChildren().clear();
         for (CatalogOption option : options) {
             CheckBox checkBox = new CheckBox(option.getLabel());
@@ -111,6 +169,7 @@ public class CasaCunaController {
     }
 
     private List<Long> idsOf(VBox container) {
+        // The repository only needs the selected database ids, not the visual check boxes themselves.
         return container.getChildren()
                 .stream()
                 .filter(node -> node instanceof CheckBox checkBox && checkBox.isSelected())
@@ -119,6 +178,7 @@ public class CasaCunaController {
     }
 
     private void selectByIds(VBox container, List<Long> ids) {
+        // Existing profiles reopen with their previously saved options already checked.
         for (Node node : container.getChildren()) {
             if (node instanceof CheckBox checkBox) {
                 CatalogOption option = (CatalogOption) checkBox.getUserData();

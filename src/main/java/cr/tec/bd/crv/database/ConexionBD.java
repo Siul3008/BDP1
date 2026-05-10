@@ -6,7 +6,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Centralizes the Oracle connection settings used by the application.
+ * Creates Oracle database connections for the whole application.
+ *
+ * <p>Repositories do not store their own URL, user, or password. They all call
+ * this class, which keeps the connection settings in one place and makes future
+ * changes less risky.</p>
  */
 public class ConexionBD {
 
@@ -17,6 +21,12 @@ public class ConexionBD {
     private ConexionBD() {
     }
 
+    /**
+     * Opens a new Oracle connection.
+     *
+     * <p>Each repository method closes the connection after finishing its work,
+     * usually through try-with-resources.</p>
+     */
     public static Connection conectar() throws SQLException {
         if (PASSWORD == null || PASSWORD.isBlank()) {
             throw new SQLException("La contrasena de la base de datos no esta configurada.");

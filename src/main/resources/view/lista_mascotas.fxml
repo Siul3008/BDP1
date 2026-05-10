@@ -66,22 +66,31 @@
                         <Button text="Actualizar lista"
                                 onAction="#recargarMascotas"
                                 styleClass="ghost-button"/>
+                        <Button text="Editar seleccionada"
+                                onAction="#editarMascotaSeleccionada"
+                                styleClass="secondary-button"/>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                         <Label text="Nuevo estado" styleClass="field-label"/>
                         <ComboBox fx:id="cbNuevoEstado" promptText="Seleccione estado" prefWidth="220"/>
                         <Button text="Cambiar estado"
                                 onAction="#cambiarEstadoMascota"
-                                styleClass="secondary-button"/>
+                                styleClass="primary-button"/>
                     </HBox>
-                    <HBox alignment="CENTER_LEFT" spacing="10.0">
-                        <Label text="Pasar a casa cuna" styleClass="field-label"/>
-                        <ComboBox fx:id="cbCasaCuna" promptText="Seleccione casa cuna" prefWidth="260"/>
-                        <Button text="Transferir control"
+                    <VBox spacing="8.0">
+                        <CheckBox fx:id="chkTransferirCasaCuna"
+                                  text="Opcional: transferir control a una casa cuna"
+                                  onAction="#configurarTransferenciaCasaCuna"/>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label text="Casa cuna" styleClass="field-label"/>
+                            <ComboBox fx:id="cbCasaCuna" promptText="Seleccione casa cuna" prefWidth="260"/>
+                            <Button fx:id="btnTransferirControl"
+                                    text="Transferir control"
                                 onAction="#pasarControlCasaCuna"
                                 styleClass="secondary-button"/>
-                    </HBox>
-                    <Label text="El cambio de estado y la transferencia solo los puede hacer quien controla la publicacion o un admin."
+                        </HBox>
+                    </VBox>
+                    <Label text="Cambiar estado no requiere casa cuna. La transferencia es opcional y solo mueve el control de la publicacion."
                            wrapText="true"
                            styleClass="subtle-text"/>
                 </VBox>

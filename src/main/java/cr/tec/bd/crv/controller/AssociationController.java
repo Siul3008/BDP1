@@ -17,7 +17,11 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Admin controller for creating and reviewing association records.
+ * Controls association maintenance for administrators.
+ *
+ * <p>Associations are the organizations that receive donations. The screen lets
+ * an admin create them, rename them, and review donation totals attached to each
+ * association.</p>
  */
 public class AssociationController {
 
@@ -49,6 +53,7 @@ public class AssociationController {
 
     @FXML
     public void initialize() {
+        // Selecting a row copies its name into the form so the admin can edit it directly.
         configureColumns();
         loadAssociations();
         tablaAsociaciones.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, selected) -> {
@@ -59,7 +64,9 @@ public class AssociationController {
         });
     }
 
-    // The current database table only stores id and name for associations.
+    /**
+     * Creates a new association using the name typed in the form.
+     */
     @FXML
     public void guardarAsociacion() {
         try {
@@ -76,6 +83,7 @@ public class AssociationController {
 
     @FXML
     public void actualizarAsociacion() {
+        // Updates only the selected association to avoid changing the wrong organization.
         AssociationRecord selectedAssociation = tablaAsociaciones.getSelectionModel().getSelectedItem();
         if (selectedAssociation == null) {
             lblMensajeAsociacion.setText("Seleccione una asociacion de la tabla.");

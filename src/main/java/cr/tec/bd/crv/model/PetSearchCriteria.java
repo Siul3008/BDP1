@@ -3,7 +3,9 @@ package cr.tec.bd.crv.model;
 import java.time.LocalDate;
 
 /**
- * Optional filters used by the pet search and list screens.
+ * Search filters for pet lists.
+ *
+ * <p>Any field may be null, which means that filter is not being used.</p>
  */
 public class PetSearchCriteria {
 

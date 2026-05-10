@@ -3,7 +3,10 @@ package cr.tec.bd.crv.model;
 import java.time.LocalDate;
 
 /**
- * Data entered from the adoption registration form.
+ * Groups values entered in the adoption registration form.
+ *
+ * <p>The repository uses this data to create the application, rating, adoption
+ * record, follow-up notes, and optional photos.</p>
  */
 public class AdoptionFormData {
 

@@ -1,7 +1,10 @@
 package cr.tec.bd.crv.model;
 
 /**
- * Represents one database catalog row shown inside a ComboBox.
+ * Represents one selectable option loaded from a catalog table.
+ *
+ * <p>The id is what the database needs; the label is what the user sees in the
+ * ComboBox.</p>
  */
 public class CatalogOption {
 

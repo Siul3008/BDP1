@@ -23,7 +23,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Controller for the pet search screen.
+ * Controls the pet search screen.
+ *
+ * <p>The user can search by text, status, and event dates. The controller only
+ * builds the search request; the repository turns it into the database query.</p>
  */
 public class BuscarMascotaController {
 
@@ -69,6 +72,7 @@ public class BuscarMascotaController {
     @FXML
     public void buscarMascota() {
         try {
+            // The criteria object keeps the search values together and easy to pass around.
             List<Mascota> results = petRepository.findPets(buildCriteria());
             tablaResultados.setItems(FXCollections.observableArrayList(results));
             lblResultado.setText(results.size() + " resultado(s) encontrados.");
@@ -119,6 +123,7 @@ public class BuscarMascotaController {
     }
 
     private PetSearchCriteria buildCriteria() {
+        // Empty fields become null filters, which means "do not restrict by this value".
         CatalogOption selectedStatus = cbEstado.getValue();
         Long statusId = selectedStatus == null ? null : selectedStatus.getId();
         return new PetSearchCriteria(txtBusqueda.getText(), statusId, dpDesde.getValue(), dpHasta.getValue());

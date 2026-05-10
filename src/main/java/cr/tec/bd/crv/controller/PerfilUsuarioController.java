@@ -17,7 +17,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 /**
- * Controller for the user's profile sections.
+ * Controls the user's profile screen.
+ *
+ * <p>The profile is split into simple sections, similar to settings pages in
+ * common apps: personal data, contact data, password changes, and foster home
+ * activation. Each sidebar option only shows the section the user wants to edit.</p>
  */
 public class PerfilUsuarioController {
 
@@ -83,6 +87,7 @@ public class PerfilUsuarioController {
 
     @FXML
     public void initialize() {
+        // Start on the account section because it contains the most basic profile information.
         showSection(paneCuenta);
         loadProfile();
         loadFosterHomeState();
@@ -110,6 +115,7 @@ public class PerfilUsuarioController {
 
     @FXML
     public void guardarCuenta() {
+        // Names are separated because the database stores each part in its own column.
         Long personId = SessionContext.getCurrentPersonId();
         if (personId == null) {
             lblMensajePerfil.setText("Debe iniciar sesion como usuario.");
@@ -135,6 +141,7 @@ public class PerfilUsuarioController {
 
     @FXML
     public void guardarContacto() {
+        // Updating the main email also updates the active session so later audit rows use the new email.
         Long personId = SessionContext.getCurrentPersonId();
         if (personId == null) {
             lblMensajePerfil.setText("Debe iniciar sesion como usuario.");
@@ -159,6 +166,7 @@ public class PerfilUsuarioController {
 
     @FXML
     public void cambiarContrasena() {
+        // The repository checks the current password before replacing it with the new hash.
         Long personId = SessionContext.getCurrentPersonId();
         if (personId == null) {
             lblMensajePerfil.setText("Debe iniciar sesion como usuario.");
@@ -194,6 +202,7 @@ public class PerfilUsuarioController {
     }
 
     private void loadProfile() {
+        // Refreshing after each save keeps the labels and form fields synchronized with the database.
         Long personId = SessionContext.getCurrentPersonId();
         if (personId == null) {
             lblMensajePerfil.setText("Debe iniciar sesion como usuario.");
@@ -219,6 +228,7 @@ public class PerfilUsuarioController {
 
     private void loadFosterHomeState() {
         try {
+            // The button text tells the user whether they are activating or editing foster home settings.
             boolean active = fosterHomeRepository.isFosterHome(SessionContext.getCurrentPersonId());
             lblEstadoCasaCuna.setText(active
                     ? "Tu perfil ya esta activo como casa cuna."
@@ -230,6 +240,7 @@ public class PerfilUsuarioController {
     }
 
     private void showSection(VBox selectedPane) {
+        // Only one content panel is visible at a time, which keeps the profile screen easy to scan.
         setPaneVisible(paneCuenta, selectedPane == paneCuenta);
         setPaneVisible(paneContacto, selectedPane == paneContacto);
         setPaneVisible(paneSeguridad, selectedPane == paneSeguridad);

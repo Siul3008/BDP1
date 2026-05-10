@@ -2,6 +2,9 @@ package cr.tec.bd.crv.model;
 
 /**
  * Editable profile data for a logged-in user.
+ *
+ * <p>The profile screen reads this object and fills the personal-data and
+ * contact sections.</p>
  */
 public class UserProfile {
 

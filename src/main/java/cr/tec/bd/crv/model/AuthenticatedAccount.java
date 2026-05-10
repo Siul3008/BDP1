@@ -1,7 +1,10 @@
 package cr.tec.bd.crv.model;
 
 /**
- * Minimal account data returned after a successful login.
+ * Account data returned after a successful login.
+ *
+ * <p>The controller uses this object to decide whether to open the admin menu
+ * or the normal user menu.</p>
  */
 public class AuthenticatedAccount {
 

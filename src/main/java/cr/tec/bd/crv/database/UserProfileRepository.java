@@ -9,10 +9,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Data access class for profile information shown in "Mi perfil".
+ * Reads and updates the information shown in "Mi perfil".
+ *
+ * <p>The profile screen changes person names, contact data, and passwords. Each
+ * update is kept separate so a user can edit one section without accidentally
+ * changing another.</p>
  */
 public class UserProfileRepository {
 
+    private final ApplicationAuditRepository auditRepository = new ApplicationAuditRepository();
+
+    /**
+     * Loads the signed-in user's current profile values.
+     */
     public UserProfile findProfile(long personId) throws SQLException {
         String sql = """
                 SELECT
@@ -53,6 +62,9 @@ public class UserProfileRepository {
         }
     }
 
+    /**
+     * Updates the user's separated name fields.
+     */
     public void updateNames(long personId, String firstName, String secondName, String firstLastName, String secondLastName)
             throws SQLException {
         validateNames(firstName, secondName, firstLastName, secondLastName);
@@ -66,17 +78,30 @@ public class UserProfileRepository {
                 WHERE id = ?
                 """;
 
-        try (Connection connection = ConexionBD.conectar();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, firstName.trim());
-            statement.setString(2, emptyToNull(secondName));
-            statement.setString(3, firstLastName.trim());
-            statement.setString(4, emptyToNull(secondLastName));
-            statement.setLong(5, personId);
-            statement.executeUpdate();
+        try (Connection connection = ConexionBD.conectar()) {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, firstName.trim());
+                statement.setString(2, emptyToNull(secondName));
+                statement.setString(3, firstLastName.trim());
+                statement.setString(4, emptyToNull(secondLastName));
+                statement.setLong(5, personId);
+                statement.executeUpdate();
+                auditRepository.log(connection, "Perfil", "Nombres", "person:" + personId, firstName.trim());
+                connection.commit();
+            } catch (SQLException | RuntimeException e) {
+                connection.rollback();
+                throw e;
+            } finally {
+                connection.setAutoCommit(true);
+            }
         }
     }
 
+    /**
+     * Updates primary email and phone in both account/contact tables.
+     */
     public void updateContact(long personId, String email, String phone) throws SQLException {
         validateContact(email, phone);
 
@@ -88,6 +113,7 @@ public class UserProfileRepository {
                 updateAccountEmail(connection, personId, email.trim());
                 upsertPrimaryEmail(connection, personId, email.trim());
                 upsertPrimaryPhone(connection, personId, phone.trim());
+                auditRepository.log(connection, "Perfil", "Contacto", "person:" + personId, email.trim());
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
                 connection.rollback();
@@ -98,27 +124,41 @@ public class UserProfileRepository {
         }
     }
 
+    /**
+     * Changes the password after checking the current password and confirmation.
+     */
     public void updatePassword(long personId, String currentPassword, String newPassword, String confirmation)
             throws SQLException {
         validatePasswordChange(currentPassword, newPassword, confirmation);
 
         try (Connection connection = ConexionBD.conectar()) {
-            if (!currentPasswordMatches(connection, personId, currentPassword)) {
-                throw new IllegalArgumentException("La contrasena actual no coincide.");
-            }
+            connection.setAutoCommit(false);
 
-            String sql = """
-                    UPDATE appAccount
-                    SET passwordHash = ?
-                    WHERE idPerson = ?
-                      AND accountType = 'USER'
-                      AND isActive = 'Y'
-                    """;
+            try {
+                if (!currentPasswordMatches(connection, personId, currentPassword)) {
+                    throw new IllegalArgumentException("La contrasena actual no coincide.");
+                }
 
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, PasswordUtil.hash(newPassword.trim()));
-                statement.setLong(2, personId);
-                statement.executeUpdate();
+                String sql = """
+                        UPDATE appAccount
+                        SET passwordHash = ?
+                        WHERE idPerson = ?
+                          AND accountType = 'USER'
+                          AND isActive = 'Y'
+                        """;
+
+                try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                    statement.setString(1, PasswordUtil.hash(newPassword.trim()));
+                    statement.setLong(2, personId);
+                    statement.executeUpdate();
+                }
+                auditRepository.log(connection, "Perfil", "Contrasena", "person:" + personId, "actualizada");
+                connection.commit();
+            } catch (SQLException | RuntimeException e) {
+                connection.rollback();
+                throw e;
+            } finally {
+                connection.setAutoCommit(true);
             }
         }
     }

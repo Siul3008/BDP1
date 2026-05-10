@@ -38,7 +38,7 @@
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button">
                 <tooltip>
-                    <Tooltip text="Regresa al menu principal segun la sesion actual."/>
+                    <Tooltip text="Regresa al menu principal de la cuenta activa."/>
                 </tooltip>
             </Button>
         </HBox>
@@ -102,6 +102,10 @@
                         <VBox spacing="6.0" GridPane.columnIndex="3" GridPane.rowIndex="0">
                             <Label text="Asociacion" styleClass="field-label"/>
                             <ComboBox fx:id="cbFiltroAsociacion" promptText="Todas"/>
+                        </VBox>
+                        <VBox spacing="6.0" GridPane.columnIndex="4" GridPane.rowIndex="0">
+                            <Label text="Monto exacto" styleClass="field-label"/>
+                            <TextField fx:id="txtMontoFiltro" promptText="0.00"/>
                         </VBox>
                     </GridPane>
                     <HBox spacing="10.0">

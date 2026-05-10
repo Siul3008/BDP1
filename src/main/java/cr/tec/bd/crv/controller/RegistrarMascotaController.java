@@ -22,12 +22,18 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Controller for the pet registration screen.
+ * Controls the pet registration and pet editing screen.
+ *
+ * <p>The screen collects everything a user needs to publish a pet: basic data,
+ * location, contact information, photos, reward information, and optional health
+ * notes. When a pet is being edited, the controller receives the pet id from
+ * {@link SessionContext} and loads the existing values into the same form.</p>
  */
 public class RegistrarMascotaController {
 
     private final CatalogRepository catalogRepository = new CatalogRepository();
     private final PetRepository petRepository = new PetRepository();
+    private Long editingPetId;
 
     @FXML
     private TextField txtNombre;
@@ -75,6 +81,27 @@ public class RegistrarMascotaController {
     private ComboBox<CatalogOption> cbEntrenamiento;
 
     @FXML
+    private ComboBox<CatalogOption> cbVeterinario;
+
+    @FXML
+    private TextField txtEstadoSalud;
+
+    @FXML
+    private ComboBox<CatalogOption> cbEnfermedad;
+
+    @FXML
+    private ComboBox<CatalogOption> cbTratamiento;
+
+    @FXML
+    private ComboBox<CatalogOption> cbMedicamento;
+
+    @FXML
+    private TextField txtDosisMedicamento;
+
+    @FXML
+    private TextArea txtDetalleSalud;
+
+    @FXML
     private TextField txtEspacio;
 
     @FXML
@@ -97,24 +124,33 @@ public class RegistrarMascotaController {
 
     @FXML
     public void initialize() {
-        cbEnergia.setItems(FXCollections.observableArrayList(
-                "Athletic",
-                "Runner",
-                "Walker",
-                "Calm",
-                "Couch companion"
-        ));
-
         configureDependentSelectors();
         loadCatalogs();
+        editingPetId = SessionContext.consumeEditingPetId();
+        if (editingPetId != null) {
+            loadPetForEditing(editingPetId);
+        }
     }
 
     @FXML
     public void guardarMascota() {
         try {
-            List<String> warnings = petRepository.savePet(buildFormData(), SessionContext.getCurrentPersonId());
+            // A null editing id means "new pet"; otherwise the same form updates the selected pet.
+            List<String> warnings;
+            if (editingPetId == null) {
+                warnings = petRepository.savePet(buildFormData(), SessionContext.getCurrentPersonId());
+            } else {
+                warnings = petRepository.updatePet(
+                        editingPetId,
+                        buildFormData(),
+                        SessionContext.getCurrentPersonId(),
+                        SessionContext.isAdmin()
+                );
+            }
             if (warnings.isEmpty()) {
-                lblMensaje.setText("Mascota guardada correctamente.");
+                lblMensaje.setText(editingPetId == null
+                        ? "Mascota guardada correctamente."
+                        : "Mascota actualizada correctamente.");
             } else {
                 lblMensaje.setText("Mascota guardada. Revise: " + String.join(" ", warnings));
             }
@@ -136,9 +172,27 @@ public class RegistrarMascotaController {
                 txtRecompensa,
                 txtFotoAntes,
                 txtFotoDespues,
-                txtDescripcion
+                txtDescripcion,
+                txtEstadoSalud,
+                txtDosisMedicamento,
+                txtDetalleSalud
         );
-        clearSelection(cbTipo, cbRaza, cbEstado, cbColor, cbTamano, cbProvincia, cbCanton, cbDistrito, cbEntrenamiento, cbMoneda);
+        clearSelection(
+                cbTipo,
+                cbRaza,
+                cbEstado,
+                cbColor,
+                cbTamano,
+                cbProvincia,
+                cbCanton,
+                cbDistrito,
+                cbEntrenamiento,
+                cbMoneda,
+                cbVeterinario,
+                cbEnfermedad,
+                cbTratamiento,
+                cbMedicamento
+        );
         cbEnergia.getSelectionModel().clearSelection();
         dpEvento.setValue(null);
         lblMensaje.setText("");
@@ -157,19 +211,27 @@ public class RegistrarMascotaController {
 
     private void loadCatalogs() {
         try {
+            // Catalogs come from the database so the interface only offers valid existing options.
             cbTipo.setItems(FXCollections.observableArrayList(catalogRepository.findPetTypes()));
             cbEstado.setItems(FXCollections.observableArrayList(catalogRepository.findPetStatuses()));
             cbColor.setItems(FXCollections.observableArrayList(catalogRepository.findColors()));
             cbTamano.setItems(FXCollections.observableArrayList(catalogRepository.findPetSizes()));
             cbMoneda.setItems(FXCollections.observableArrayList(catalogRepository.findCurrencies()));
             cbEntrenamiento.setItems(FXCollections.observableArrayList(catalogRepository.findTrainingEases()));
+            cbVeterinario.setItems(FXCollections.observableArrayList(catalogRepository.findVeterinarians()));
+            cbEnfermedad.setItems(FXCollections.observableArrayList(catalogRepository.findDiseases()));
+            cbTratamiento.setItems(FXCollections.observableArrayList(catalogRepository.findTreatments()));
+            cbMedicamento.setItems(FXCollections.observableArrayList(catalogRepository.findMedicines()));
             cbProvincia.setItems(FXCollections.observableArrayList(catalogRepository.findProvinces()));
+            cbEnergia.setItems(FXCollections.observableArrayList(catalogRepository.findEnergyLevels()));
         } catch (SQLException e) {
             lblMensaje.setText("No se pudieron cargar los catalogos: " + e.getMessage());
         }
     }
 
     private void configureDependentSelectors() {
+        // Breed, canton, and district lists depend on a previous selection.
+        // The user sees fewer options and avoids choosing impossible combinations.
         cbTipo.valueProperty().addListener((observable, oldValue, newValue) -> {
             cbRaza.getItems().clear();
             if (newValue != null) {
@@ -218,6 +280,7 @@ public class RegistrarMascotaController {
     }
 
     private PetFormData buildFormData() {
+        // The repository receives one data object instead of many separate UI controls.
         return new PetFormData(
                 valueOf(txtNombre),
                 idOf(cbTipo),
@@ -237,8 +300,55 @@ public class RegistrarMascotaController {
                 dpEvento.getValue(),
                 valueOf(txtFotoAntes),
                 valueOf(txtFotoDespues),
-                valueOf(txtDescripcion)
+                valueOf(txtDescripcion),
+                valueOf(txtEstadoSalud),
+                valueOf(txtDetalleSalud),
+                idOf(cbEnfermedad),
+                idOf(cbTratamiento),
+                idOf(cbMedicamento),
+                valueOf(txtDosisMedicamento),
+                idOf(cbVeterinario),
+                null
         );
+    }
+
+    private void loadPetForEditing(long petId) {
+        try {
+            // Editing reuses the registration form, so we fill the visible controls with saved values.
+            PetFormData data = petRepository.findPetForEdit(petId);
+            txtNombre.setText(data.getName());
+            selectById(cbTipo, data.getPetTypeId());
+            if (data.getPetTypeId() != null) {
+                loadBreeds(data.getPetTypeId());
+            }
+            selectById(cbRaza, data.getBreedId());
+            selectById(cbEstado, data.getPetStatusId());
+            selectById(cbColor, data.getColorId());
+            txtChip.setText(data.getChip());
+            selectById(cbTamano, data.getPetSizeId());
+            cbEnergia.setValue(data.getEnergyLevel());
+            loadLocationForEditing(data.getDistrictId());
+            dpEvento.setValue(data.getEventDate());
+            txtTelefonoContacto.setText(data.getContactPhone());
+            txtCorreoContacto.setText(data.getContactEmail());
+            selectById(cbEntrenamiento, data.getTrainingEaseId());
+            selectById(cbVeterinario, data.getVeterinarianId());
+            txtEstadoSalud.setText(data.getHealthState());
+            selectById(cbEnfermedad, data.getDiseaseId());
+            selectById(cbTratamiento, data.getTreatmentId());
+            selectById(cbMedicamento, data.getMedicineId());
+            txtDosisMedicamento.setText(data.getMedicineDose());
+            txtDetalleSalud.setText(data.getHealthDescription());
+            txtEspacio.setText(data.getNeedSpace());
+            selectById(cbMoneda, data.getCurrencyId());
+            txtRecompensa.setText(data.getRewardAmount() == null ? "" : data.getRewardAmount().toPlainString());
+            txtFotoAntes.setText(data.getPhotoBeforePath());
+            txtFotoDespues.setText(data.getPhotoAfterPath());
+            txtDescripcion.setText(data.getDescription());
+            lblMensaje.setText("Modo edicion: actualice los datos y presione Guardar.");
+        } catch (SQLException e) {
+            lblMensaje.setText("No se pudo cargar la mascota para editar: " + e.getMessage());
+        }
     }
 
     private BigDecimal parseAmount(String amount) {
@@ -260,6 +370,36 @@ public class RegistrarMascotaController {
 
     private String valueOf(TextInputControl field) {
         return field == null ? null : field.getText();
+    }
+
+    private void selectById(ComboBox<CatalogOption> comboBox, Long id) {
+        if (id == null || comboBox == null || comboBox.getItems() == null) {
+            return;
+        }
+
+        comboBox.getItems().stream()
+                .filter(option -> option.getId() == id)
+                .findFirst()
+                .ifPresent(option -> comboBox.getSelectionModel().select(option));
+    }
+
+    private void loadLocationForEditing(Long districtId) throws SQLException {
+        if (districtId == null) {
+            return;
+        }
+
+        Long cantonId = catalogRepository.findCantonIdByDistrict(districtId);
+        Long provinceId = cantonId == null ? null : catalogRepository.findProvinceIdByCanton(cantonId);
+
+        selectById(cbProvincia, provinceId);
+        if (provinceId != null) {
+            loadCantons(provinceId);
+        }
+        selectById(cbCanton, cantonId);
+        if (cantonId != null) {
+            loadDistricts(cantonId);
+        }
+        selectById(cbDistrito, districtId);
     }
 
     private void clearFields(TextInputControl... fields) {

@@ -69,6 +69,9 @@
                 <Button text="Donaciones" onAction="#abrirDonaciones" styleClass="menu-tile">
                     <tooltip><Tooltip text="Permite registrar o revisar aportes de donación."/></tooltip>
                 </Button>
+                <Button text="Lista negra" onAction="#abrirListaNegra" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Permite reportar personas con calificacion y motivo."/></tooltip>
+                </Button>
             </FlowPane>
         </VBox>
     </center>

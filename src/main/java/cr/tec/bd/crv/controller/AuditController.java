@@ -17,7 +17,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Controller for the audit and journal review screen.
+ * Controls the audit review screen.
+ *
+ * <p>Admins use this module to see what changed, who triggered the change, and
+ * the previous/new values when that information is available.</p>
  */
 public class AuditController {
 
@@ -68,6 +71,7 @@ public class AuditController {
     @FXML
     public void consultarBitacora() {
         try {
+            // Filters are optional; leaving them blank returns the available audit history.
             List<AuditRecord> records = auditRepository.findAuditRecords(
                     txtModuloBitacora.getText(),
                     txtUsuarioBitacora.getText(),

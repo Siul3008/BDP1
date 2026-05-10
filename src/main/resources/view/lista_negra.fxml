@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cr.tec.bd.crv.controller.BlacklistController"
+            styleClass="screen">
+    <top>
+        <HBox alignment="CENTER_LEFT" styleClass="top-bar">
+            <padding>
+                <Insets top="18" right="24" bottom="10" left="24"/>
+            </padding>
+            <ImageView fitHeight="52" fitWidth="52" preserveRatio="true">
+                <image>
+                    <Image url="@/images/logo.png"/>
+                </image>
+            </ImageView>
+            <VBox spacing="2.0">
+                <Label text="Lista negra" styleClass="brand-title"/>
+                <Label text="Registro y revision de reportes de personas" styleClass="brand-subtitle"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Volver al menu" onAction="#backToMenu" styleClass="ghost-button"/>
+        </HBox>
+    </top>
+    <center>
+        <VBox spacing="18.0">
+            <padding>
+                <Insets top="10" right="24" bottom="24" left="24"/>
+            </padding>
+            <VBox spacing="12.0" styleClass="card form-card">
+                <Label text="Nuevo reporte" styleClass="title-lg"/>
+                <Label fx:id="lblReporterInfo" text="" wrapText="true" styleClass="subtle-text"/>
+                <GridPane hgap="14.0" vgap="14.0">
+                    <VBox fx:id="boxReporter" spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="Reportante" styleClass="field-label"/>
+                        <ComboBox fx:id="cbReporter" promptText="Persona que reporta" maxWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="Persona reportada" styleClass="field-label"/>
+                        <ComboBox fx:id="cbReportee" promptText="Persona a revisar" maxWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                        <Label text="Calificacion" styleClass="field-label"/>
+                        <ComboBox fx:id="cbRating" promptText="1 a 5"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                        <Label text="Fecha" styleClass="field-label"/>
+                        <DatePicker fx:id="dpReportDate"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="4">
+                        <Label text="Razon del reporte" styleClass="field-label"/>
+                        <TextArea fx:id="txtReason" prefRowCount="3" promptText="Explique el motivo de la alerta"/>
+                    </VBox>
+                </GridPane>
+                <HBox spacing="10.0">
+                    <Button text="Guardar reporte" onAction="#saveReport" styleClass="primary-button">
+                        <tooltip>
+                            <Tooltip text="Registra la persona en lista negra con calificacion y motivo."/>
+                        </tooltip>
+                    </Button>
+                    <Button text="Limpiar formulario" onAction="#clearForm" styleClass="secondary-button"/>
+                </HBox>
+                <Label fx:id="lblMessage" text="" wrapText="true" styleClass="message-label"/>
+            </VBox>
+            <VBox spacing="12.0" styleClass="card result-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Reportes registrados" styleClass="section-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblSummary" text="0 registro(s)" styleClass="message-label"/>
+                </HBox>
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <TextField fx:id="txtFilter" promptText="Buscar por persona, razon o calificacion" prefWidth="340"/>
+                    <Button text="Consultar" onAction="#loadReports" styleClass="primary-button"/>
+                    <Button text="Limpiar filtros" onAction="#clearFilters" styleClass="secondary-button"/>
+                </HBox>
+                <TableView fx:id="tableBlacklist" prefHeight="360">
+                    <columns>
+                        <TableColumn fx:id="colDate" text="Fecha" prefWidth="105"/>
+                        <TableColumn fx:id="colReporter" text="Reportante" prefWidth="160"/>
+                        <TableColumn fx:id="colReportee" text="Reportado" prefWidth="165"/>
+                        <TableColumn fx:id="colRating" text="Calif." prefWidth="70"/>
+                        <TableColumn fx:id="colAverage" text="Promedio" prefWidth="90"/>
+                        <TableColumn fx:id="colStatus" text="Estado" prefWidth="90"/>
+                        <TableColumn fx:id="colReason" text="Razon" prefWidth="370"/>
+                    </columns>
+                </TableView>
+                <VBox spacing="10.0" styleClass="card">
+                    <Label text="Detalle del reporte seleccionado" styleClass="section-title"/>
+                    <GridPane hgap="14.0" vgap="8.0">
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="Reportante" styleClass="field-label"/>
+                            <Label fx:id="lblDetalleReportante" text="-"/>
+                        </VBox>
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="Reportado" styleClass="field-label"/>
+                            <Label fx:id="lblDetalleReportado" text="-"/>
+                        </VBox>
+                        <VBox spacing="4.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                            <Label text="Calificacion" styleClass="field-label"/>
+                            <Label fx:id="lblDetalleCalificacion" text="-"/>
+                        </VBox>
+                        <VBox spacing="4.0" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                            <Label text="Promedio" styleClass="field-label"/>
+                            <Label fx:id="lblDetallePromedio" text="-"/>
+                        </VBox>
+                        <VBox spacing="4.0" GridPane.columnIndex="4" GridPane.rowIndex="0">
+                            <Label text="Estado" styleClass="field-label"/>
+                            <Label fx:id="lblDetalleEstado" text="-"/>
+                        </VBox>
+                    </GridPane>
+                    <TextArea fx:id="txtDetalleRazon"
+                              prefRowCount="3"
+                              editable="false"
+                              wrapText="true"
+                              promptText="Seleccione una fila para ver la razon completa."/>
+                </VBox>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

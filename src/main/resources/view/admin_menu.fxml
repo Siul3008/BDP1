@@ -63,6 +63,12 @@
                 <Button text="Bitácora" onAction="#abrirBitacora" styleClass="menu-tile">
                     <tooltip><Tooltip text="Consultar cambios y auditoría de información sensible."/></tooltip>
                 </Button>
+                <Button text="Lista negra" onAction="#abrirListaNegra" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Registrar y consultar reportes de personas con calificacion y notas."/></tooltip>
+                </Button>
+                <Button text="Parametros" onAction="#abrirParametros" styleClass="menu-tile">
+                    <tooltip><Tooltip text="Administrar catalogos y valores parametrizables del sistema."/></tooltip>
+                </Button>
                 <Button text="Estadísticas" onAction="#abrirEstadisticas" styleClass="menu-tile">
                     <tooltip><Tooltip text="Visualizar indicadores, gráficas y porcentajes del sistema."/></tooltip>
                 </Button>

@@ -10,11 +10,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Data access class for login and account registration.
+ * Handles login and account creation in the database.
+ *
+ * <p>Controllers should not know how passwords are hashed, how accounts are
+ * looked up, or how the person/adopter/contact rows are created. This repository
+ * keeps all of that database work together.</p>
  */
 public class AuthRepository {
 
-    // Public login entry points keep account type details out of the controller.
+    /**
+     * Returns the authenticated account when email and password match an active account.
+     */
     public AuthenticatedAccount loginAccount(String email, String password) throws SQLException {
         String normalizedEmail = emptyToNull(email);
         String normalizedPassword = emptyToNull(password);
@@ -53,15 +59,24 @@ public class AuthRepository {
         }
     }
 
+    /**
+     * Convenience check used by older user-login flows.
+     */
     public boolean loginUser(String email, String password) throws SQLException {
         return loginUserPersonId(email, password) != null;
     }
 
+    /**
+     * Returns true only when the credentials belong to an admin account.
+     */
     public boolean loginAdmin(String email, String password) throws SQLException {
         AuthenticatedAccount account = loginAccount(email, password);
         return account != null && account.isAdmin();
     }
 
+    /**
+     * Returns the linked person id for a normal user account.
+     */
     public Long loginUserPersonId(String email, String password) throws SQLException {
         AuthenticatedAccount account = loginAccount(email, password);
         if (account != null && account.isUser()) {
@@ -70,7 +85,12 @@ public class AuthRepository {
         return null;
     }
 
-    // User registration touches several tables, so it runs inside a single transaction.
+    /**
+     * Creates a complete user account: person, adopter profile, contacts, and app login.
+     *
+     * <p>All inserts run in one transaction. If one insert fails, everything is
+     * rolled back so the database does not keep a half-created user.</p>
+     */
     public long registerUser(UserRegistrationData data) throws SQLException {
         validateUserRegistration(data);
 

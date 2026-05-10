@@ -4,6 +4,9 @@ import java.util.List;
 
 /**
  * Foster home configuration linked to the current user.
+ *
+ * <p>It tells the screen whether the profile is active and which pet types,
+ * sizes, food option, and notes are already saved.</p>
  */
 public class FosterHomeProfile {
 

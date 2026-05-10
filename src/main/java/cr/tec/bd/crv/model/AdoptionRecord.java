@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Adoption row shown in the adoption history table.
+ *
+ * <p>Dates are formatted here so the JavaFX table can display simple text.</p>
  */
 public class AdoptionRecord {
 

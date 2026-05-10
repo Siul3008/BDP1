@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * Row shown in the donations table.
+ * Donation row shown in the donations table.
+ *
+ * <p>It includes both raw values and formatted text so the table can show money
+ * and dates cleanly.</p>
  */
 public class DonationRecord {
 

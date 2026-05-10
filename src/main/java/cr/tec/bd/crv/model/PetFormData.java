@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * Data captured by the pet registration form before it is saved in Oracle.
+ * Groups all values from the pet form.
+ *
+ * <p>The pet form is large, so the controller creates one PetFormData object and
+ * sends it to the repository. That makes saving and editing pets easier to read.</p>
  */
 public class PetFormData {
 
@@ -27,6 +30,14 @@ public class PetFormData {
     private final String photoBeforePath;
     private final String photoAfterPath;
     private final String description;
+    private final String healthState;
+    private final String healthDescription;
+    private final Long diseaseId;
+    private final Long treatmentId;
+    private final Long medicineId;
+    private final String medicineDose;
+    private final Long veterinarianId;
+    private final String veterinarianName;
 
     public PetFormData(
             String name,
@@ -47,7 +58,15 @@ public class PetFormData {
             LocalDate eventDate,
             String photoBeforePath,
             String photoAfterPath,
-            String description
+            String description,
+            String healthState,
+            String healthDescription,
+            Long diseaseId,
+            Long treatmentId,
+            Long medicineId,
+            String medicineDose,
+            Long veterinarianId,
+            String veterinarianName
     ) {
         this.name = name;
         this.petTypeId = petTypeId;
@@ -68,6 +87,14 @@ public class PetFormData {
         this.photoBeforePath = photoBeforePath;
         this.photoAfterPath = photoAfterPath;
         this.description = description;
+        this.healthState = healthState;
+        this.healthDescription = healthDescription;
+        this.diseaseId = diseaseId;
+        this.treatmentId = treatmentId;
+        this.medicineId = medicineId;
+        this.medicineDose = medicineDose;
+        this.veterinarianId = veterinarianId;
+        this.veterinarianName = veterinarianName;
     }
 
     public String getName() {
@@ -144,5 +171,37 @@ public class PetFormData {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getHealthState() {
+        return healthState;
+    }
+
+    public String getHealthDescription() {
+        return healthDescription;
+    }
+
+    public Long getDiseaseId() {
+        return diseaseId;
+    }
+
+    public Long getTreatmentId() {
+        return treatmentId;
+    }
+
+    public Long getMedicineId() {
+        return medicineId;
+    }
+
+    public String getMedicineDose() {
+        return medicineDose;
+    }
+
+    public Long getVeterinarianId() {
+        return veterinarianId;
+    }
+
+    public String getVeterinarianName() {
+        return veterinarianName;
     }
 }

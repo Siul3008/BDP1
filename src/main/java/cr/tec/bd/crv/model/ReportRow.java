@@ -1,7 +1,10 @@
 package cr.tec.bd.crv.model;
 
 /**
- * Generic row used by administrative reports with dynamic column labels.
+ * Generic row used by administrative reports.
+ *
+ * <p>Reports do not all share the same meaning for each column, so the controller
+ * changes the table headers while this model keeps five generic values.</p>
  */
 public class ReportRow {
 

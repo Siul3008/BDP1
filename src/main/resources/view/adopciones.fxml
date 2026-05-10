@@ -39,7 +39,7 @@
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="Volver al menu" onAction="#volverMenu" styleClass="ghost-button">
                 <tooltip>
-                    <Tooltip text="Regresa al menu principal segun la sesion actual."/>
+                    <Tooltip text="Regresa al menu principal de la cuenta activa."/>
                 </tooltip>
             </Button>
         </HBox>
@@ -67,19 +67,19 @@
                             <DatePicker fx:id="dpFechaAdopcion"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                            <Label text="Patio" styleClass="field-label"/>
+                            <Label fx:id="lblPatio" text="Patio" styleClass="field-label"/>
                             <TextField fx:id="txtPatio" promptText="Si / No / Detalle"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                            <Label text="Tipo de vivienda" styleClass="field-label"/>
+                            <Label fx:id="lblTipoVivienda" text="Tipo de vivienda" styleClass="field-label"/>
                             <TextField fx:id="txtTipoVivienda" promptText="Casa, apartamento, finca"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
-                            <Label text="Tiempo de ejercicio" styleClass="field-label"/>
+                            <Label fx:id="lblEjercicio" text="Tiempo de ejercicio" styleClass="field-label"/>
                             <TextField fx:id="txtEjercicio" promptText="Ej. 30 min diarios"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                            <Label text="Otras mascotas" styleClass="field-label"/>
+                            <Label fx:id="lblOtrasMascotas" text="Otras mascotas" styleClass="field-label"/>
                             <TextField fx:id="txtOtrasMascotas" promptText="No / Si, detalle"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="4">
@@ -91,7 +91,7 @@
                             <TextField fx:id="txtFotoAdopcion" promptText="Ruta o referencia"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="2">
-                            <Label text="Respuestas de solicitud" styleClass="field-label"/>
+                            <Label fx:id="lblRespuestas" text="Respuestas de solicitud" styleClass="field-label"/>
                             <TextArea fx:id="txtRespuestas" prefRowCount="3" promptText="Resumen de respuestas del formulario de adopcion"/>
                         </VBox>
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="6">
@@ -121,6 +121,11 @@
                         <Button text="Actualizar" onAction="#recargarAdopciones" styleClass="ghost-button">
                             <tooltip>
                                 <Tooltip text="Recarga mascotas disponibles e historial de adopciones."/>
+                            </tooltip>
+                        </Button>
+                        <Button text="Actualizar seguimiento" onAction="#actualizarSeguimiento" styleClass="secondary-button">
+                            <tooltip>
+                                <Tooltip text="Actualiza las notas de seguimiento de la adopcion seleccionada."/>
                             </tooltip>
                         </Button>
                     </HBox>

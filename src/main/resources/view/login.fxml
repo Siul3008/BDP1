@@ -59,7 +59,7 @@
                             onAction="#iniciarSesion"
                             styleClass="primary-button">
                         <tooltip>
-                            <Tooltip text="Valida la cuenta y abre el menu correcto segun el rol."/>
+                            <Tooltip text="Valida la cuenta y abre el menu de usuario o administracion."/>
                         </tooltip>
                     </Button>
                     <Button text="Crear cuenta"

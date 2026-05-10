@@ -117,7 +117,7 @@
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
                                     <Label text="Veterinario de contacto" styleClass="field-label"/>
-                                    <TextField promptText="Nombre o clinica"/>
+                                    <ComboBox fx:id="cbVeterinario" promptText="Veterinario registrado"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                                     <Label text="Requiere mucho espacio" styleClass="field-label"/>
@@ -138,7 +138,7 @@
                             <GridPane hgap="14.0" vgap="14.0">
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
                                     <Label text="Severidad" styleClass="field-label"/>
-                                    <TextField promptText="Critico, mal estado, buen estado"/>
+                                    <TextField fx:id="txtEstadoSalud" promptText="Critico, estable, recuperado"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                     <Label text="Entrenamiento" styleClass="field-label"/>
@@ -146,11 +146,23 @@
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
                                     <Label text="Enfermedades" styleClass="field-label"/>
-                                    <TextArea prefRowCount="3" promptText="Detalle de enfermedades o hallazgos"/>
+                                    <ComboBox fx:id="cbEnfermedad" promptText="Seleccione enfermedad"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                     <Label text="Tratamientos y medicamentos" styleClass="field-label"/>
-                                    <TextArea prefRowCount="3" promptText="Tratamientos, dosis o cuidados"/>
+                                    <ComboBox fx:id="cbTratamiento" promptText="Seleccione tratamiento"/>
+                                </VBox>
+                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                    <Label text="Medicamento" styleClass="field-label"/>
+                                    <ComboBox fx:id="cbMedicamento" promptText="Seleccione medicamento"/>
+                                </VBox>
+                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                    <Label text="Dosis / indicacion" styleClass="field-label"/>
+                                    <TextField fx:id="txtDosisMedicamento" promptText="Segun veterinario"/>
+                                </VBox>
+                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2">
+                                    <Label text="Detalle de salud" styleClass="field-label"/>
+                                    <TextArea fx:id="txtDetalleSalud" prefRowCount="3" promptText="Observaciones del estado de salud"/>
                                 </VBox>
                             </GridPane>
                         </VBox>

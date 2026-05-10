@@ -30,7 +30,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Controller for donation registration and donation reports.
+ * Controls donation registration and donation review.
+ *
+ * <p>Normal users use this screen to register their own donations. Admin users
+ * use the same screen as a review and maintenance area, so role checks decide
+ * which buttons and panels are available.</p>
  */
 public class DonationController {
 
@@ -71,6 +75,9 @@ public class DonationController {
     private ComboBox<CatalogOption> cbFiltroAsociacion;
 
     @FXML
+    private TextField txtMontoFiltro;
+
+    @FXML
     private Button btnEliminarDonacion;
 
     @FXML
@@ -106,6 +113,7 @@ public class DonationController {
     @FXML
     public void registrarDonacion() {
         try {
+            // The current user is used as the donor; the form only asks where and how much they donate.
             donationRepository.registerDonation(
                     SessionContext.getCurrentPersonId(),
                     idOf(cbAsociacionDonacion),
@@ -127,18 +135,22 @@ public class DonationController {
     @FXML
     public void buscarDonaciones() {
         try {
+            // Users see their own donations. Admins pass null to review all donations.
             Long visiblePersonId = SessionContext.isAdmin() ? null : SessionContext.getCurrentPersonId();
             List<DonationRecord> donations = donationRepository.findDonations(
                     dpDesdeFiltro.getValue(),
                     dpHastaFiltro.getValue(),
                     txtDonadorFiltro.getText(),
                     idOf(cbFiltroAsociacion),
+                    parseOptionalAmount(txtMontoFiltro.getText()),
                     visiblePersonId
             );
 
             tablaDonaciones.setItems(FXCollections.observableArrayList(donations));
             updateSummary(donations);
             clearMessageIfNeeded();
+        } catch (IllegalArgumentException e) {
+            lblMensajeDonacion.setText(e.getMessage());
         } catch (SQLException e) {
             lblMensajeDonacion.setText("No se pudieron consultar donaciones: " + e.getMessage());
         }
@@ -149,6 +161,7 @@ public class DonationController {
         dpDesdeFiltro.setValue(null);
         dpHastaFiltro.setValue(null);
         txtDonadorFiltro.clear();
+        txtMontoFiltro.clear();
         cbFiltroAsociacion.getSelectionModel().clearSelection();
         buscarDonaciones();
     }
@@ -163,6 +176,7 @@ public class DonationController {
 
     @FXML
     public void eliminarDonacionSeleccionada() {
+        // Deleting a donation is restricted to admins because it changes historical money records.
         if (!SessionContext.isAdmin()) {
             lblMensajeDonacion.setText("Solo el administrador puede eliminar donaciones.");
             return;
@@ -206,6 +220,7 @@ public class DonationController {
     }
 
     private void configureRole() {
+        // The same FXML serves two modes: user donation entry and admin review.
         boolean admin = SessionContext.isAdmin();
         pnlRegistroDonacion.setDisable(admin);
         btnRegistrarDonacion.setDisable(admin);
@@ -278,5 +293,12 @@ public class DonationController {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("El monto debe ser numerico.");
         }
+    }
+
+    private BigDecimal parseOptionalAmount(String rawAmount) {
+        if (rawAmount == null || rawAmount.trim().isEmpty()) {
+            return null;
+        }
+        return parseAmount(rawAmount);
     }
 }

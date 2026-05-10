@@ -5,14 +5,21 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Password helper for storing login credentials safely enough for this course project.
+ * Converts passwords into a stored hash.
+ *
+ * <p>The application never needs to keep the real password text after the user
+ * types it. Instead, it stores a SHA-256 hash and later compares hashes during
+ * login. This is why the database table contains long hash strings instead of
+ * readable passwords.</p>
  */
 public final class PasswordUtil {
 
     private PasswordUtil() {
     }
 
-    // Stores passwords as SHA-256 hashes to avoid saving plain text credentials.
+    /**
+     * Returns the SHA-256 hash for the received password text.
+     */
     public static String hash(String rawPassword) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

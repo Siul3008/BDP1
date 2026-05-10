@@ -1,7 +1,10 @@
 package cr.tec.bd.crv.model;
 
 /**
- * Immutable data transfer object for association registration form values.
+ * Groups association registration values.
+ *
+ * <p>This class is kept as a simple container in case association registration
+ * needs a dedicated form again.</p>
  */
 public class AssociationRegistrationData {
 

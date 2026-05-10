@@ -19,7 +19,11 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Controller for administrative reports.
+ * Controls the administrative report screen.
+ *
+ * <p>The combo box selects which prepared query should run. Each report uses the
+ * same table, so this controller also changes the column titles to match the
+ * selected report.</p>
  */
 public class ReportController {
 
@@ -27,6 +31,10 @@ public class ReportController {
     private static final String DONATIONS_BY_ASSOCIATION = "Donaciones por asociacion";
     private static final String POTENTIAL_MATCHES = "Matches potenciales";
     private static final String BLACKLIST = "Lista negra";
+    private static final String NOT_ADOPTED_TWO_MONTHS = "No adoptadas 2 meses";
+    private static final String TOP_RESCUERS = "Top rescatistas";
+    private static final String FOSTER_HOME_TYPES = "Casas cuna por tipo";
+    private static final String CRITICAL_ADOPTION_PETS = "Criticas en adopcion";
 
     private final ReportRepository reportRepository = new ReportRepository();
 
@@ -73,7 +81,11 @@ public class ReportController {
                 PETS_BY_STATUS,
                 DONATIONS_BY_ASSOCIATION,
                 POTENTIAL_MATCHES,
-                BLACKLIST
+                BLACKLIST,
+                NOT_ADOPTED_TWO_MONTHS,
+                TOP_RESCUERS,
+                FOSTER_HOME_TYPES,
+                CRITICAL_ADOPTION_PETS
         ));
         cbTipoReporte.setValue(PETS_BY_STATUS);
         generarReporte();
@@ -82,6 +94,7 @@ public class ReportController {
     @FXML
     public void generarReporte() {
         try {
+            // The selected name decides which repository method runs.
             String reportType = cbTipoReporte.getValue();
             configureHeaders(reportType);
             List<ReportRow> rows = switch (reportType) {
@@ -99,6 +112,14 @@ public class ReportController {
                         txtFiltroReporte.getText(),
                         dpReporteDesde.getValue(),
                         dpReporteHasta.getValue()
+                );
+                case NOT_ADOPTED_TWO_MONTHS -> reportRepository.findNotAdoptedAfterTwoMonths(
+                        txtFiltroReporte.getText()
+                );
+                case TOP_RESCUERS -> reportRepository.findTopRescuers();
+                case FOSTER_HOME_TYPES -> reportRepository.findFosterHomesByAcceptedType();
+                case CRITICAL_ADOPTION_PETS -> reportRepository.findCriticalPetsInAdoption(
+                        txtFiltroReporte.getText()
                 );
                 default -> reportRepository.findPetsByStatus(
                         txtFiltroReporte.getText(),
@@ -137,10 +158,15 @@ public class ReportController {
     }
 
     private void configureHeaders(String reportType) {
+        // One table is reused for many reports, so the visible headers change with the report.
         switch (reportType) {
             case DONATIONS_BY_ASSOCIATION -> setHeaders("Asociacion", "Moneda", "Total", "Cantidad", "Ultima donacion");
             case POTENTIAL_MATCHES -> setHeaders("Mascota", "Tipo", "Raza", "Color", "Fecha reporte");
             case BLACKLIST -> setHeaders("Reporta", "Reportado", "Rating", "Razon", "Fecha");
+            case NOT_ADOPTED_TWO_MONTHS -> setHeaders("Mascota", "Tipo", "Raza", "Desde", "Tiempo espera");
+            case TOP_RESCUERS -> setHeaders("Rescatista", "Mascotas", "Segundo nombre", "Segundo apellido", "ID");
+            case FOSTER_HOME_TYPES -> setHeaders("Casa cuna", "Tipos aceptados", "Detalle", "ID", "Modulo");
+            case CRITICAL_ADOPTION_PETS -> setHeaders("Mascota", "Tipo", "Raza", "Salud", "Descripcion");
             default -> setHeaders("Estado", "Tipo", "Cantidad", "Ultima fecha", "Porcentaje");
         }
     }

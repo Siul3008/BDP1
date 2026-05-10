@@ -1,7 +1,10 @@
 package cr.tec.bd.crv.model;
 
 /**
- * Simple pet model used by the pet list table.
+ * Pet row shown in pet tables.
+ *
+ * <p>The field names are in Spanish because the JavaFX table columns use these
+ * getter names directly when painting the visible table.</p>
  */
 public class Mascota {
 

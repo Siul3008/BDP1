@@ -12,10 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data access class for administrative reports.
+ * Contains prepared SQL reports for the admin report screen.
+ *
+ * <p>Each public method returns rows with five generic columns. The controller
+ * changes the visible table headers depending on which report is selected.</p>
  */
 public class ReportRepository {
 
+    /**
+     * Counts pets grouped by status and pet type.
+     */
     public List<ReportRow> findPetsByStatus(String textFilter, LocalDate from, LocalDate to) throws SQLException {
         List<Object> parameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
@@ -44,6 +50,9 @@ public class ReportRepository {
         return queryRows(sql.toString(), parameters);
     }
 
+    /**
+     * Summarizes donated money by association and currency.
+     */
     public List<ReportRow> findDonationsByAssociation(String textFilter, LocalDate from, LocalDate to)
             throws SQLException {
         List<Object> parameters = new ArrayList<>();
@@ -79,6 +88,9 @@ public class ReportRepository {
         return queryRows(sql.toString(), parameters);
     }
 
+    /**
+     * Looks for possible matches between reports and pets with similar characteristics.
+     */
     public List<ReportRow> findPotentialMatches(String textFilter, LocalDate from, LocalDate to) throws SQLException {
         List<Object> parameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
@@ -110,6 +122,9 @@ public class ReportRepository {
         return queryRows(sql.toString(), parameters);
     }
 
+    /**
+     * Shows blacklist reports with reporter, reported person, rating, reason, and date.
+     */
     public List<ReportRow> findBlacklist(String textFilter, LocalDate from, LocalDate to) throws SQLException {
         List<Object> parameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
@@ -142,6 +157,116 @@ public class ReportRepository {
         );
 
         sql.append(" ORDER BY bl.reportDate DESC, bl.id DESC");
+        return queryRows(sql.toString(), parameters);
+    }
+
+    public List<ReportRow> findNotAdoptedAfterTwoMonths(String textFilter) throws SQLException {
+        List<Object> parameters = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+                SELECT
+                    p.name AS column1,
+                    NVL(pt.name, 'No type') AS column2,
+                    NVL(b.name, 'No breed') AS column3,
+                    NVL(TO_CHAR(p.eventDate, 'YYYY-MM-DD'), 'No date') AS column4,
+                    TO_CHAR(TRUNC(SYSDATE - NVL(p.eventDate, SYSDATE))) || ' dias' AS column5
+                FROM pet p
+                LEFT JOIN petType pt
+                    ON pt.id = p.idPetType
+                LEFT JOIN breed b
+                    ON b.id = p.idBreed
+                LEFT JOIN petStatus ps
+                    ON ps.id = p.idPetStatus
+                WHERE (
+                    LOWER(NVL(ps.status, '')) IN ('for adoption', 'en adopcion')
+                    OR LOWER(NVL(ps.status, '')) LIKE 'en adopci%'
+                )
+                  AND p.eventDate <= ADD_MONTHS(TRUNC(SYSDATE), -2)
+                """);
+
+        addTextFilter(sql, parameters, textFilter, "p.name", "pt.name", "b.name", "ps.status");
+        sql.append(" ORDER BY p.eventDate ASC NULLS LAST, p.name");
+        return queryRows(sql.toString(), parameters);
+    }
+
+    public List<ReportRow> findTopRescuers() throws SQLException {
+        String sql = """
+                SELECT *
+                FROM (
+                    SELECT
+                        p.firstName || ' ' || p.firstLastName AS column1,
+                        TO_CHAR(COUNT(rxp.idPet)) AS column2,
+                        NVL(p.secondName, '-') AS column3,
+                        NVL(p.secondLastName, '-') AS column4,
+                        TO_CHAR(p.id) AS column5
+                    FROM rescuerxPet rxp
+                    JOIN rescuer r
+                        ON rxp.idRescuer = r.idPerson
+                    JOIN person p
+                        ON r.idPerson = p.id
+                    GROUP BY p.id, p.firstName, p.secondName, p.firstLastName, p.secondLastName
+                    ORDER BY COUNT(rxp.idPet) DESC
+                )
+                WHERE ROWNUM <= 10
+                """;
+        return queryRows(sql, List.of());
+    }
+
+    public List<ReportRow> findFosterHomesByAcceptedType() throws SQLException {
+        String sql = """
+                SELECT
+                    p.firstName || ' ' || p.firstLastName AS column1,
+                    TO_CHAR(COUNT(DISTINCT pt.id)) AS column2,
+                    LISTAGG(pt.name, ', ') WITHIN GROUP (ORDER BY pt.name) AS column3,
+                    TO_CHAR(fh.idPerson) AS column4,
+                    'Casa cuna' AS column5
+                FROM fosterHomexFosterCondition fhxfc
+                JOIN fosterHome fh
+                    ON fhxfc.idFosterHome = fh.idPerson
+                JOIN fosterConditionxAccType fcxat
+                    ON fhxfc.idFosterCondition = fcxat.idFosterCondition
+                JOIN petType pt
+                    ON fcxat.idPetType = pt.id
+                JOIN person p
+                    ON fh.idPerson = p.id
+                GROUP BY fh.idPerson, p.firstName, p.firstLastName
+                ORDER BY COUNT(DISTINCT pt.id) DESC, column1
+                """;
+        return queryRows(sql, List.of());
+    }
+
+    public List<ReportRow> findCriticalPetsInAdoption(String textFilter) throws SQLException {
+        List<Object> parameters = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+                SELECT
+                    p.name AS column1,
+                    NVL(pt.name, 'No type') AS column2,
+                    NVL(b.name, 'No breed') AS column3,
+                    NVL(hs.illnessState, 'No health') AS column4,
+                    NVL(hs.description, '-') AS column5
+                FROM pet p
+                LEFT JOIN petType pt
+                    ON pt.id = p.idPetType
+                LEFT JOIN breed b
+                    ON b.id = p.idBreed
+                JOIN petStatus ps
+                    ON ps.id = p.idPetStatus
+                JOIN petxHealthStatus pxhs
+                    ON pxhs.idPet = p.id
+                JOIN healthStatus hs
+                    ON hs.id = pxhs.idHealthStatus
+                WHERE (
+                    LOWER(NVL(ps.status, '')) IN ('for adoption', 'en adopcion')
+                    OR LOWER(NVL(ps.status, '')) LIKE 'en adopci%'
+                )
+                  AND (
+                    LOWER(NVL(hs.illnessState, '')) LIKE '%critical%'
+                    OR LOWER(NVL(hs.illnessState, '')) LIKE '%critico%'
+                    OR LOWER(NVL(hs.illnessState, '')) LIKE '%grave%'
+                  )
+                """);
+
+        addTextFilter(sql, parameters, textFilter, "p.name", "pt.name", "b.name", "hs.illnessState", "hs.description");
+        sql.append(" ORDER BY p.name");
         return queryRows(sql.toString(), parameters);
     }
 

@@ -22,10 +22,19 @@ import java.util.Set;
 import java.util.StringJoiner;
 
 /**
- * Data access class for pet publications.
+ * Handles pet publication data.
+ *
+ * <p>This is one of the central repositories of the application. It saves new
+ * pet posts, edits existing posts, searches pets, changes status, transfers
+ * control to foster homes, and stores optional health/veterinarian information.</p>
  */
 public class PetRepository {
 
+    private final ApplicationAuditRepository auditRepository = new ApplicationAuditRepository();
+
+    /**
+     * Saves a new pet publication and links it to the user who published it.
+     */
     public List<String> savePet(PetFormData data, Long publisherPersonId) throws SQLException {
         validatePet(data);
 
@@ -33,6 +42,7 @@ public class PetRepository {
             connection.setAutoCommit(false);
 
             try {
+                // Some scripts evolved during the project, so the repository checks real columns at runtime.
                 Set<String> petColumns = findColumnNames(connection, "PET");
                 Map<String, Integer> petColumnSizes = findColumnSizes(connection, "PET");
                 List<String> warnings = new ArrayList<>();
@@ -50,6 +60,9 @@ public class PetRepository {
                     ensureRescuerProfile(connection, publisherPersonId);
                     linkRescuerToPet(connection, publisherPersonId, petId);
                 }
+                insertOptionalHealthAndVeterinarian(connection, petId, data);
+                insertPetReportIfNeeded(connection, data);
+                auditRepository.log(connection, "Mascotas", "Crear", "-", data.getName());
 
                 connection.commit();
                 return warnings;
@@ -62,10 +75,177 @@ public class PetRepository {
         }
     }
 
+    /**
+     * Loads the editable fields for one pet so the registration screen can reuse the same form.
+     */
+    public PetFormData findPetForEdit(long petId) throws SQLException {
+        try (Connection connection = ConexionBD.conectar()) {
+            String sql = """
+                    SELECT
+                        p.idPetType,
+                        p.idBreed,
+                        p.idPetStatus,
+                        p.idTrainingEase,
+                        p.idLocation,
+                        p.idColor,
+                        p.idSize,
+                        p.name,
+                        p.description,
+                        p.needSpace,
+                        p.energyLevel,
+                        p.chip,
+                        p.eventDate,
+                        pp.photoPath,
+                        rw.idCurrency,
+                        rw.amount,
+                        hs.illnessState,
+                        hs.description AS healthDescription,
+                        (
+                            SELECT MIN(e.emailAddress)
+                            FROM petContactxEmail pce
+                            JOIN email e ON e.id = pce.idEmail
+                            WHERE pce.idPetContact = p.idPetContact
+                        ) AS contactEmail,
+                        (
+                            SELECT MIN(ph.phoneNumber)
+                            FROM petContactxPhone pcp
+                            JOIN phone ph ON ph.id = pcp.idPhone
+                            WHERE pcp.idPetContact = p.idPetContact
+                        ) AS contactPhone,
+                        (
+                            SELECT MIN(hd.idDisease)
+                            FROM healthStxDisease hd
+                            WHERE hd.idHealthStatus = hs.id
+                        ) AS idDisease,
+                        (
+                            SELECT MIN(ht.idTreatment)
+                            FROM healthStxTreatment ht
+                            WHERE ht.idHealthStatus = hs.id
+                        ) AS idTreatment,
+                        (
+                            SELECT MIN(hm.idMedicine)
+                            FROM healthStxMedicine hm
+                            WHERE hm.idHealthStatus = hs.id
+                        ) AS idMedicine,
+                        (
+                            SELECT MIN(hm.dose)
+                            FROM healthStxMedicine hm
+                            WHERE hm.idHealthStatus = hs.id
+                        ) AS medicineDose,
+                        (
+                            SELECT MIN(pv.idVeterinarian)
+                            FROM petxVeterinarian pv
+                            WHERE pv.idPet = p.id
+                        ) AS idVeterinarian
+                    FROM pet p
+                    LEFT JOIN petPhoto pp
+                        ON pp.id = p.idPetPhoto
+                    LEFT JOIN reward rw
+                        ON rw.id = (
+                            SELECT MAX(r2.id)
+                            FROM reward r2
+                            WHERE r2.idPet = p.id
+                        )
+                    LEFT JOIN healthStatus hs
+                        ON hs.id = (
+                            SELECT MAX(pxhs.idHealthStatus)
+                            FROM petxHealthStatus pxhs
+                            WHERE pxhs.idPet = p.id
+                        )
+                    WHERE p.id = ?
+                    """;
+
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setLong(1, petId);
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (!resultSet.next()) {
+                        throw new IllegalArgumentException("La mascota seleccionada no existe.");
+                    }
+
+                    Date eventDate = resultSet.getDate("eventDate");
+                    return new PetFormData(
+                            resultSet.getString("name"),
+                            longOrNull(resultSet, "idPetType"),
+                            longOrNull(resultSet, "idBreed"),
+                            longOrNull(resultSet, "idPetStatus"),
+                            longOrNull(resultSet, "idTrainingEase"),
+                            longOrNull(resultSet, "idLocation"),
+                            longOrNull(resultSet, "idCurrency"),
+                            longOrNull(resultSet, "idColor"),
+                            resultSet.getString("chip"),
+                            longOrNull(resultSet, "idSize"),
+                            resultSet.getString("needSpace"),
+                            resultSet.getString("energyLevel"),
+                            resultSet.getString("contactPhone"),
+                            resultSet.getString("contactEmail"),
+                            resultSet.getBigDecimal("amount"),
+                            eventDate == null ? null : eventDate.toLocalDate(),
+                            resultSet.getString("photoPath"),
+                            null,
+                            resultSet.getString("description"),
+                            resultSet.getString("illnessState"),
+                            resultSet.getString("healthDescription"),
+                            longOrNull(resultSet, "idDisease"),
+                            longOrNull(resultSet, "idTreatment"),
+                            longOrNull(resultSet, "idMedicine"),
+                            resultSet.getString("medicineDose"),
+                            longOrNull(resultSet, "idVeterinarian"),
+                            null
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates a pet after checking that the current user is allowed to control it.
+     */
+    public List<String> updatePet(long petId, PetFormData data, Long currentPersonId, boolean admin) throws SQLException {
+        validatePetUpdate(petId, data, currentPersonId, admin);
+
+        try (Connection connection = ConexionBD.conectar()) {
+            connection.setAutoCommit(false);
+
+            try {
+                ensurePetExists(connection, petId);
+                if (!admin && !userControlsPet(connection, petId, currentPersonId)) {
+                    throw new IllegalArgumentException("Solo quien controla la publicacion puede editar esta mascota.");
+                }
+
+                Set<String> petColumns = findColumnNames(connection, "PET");
+                Map<String, Integer> petColumnSizes = findColumnSizes(connection, "PET");
+                List<String> warnings = new ArrayList<>();
+
+                updatePetCore(connection, petId, data, petColumns, petColumnSizes, warnings);
+                updatePetPhoto(connection, petId, firstValue(data.getPhotoBeforePath(), data.getPhotoAfterPath()));
+                updatePetContact(connection, petId, data.getContactEmail(), data.getContactPhone());
+                upsertReward(connection, petId, data.getCurrencyId(), data.getRewardAmount());
+                insertOptionalHealthAndVeterinarian(connection, petId, data);
+                insertPetReportIfNeeded(connection, data);
+                auditRepository.log(connection, "Mascotas", "Editar", "pet:" + petId, data.getName());
+
+                connection.commit();
+                return warnings;
+            } catch (SQLException | RuntimeException e) {
+                connection.rollback();
+                throw e;
+            } finally {
+                connection.setAutoCommit(true);
+            }
+        }
+    }
+
+    /**
+     * Searches pets without restricting by owner.
+     */
     public List<Mascota> findPets(PetSearchCriteria criteria) throws SQLException {
         return findPets(criteria, null);
     }
 
+    /**
+     * Searches pets and optionally limits the results to the pets controlled by one person.
+     */
     public List<Mascota> findPets(PetSearchCriteria criteria, Long ownerPersonId) throws SQLException {
         try (Connection connection = ConexionBD.conectar()) {
             Set<String> petColumns = findColumnNames(connection, "PET");
@@ -99,11 +279,15 @@ public class PetRepository {
         }
     }
 
+    /**
+     * Changes the visible status of a pet when the user has permission.
+     */
     public void updatePetStatus(long petId, long statusId, Long currentPersonId, boolean admin) throws SQLException {
         validateStatusChange(petId, statusId, currentPersonId, admin);
 
         try (Connection connection = ConexionBD.conectar()) {
             ensurePetStatusExists(connection, statusId);
+            ensureStatusCanBeChangedFromList(connection, statusId);
 
             String sql;
             if (admin) {
@@ -135,10 +319,15 @@ public class PetRepository {
                             "Solo quien creo la publicacion o un administrador puede cambiar ese estado."
                     );
                 }
+                insertPetReportForExistingPetIfNeeded(connection, petId);
+                auditRepository.log(connection, "Mascotas", "Estado", "pet:" + petId, "status:" + statusId);
             }
         }
     }
 
+    /**
+     * Transfers control of an adoptable pet to a foster home user.
+     */
     public void transferPetControlToFosterHome(long petId, long fosterHomePersonId, Long currentPersonId, boolean admin)
             throws SQLException {
         validateControlTransfer(petId, fosterHomePersonId, currentPersonId, admin);
@@ -148,6 +337,7 @@ public class PetRepository {
 
             try {
                 ensurePetExists(connection, petId);
+                ensurePetIsForAdoption(connection, petId);
                 ensureFosterHomeExists(connection, fosterHomePersonId);
                 if (!admin && !userControlsPet(connection, petId, currentPersonId)) {
                     throw new IllegalArgumentException(
@@ -157,6 +347,7 @@ public class PetRepository {
 
                 ensureRescuerProfile(connection, fosterHomePersonId);
                 replacePetController(connection, petId, fosterHomePersonId);
+                auditRepository.log(connection, "Mascotas", "Casa cuna", "pet:" + petId, "person:" + fosterHomePersonId);
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
                 connection.rollback();
@@ -323,6 +514,179 @@ public class PetRepository {
         }
     }
 
+    private void updatePetCore(
+            Connection connection,
+            long petId,
+            PetFormData data,
+            Set<String> petColumns,
+            Map<String, Integer> petColumnSizes,
+            List<String> warnings
+    ) throws SQLException {
+        List<String> assignments = new ArrayList<>();
+        List<Object> values = new ArrayList<>();
+
+        addAssignment(assignments, values, petColumnSizes, "name", "NAME", data.getName());
+        addAssignment(assignments, values, "idPetType", data.getPetTypeId());
+        addAssignment(assignments, values, "idBreed", data.getBreedId());
+        addAssignment(assignments, values, "idPetStatus", data.getPetStatusId());
+        addAssignment(assignments, values, "idTrainingEase", data.getTrainingEaseId());
+        addAssignment(assignments, values, "idColor", data.getColorId());
+        addAssignment(assignments, values, "idSize", data.getPetSizeId());
+        addAssignment(assignments, values, petColumnSizes, "description", "DESCRIPTION", data.getDescription());
+        addAssignment(assignments, values, petColumnSizes, "needSpace", "NEEDSPACE", data.getNeedSpace());
+        addAssignment(assignments, values, petColumnSizes, "energyLevel", "ENERGYLEVEL", data.getEnergyLevel());
+
+        if (data.getDistrictId() != null) {
+            addAssignment(assignments, values, "idLocation", data.getDistrictId());
+        }
+
+        if (petColumns.contains("CHIP")) {
+            addAssignment(assignments, values, petColumnSizes, "chip", "CHIP", data.getChip());
+        } else if (emptyToNull(data.getChip()) != null) {
+            warnings.add("No se actualizo chip porque falta la columna pet.chip.");
+        }
+
+        if (petColumns.contains("EVENTDATE") && data.getEventDate() != null) {
+            addAssignment(assignments, values, "eventDate", Date.valueOf(data.getEventDate()));
+        }
+
+        if (assignments.isEmpty()) {
+            return;
+        }
+
+        values.add(petId);
+        String sql = "UPDATE pet SET " + String.join(", ", assignments) + " WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            setParameters(statement, values);
+            statement.executeUpdate();
+        }
+    }
+
+    private void insertOptionalHealthAndVeterinarian(Connection connection, long petId, PetFormData data)
+            throws SQLException {
+        Long healthStatusId = insertOptionalHealthStatus(connection, data);
+        if (healthStatusId != null) {
+            mergePetHealthStatus(connection, petId, healthStatusId);
+            mergeHealthDisease(connection, healthStatusId, data.getDiseaseId(), data.getHealthDescription());
+            mergeHealthTreatment(connection, healthStatusId, data.getTreatmentId());
+            mergeHealthMedicine(connection, healthStatusId, data.getMedicineId(), data.getMedicineDose());
+        }
+
+        Long veterinarianId = data.getVeterinarianId();
+        if (veterinarianId == null && emptyToNull(data.getVeterinarianName()) != null) {
+            veterinarianId = insertVeterinarian(connection, data.getVeterinarianName());
+        }
+        if (veterinarianId != null) {
+            mergePetVeterinarian(connection, petId, veterinarianId);
+        }
+    }
+
+    private Long insertOptionalHealthStatus(Connection connection, PetFormData data) throws SQLException {
+        boolean hasHealthData = emptyToNull(data.getHealthState()) != null
+                || emptyToNull(data.getHealthDescription()) != null
+                || data.getDiseaseId() != null
+                || data.getTreatmentId() != null
+                || data.getMedicineId() != null;
+
+        if (!hasHealthData) {
+            return null;
+        }
+
+        long healthStatusId = nextSequenceValue(connection, "sHealthStatus");
+        String sql = "INSERT INTO healthStatus(id, illnessState, description) VALUES (?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, healthStatusId);
+            statement.setString(2, fit(data.getHealthState(), "Not specified", 25));
+            statement.setString(3, fit(data.getHealthDescription(), null, 50));
+            statement.executeUpdate();
+        }
+        return healthStatusId;
+    }
+
+    private Long insertVeterinarian(Connection connection, String veterinarianName) throws SQLException {
+        long veterinarianId = nextSequenceValue(connection, "sVeterinarian");
+        String sql = "INSERT INTO veterinarian(id, name) VALUES (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, veterinarianId);
+            statement.setString(2, fit(veterinarianName, null, 25));
+            statement.executeUpdate();
+        }
+        return veterinarianId;
+    }
+
+    private void mergePetHealthStatus(Connection connection, long petId, long healthStatusId) throws SQLException {
+        String sql = """
+                MERGE INTO petxHealthStatus target
+                USING (SELECT ? AS idPet, ? AS idHealthStatus FROM dual) source
+                ON (target.idPet = source.idPet AND target.idHealthStatus = source.idHealthStatus)
+                WHEN NOT MATCHED THEN
+                    INSERT (idPet, idHealthStatus) VALUES (source.idPet, source.idHealthStatus)
+                """;
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+            statement.setLong(2, healthStatusId);
+            statement.executeUpdate();
+        }
+    }
+
+    private void mergeHealthDisease(Connection connection, long healthStatusId, Long diseaseId, String description)
+            throws SQLException {
+        if (diseaseId == null) {
+            return;
+        }
+
+        String sql = "INSERT INTO healthStxDisease(idHealthStatus, idDisease, description) VALUES (?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, healthStatusId);
+            statement.setLong(2, diseaseId);
+            statement.setString(3, fit(description, null, 50));
+            statement.executeUpdate();
+        }
+    }
+
+    private void mergeHealthTreatment(Connection connection, long healthStatusId, Long treatmentId) throws SQLException {
+        if (treatmentId == null) {
+            return;
+        }
+
+        String sql = "INSERT INTO healthStxTreatment(idHealthStatus, idTreatment) VALUES (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, healthStatusId);
+            statement.setLong(2, treatmentId);
+            statement.executeUpdate();
+        }
+    }
+
+    private void mergeHealthMedicine(Connection connection, long healthStatusId, Long medicineId, String dose)
+            throws SQLException {
+        if (medicineId == null) {
+            return;
+        }
+
+        String sql = "INSERT INTO healthStxMedicine(idHealthStatus, idMedicine, dose) VALUES (?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, healthStatusId);
+            statement.setLong(2, medicineId);
+            statement.setString(3, fit(dose, "Vet directed", 20));
+            statement.executeUpdate();
+        }
+    }
+
+    private void mergePetVeterinarian(Connection connection, long petId, long veterinarianId) throws SQLException {
+        String sql = """
+                MERGE INTO petxVeterinarian target
+                USING (SELECT ? AS idPet, ? AS idVeterinarian FROM dual) source
+                ON (target.idPet = source.idPet AND target.idVeterinarian = source.idVeterinarian)
+                WHEN NOT MATCHED THEN
+                    INSERT (idPet, idVeterinarian) VALUES (source.idPet, source.idVeterinarian)
+                """;
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+            statement.setLong(2, veterinarianId);
+            statement.executeUpdate();
+        }
+    }
+
     private void addOptionalPetColumn(
             List<String> columns,
             List<Object> values,
@@ -430,6 +794,266 @@ public class PetRepository {
         }
     }
 
+    private void updatePetPhoto(Connection connection, long petId, String photoPath) throws SQLException {
+        String normalizedPath = emptyToNull(photoPath);
+        if (normalizedPath == null) {
+            return;
+        }
+
+        Long photoId = findPetLinkedId(connection, petId, "idPetPhoto");
+        if (photoId == null) {
+            Long newPhotoId = insertPetPhoto(connection, normalizedPath);
+            updatePetLinkedId(connection, petId, "idPetPhoto", newPhotoId);
+            return;
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement("UPDATE petPhoto SET photoPath = ? WHERE id = ?")) {
+            statement.setString(1, normalizedPath);
+            statement.setLong(2, photoId);
+            statement.executeUpdate();
+        }
+    }
+
+    private void updatePetContact(Connection connection, long petId, String email, String phone) throws SQLException {
+        String normalizedEmail = emptyToNull(email);
+        String normalizedPhone = emptyToNull(phone);
+        if (normalizedEmail == null && normalizedPhone == null) {
+            return;
+        }
+
+        Long contactId = findPetLinkedId(connection, petId, "idPetContact");
+        if (contactId == null) {
+            contactId = insertPetContact(connection);
+            updatePetLinkedId(connection, petId, "idPetContact", contactId);
+        }
+
+        if (normalizedEmail != null) {
+            upsertPetContactEmail(connection, contactId, normalizedEmail);
+        }
+        if (normalizedPhone != null) {
+            upsertPetContactPhone(connection, contactId, normalizedPhone);
+        }
+    }
+
+    private void upsertPetContactEmail(Connection connection, long contactId, String email) throws SQLException {
+        Long emailId = findFirstLinkedId(
+                connection,
+                "SELECT MIN(idEmail) FROM petContactxEmail WHERE idPetContact = ?",
+                contactId
+        );
+        if (emailId == null) {
+            insertOptionalPetContactEmail(connection, contactId, email);
+            return;
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement("UPDATE email SET emailAddress = ? WHERE id = ?")) {
+            statement.setString(1, email);
+            statement.setLong(2, emailId);
+            statement.executeUpdate();
+        }
+    }
+
+    private void upsertPetContactPhone(Connection connection, long contactId, String phone) throws SQLException {
+        Long phoneId = findFirstLinkedId(
+                connection,
+                "SELECT MIN(idPhone) FROM petContactxPhone WHERE idPetContact = ?",
+                contactId
+        );
+        if (phoneId == null) {
+            insertOptionalPetContactPhone(connection, contactId, phone);
+            return;
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement("UPDATE phone SET phoneNumber = ? WHERE id = ?")) {
+            statement.setString(1, phone);
+            statement.setLong(2, phoneId);
+            statement.executeUpdate();
+        }
+    }
+
+    private void upsertReward(Connection connection, long petId, Long currencyId, BigDecimal amount) throws SQLException {
+        if (currencyId == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return;
+        }
+
+        Long rewardId = findFirstLinkedId(connection, "SELECT MAX(id) FROM reward WHERE idPet = ?", petId);
+        if (rewardId == null) {
+            insertOptionalReward(connection, petId, currencyId, amount);
+            return;
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(
+                "UPDATE reward SET idCurrency = ?, amount = ? WHERE id = ?"
+        )) {
+            statement.setLong(1, currencyId);
+            statement.setBigDecimal(2, amount);
+            statement.setLong(3, rewardId);
+            statement.executeUpdate();
+        }
+    }
+
+    private Long findPetLinkedId(Connection connection, long petId, String columnName) throws SQLException {
+        String sql = "SELECT " + columnName + " FROM pet WHERE id = ?";
+        return findFirstLinkedId(connection, sql, petId);
+    }
+
+    private void updatePetLinkedId(Connection connection, long petId, String columnName, Long value) throws SQLException {
+        String sql = "UPDATE pet SET " + columnName + " = ? WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setObject(1, value);
+            statement.setLong(2, petId);
+            statement.executeUpdate();
+        }
+    }
+
+    private Long findFirstLinkedId(Connection connection, String sql, long id) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, id);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return null;
+                }
+
+                long value = resultSet.getLong(1);
+                return resultSet.wasNull() ? null : value;
+            }
+        }
+    }
+
+    private void insertPetReportForExistingPetIfNeeded(Connection connection, long petId) throws SQLException {
+        String sql = """
+                SELECT idPetType, idBreed, idPetStatus, idColor, idSize, eventDate
+                FROM pet
+                WHERE id = ?
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return;
+                }
+
+                Date eventDate = resultSet.getDate("eventDate");
+                insertPetReportIfNeeded(
+                        connection,
+                        longOrNull(resultSet, "idPetType"),
+                        longOrNull(resultSet, "idBreed"),
+                        longOrNull(resultSet, "idPetStatus"),
+                        longOrNull(resultSet, "idColor"),
+                        longOrNull(resultSet, "idSize"),
+                        eventDate == null ? LocalDate.now() : eventDate.toLocalDate()
+                );
+            }
+        }
+    }
+
+    private void insertPetReportIfNeeded(Connection connection, PetFormData data) throws SQLException {
+        insertPetReportIfNeeded(
+                connection,
+                data.getPetTypeId(),
+                data.getBreedId(),
+                data.getPetStatusId(),
+                data.getColorId(),
+                data.getPetSizeId(),
+                data.getEventDate() == null ? LocalDate.now() : data.getEventDate()
+        );
+    }
+
+    private void insertPetReportIfNeeded(
+            Connection connection,
+            Long petTypeId,
+            Long breedId,
+            Long statusId,
+            Long colorId,
+            Long sizeId,
+            LocalDate reportDate
+    ) throws SQLException {
+        if (petTypeId == null || breedId == null || statusId == null || colorId == null || sizeId == null) {
+            return;
+        }
+
+        if (!isLostOrFoundStatus(connection, statusId)) {
+            return;
+        }
+
+        if (petReportExists(connection, petTypeId, breedId, statusId, colorId, sizeId, reportDate)) {
+            return;
+        }
+
+        String sql = """
+                INSERT INTO petReport(id, idColor, idSize, idPetStatus, idBreed, idPetType, reportDate)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, nextSequenceValue(connection, "sMatch"));
+            statement.setLong(2, colorId);
+            statement.setLong(3, sizeId);
+            statement.setLong(4, statusId);
+            statement.setLong(5, breedId);
+            statement.setLong(6, petTypeId);
+            statement.setDate(7, Date.valueOf(reportDate));
+            statement.executeUpdate();
+        }
+    }
+
+    private boolean petReportExists(
+            Connection connection,
+            long petTypeId,
+            long breedId,
+            long statusId,
+            long colorId,
+            long sizeId,
+            LocalDate reportDate
+    ) throws SQLException {
+        String sql = """
+                SELECT 1
+                FROM petReport
+                WHERE idPetType = ?
+                  AND idBreed = ?
+                  AND idPetStatus = ?
+                  AND idColor = ?
+                  AND idSize = ?
+                  AND TRUNC(reportDate) = ?
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petTypeId);
+            statement.setLong(2, breedId);
+            statement.setLong(3, statusId);
+            statement.setLong(4, colorId);
+            statement.setLong(5, sizeId);
+            statement.setDate(6, Date.valueOf(reportDate));
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
+        }
+    }
+
+    private boolean isLostOrFoundStatus(Connection connection, long statusId) throws SQLException {
+        String sql = "SELECT LOWER(NVL(status, '')) FROM petStatus WHERE id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, statusId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return false;
+                }
+
+                String statusName = resultSet.getString(1);
+                return statusName.contains("lost")
+                        || statusName.contains("perd")
+                        || statusName.contains("found")
+                        || statusName.contains("encontr");
+            }
+        }
+    }
+
     private void ensureRescuerProfile(Connection connection, long personId) throws SQLException {
         String sql = """
                 MERGE INTO rescuer target
@@ -508,6 +1132,17 @@ public class PetRepository {
         }
     }
 
+    private void validatePetUpdate(long petId, PetFormData data, Long currentPersonId, boolean admin) {
+        if (petId <= 0) {
+            throw new IllegalArgumentException("Seleccione una mascota valida.");
+        }
+        validatePet(data);
+
+        if (!admin && currentPersonId == null) {
+            throw new IllegalArgumentException("Debe iniciar sesion para editar mascotas.");
+        }
+    }
+
     private void validateControlTransfer(long petId, long fosterHomePersonId, Long currentPersonId, boolean admin) {
         if (petId <= 0) {
             throw new IllegalArgumentException("Seleccione una mascota valida.");
@@ -530,6 +1165,33 @@ public class PetRepository {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
                     throw new IllegalArgumentException("La mascota seleccionada no existe.");
+                }
+            }
+        }
+    }
+
+    private void ensurePetIsForAdoption(Connection connection, long petId) throws SQLException {
+        String sql = """
+                SELECT LOWER(NVL(ps.status, '')) AS statusName
+                FROM pet p
+                LEFT JOIN petStatus ps
+                    ON ps.id = p.idPetStatus
+                WHERE p.id = ?
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    throw new IllegalArgumentException("La mascota seleccionada no existe.");
+                }
+
+                String statusName = resultSet.getString("statusName");
+                if (!isForAdoptionStatus(statusName)) {
+                    throw new IllegalArgumentException(
+                            "Solo se puede transferir el control de mascotas que estan en adopcion."
+                    );
                 }
             }
         }
@@ -579,6 +1241,17 @@ public class PetRepository {
         linkRescuerToPet(connection, fosterHomePersonId, petId);
     }
 
+    private boolean isForAdoptionStatus(String statusName) {
+        if (statusName == null) {
+            return false;
+        }
+
+        String normalizedStatus = statusName.toLowerCase(Locale.ROOT);
+        return normalizedStatus.equals("for adoption")
+                || normalizedStatus.equals("en adopcion")
+                || normalizedStatus.equals("en adopción");
+    }
+
     private void ensurePetStatusExists(Connection connection, long statusId) throws SQLException {
         String sql = "SELECT 1 FROM petStatus WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -590,6 +1263,36 @@ public class PetRepository {
                 }
             }
         }
+    }
+
+    private void ensureStatusCanBeChangedFromList(Connection connection, long statusId) throws SQLException {
+        String sql = "SELECT LOWER(NVL(status, '')) AS statusName FROM petStatus WHERE id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, statusId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    throw new IllegalArgumentException("El estado seleccionado no existe en la base de datos.");
+                }
+
+                String statusName = resultSet.getString("statusName");
+                if (isAdoptedStatus(statusName)) {
+                    throw new IllegalArgumentException(
+                            "Para marcar una mascota como adoptada use el modulo de Adopciones, asi se registra el adoptante."
+                    );
+                }
+            }
+        }
+    }
+
+    private boolean isAdoptedStatus(String statusName) {
+        if (statusName == null) {
+            return false;
+        }
+
+        String normalizedStatus = statusName.toLowerCase(Locale.ROOT);
+        return normalizedStatus.equals("adopted") || normalizedStatus.equals("adoptado");
     }
 
     private void requireValue(String value, String message) {
@@ -645,6 +1348,23 @@ public class PetRepository {
         values.add(value);
     }
 
+    private void addAssignment(List<String> assignments, List<Object> values, String column, Object value) {
+        assignments.add(column + " = ?");
+        values.add(value);
+    }
+
+    private void addAssignment(
+            List<String> assignments,
+            List<Object> values,
+            Map<String, Integer> columnSizes,
+            String sqlColumn,
+            String metadataColumn,
+            String value
+    ) {
+        assignments.add(sqlColumn + " = ?");
+        values.add(fitToColumn(value, columnSizes, metadataColumn));
+    }
+
     private void setParameters(PreparedStatement statement, List<Object> values) throws SQLException {
         for (int index = 0; index < values.size(); index++) {
             Object value = values.get(index);
@@ -669,6 +1389,22 @@ public class PetRepository {
             return normalizedValue.substring(0, size);
         }
         return normalizedValue;
+    }
+
+    private String fit(String value, String defaultValue, int maxLength) {
+        String normalizedValue = emptyToNull(value);
+        if (normalizedValue == null) {
+            normalizedValue = defaultValue;
+        }
+        if (normalizedValue != null && normalizedValue.length() > maxLength) {
+            return normalizedValue.substring(0, maxLength);
+        }
+        return normalizedValue;
+    }
+
+    private Long longOrNull(ResultSet resultSet, String columnName) throws SQLException {
+        long value = resultSet.getLong(columnName);
+        return resultSet.wasNull() ? null : value;
     }
 
     private String firstValue(String first, String second) {

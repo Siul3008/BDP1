@@ -5,6 +5,9 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Audit or journal row shown in the admin log screen.
+ *
+ * <p>It represents one recorded change: module, field, previous value, new
+ * value, actor, and date.</p>
  */
 public class AuditRecord {
 

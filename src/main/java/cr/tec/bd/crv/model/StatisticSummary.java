@@ -4,6 +4,9 @@ import java.util.List;
 
 /**
  * Aggregated numbers displayed in the statistics dashboard.
+ *
+ * <p>The repository calculates these values once, then the controller uses this
+ * object to fill cards and charts.</p>
  */
 public class StatisticSummary {
 
@@ -14,6 +17,10 @@ public class StatisticSummary {
     private final int activeFosterHomes;
     private final List<ChartDataPoint> petsByStatus;
     private final List<ChartDataPoint> petsByType;
+    private final List<ChartDataPoint> donationsByAssociation;
+    private final List<ChartDataPoint> adoptionOutcome;
+    private final List<ChartDataPoint> petsByAgeRange;
+    private final List<ChartDataPoint> criticalAdoptionPetsByType;
 
     public StatisticSummary(
             int totalPets,
@@ -22,7 +29,11 @@ public class StatisticSummary {
             String donationTotalText,
             int activeFosterHomes,
             List<ChartDataPoint> petsByStatus,
-            List<ChartDataPoint> petsByType
+            List<ChartDataPoint> petsByType,
+            List<ChartDataPoint> donationsByAssociation,
+            List<ChartDataPoint> adoptionOutcome,
+            List<ChartDataPoint> petsByAgeRange,
+            List<ChartDataPoint> criticalAdoptionPetsByType
     ) {
         this.totalPets = totalPets;
         this.adoptedPets = adoptedPets;
@@ -31,6 +42,10 @@ public class StatisticSummary {
         this.activeFosterHomes = activeFosterHomes;
         this.petsByStatus = petsByStatus;
         this.petsByType = petsByType;
+        this.donationsByAssociation = donationsByAssociation;
+        this.adoptionOutcome = adoptionOutcome;
+        this.petsByAgeRange = petsByAgeRange;
+        this.criticalAdoptionPetsByType = criticalAdoptionPetsByType;
     }
 
     public int getTotalPets() {
@@ -59,5 +74,21 @@ public class StatisticSummary {
 
     public List<ChartDataPoint> getPetsByType() {
         return petsByType;
+    }
+
+    public List<ChartDataPoint> getDonationsByAssociation() {
+        return donationsByAssociation;
+    }
+
+    public List<ChartDataPoint> getAdoptionOutcome() {
+        return adoptionOutcome;
+    }
+
+    public List<ChartDataPoint> getPetsByAgeRange() {
+        return petsByAgeRange;
+    }
+
+    public List<ChartDataPoint> getCriticalAdoptionPetsByType() {
+        return criticalAdoptionPetsByType;
     }
 }

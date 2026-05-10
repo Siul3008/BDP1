@@ -2,6 +2,8 @@ package cr.tec.bd.crv.model;
 
 /**
  * Association row shown in the admin association table.
+ *
+ * <p>It combines the association name with donation summary values.</p>
  */
 public class AssociationRecord {
 

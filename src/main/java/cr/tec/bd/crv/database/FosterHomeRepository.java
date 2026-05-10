@@ -1,6 +1,7 @@
 package cr.tec.bd.crv.database;
 
 import cr.tec.bd.crv.model.CatalogOption;
+import cr.tec.bd.crv.model.FosterHomeDirectoryRecord;
 import cr.tec.bd.crv.model.FosterHomeProfile;
 
 import java.sql.Connection;
@@ -11,10 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data access class for foster home profile activation and conditions.
+ * Handles foster home profiles and their accepted conditions.
+ *
+ * <p>A foster home is a user who can temporarily receive pets. The database
+ * stores the user profile separately from the conditions they accept, so this
+ * repository coordinates both parts.</p>
  */
 public class FosterHomeRepository {
 
+    private final ApplicationAuditRepository auditRepository = new ApplicationAuditRepository();
+
+    /**
+     * Returns active foster homes as combo-box options.
+     */
     public List<CatalogOption> findFosterHomeOptions() throws SQLException {
         String sql = """
                 SELECT
@@ -37,6 +47,83 @@ public class FosterHomeRepository {
         }
     }
 
+    /**
+     * Returns active foster homes with contact data and accepted conditions.
+     */
+    public List<FosterHomeDirectoryRecord> findDirectory() throws SQLException {
+        String sql = """
+                WITH active_condition AS (
+                    SELECT idFosterHome, MAX(idFosterCondition) AS idFosterCondition
+                    FROM fosterHomexFosterCondition
+                    GROUP BY idFosterHome
+                )
+                SELECT
+                    TRIM(
+                        p.firstName ||
+                        CASE WHEN p.secondName IS NOT NULL THEN ' ' || p.secondName ELSE '' END ||
+                        ' ' || p.firstLastName ||
+                        CASE WHEN p.secondLastName IS NOT NULL THEN ' ' || p.secondLastName ELSE '' END
+                    ) AS fosterName,
+                    (
+                        SELECT MIN(e.emailAddress)
+                        FROM personxEmail pe
+                        JOIN email e ON e.id = pe.idEmail
+                        WHERE pe.idPerson = p.id
+                    ) AS email,
+                    (
+                        SELECT MIN(ph.phoneNumber)
+                        FROM personxPhone pp
+                        JOIN phone ph ON ph.id = pp.idPhone
+                        WHERE pp.idPerson = p.id
+                    ) AS phone,
+                    (
+                        SELECT LISTAGG(pt.name, ', ') WITHIN GROUP (ORDER BY pt.name)
+                        FROM fosterConditionxAccType fct
+                        JOIN petType pt ON pt.id = fct.idPetType
+                        WHERE fct.idFosterCondition = ac.idFosterCondition
+                    ) AS acceptedTypes,
+                    (
+                        SELECT LISTAGG(ps.name, ', ') WITHIN GROUP (ORDER BY ps.name)
+                        FROM fosterConditionxAccSize fcs
+                        JOIN petSize ps ON ps.id = fcs.idPetSize
+                        WHERE fcs.idFosterCondition = ac.idFosterCondition
+                    ) AS acceptedSizes,
+                    rfd.name AS foodDonation,
+                    fc.notes
+                FROM fosterHome fh
+                JOIN person p
+                    ON p.id = fh.idPerson
+                LEFT JOIN active_condition ac
+                    ON ac.idFosterHome = fh.idPerson
+                LEFT JOIN fosterCondition fc
+                    ON fc.id = ac.idFosterCondition
+                LEFT JOIN requiresFoodDonation rfd
+                    ON rfd.id = fc.idFoodDonation
+                ORDER BY p.firstName, p.firstLastName
+                """;
+
+        try (Connection connection = ConexionBD.conectar();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            List<FosterHomeDirectoryRecord> directory = new ArrayList<>();
+            while (resultSet.next()) {
+                directory.add(new FosterHomeDirectoryRecord(
+                        valueOrEmpty(resultSet.getString("fosterName")),
+                        valueOrEmpty(resultSet.getString("email")),
+                        valueOrEmpty(resultSet.getString("phone")),
+                        valueOrEmpty(resultSet.getString("acceptedTypes")),
+                        valueOrEmpty(resultSet.getString("acceptedSizes")),
+                        valueOrEmpty(resultSet.getString("foodDonation")),
+                        valueOrEmpty(resultSet.getString("notes"))
+                ));
+            }
+            return directory;
+        }
+    }
+
+    /**
+     * Checks whether a user already has an active foster home profile.
+     */
     public boolean isFosterHome(Long personId) throws SQLException {
         if (personId == null) {
             return false;
@@ -53,6 +140,9 @@ public class FosterHomeRepository {
         }
     }
 
+    /**
+     * Loads the foster home profile and its selected pet type/size conditions.
+     */
     public FosterHomeProfile findProfile(Long personId) throws SQLException {
         if (personId == null) {
             return new FosterHomeProfile(false, null, "", List.of(), List.of());
@@ -94,6 +184,9 @@ public class FosterHomeRepository {
         }
     }
 
+    /**
+     * Creates or updates the foster home profile and replaces its condition links.
+     */
     public void saveProfile(Long personId, Long foodDonationId, List<Long> typeIds, List<Long> sizeIds, String notes)
             throws SQLException {
         validateProfile(personId, foodDonationId, typeIds, sizeIds);
@@ -110,6 +203,7 @@ public class FosterHomeRepository {
                 linkHomeCondition(connection, personId, conditionId);
                 insertAcceptedTypes(connection, conditionId, typeIds);
                 insertAcceptedSizes(connection, conditionId, sizeIds);
+                auditRepository.log(connection, "Casa cuna", "Perfil", "person:" + personId, "activa");
 
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
@@ -307,5 +401,9 @@ public class FosterHomeRepository {
             return null;
         }
         return value.trim();
+    }
+
+    private String valueOrEmpty(String value) {
+        return value == null ? "" : value;
     }
 }

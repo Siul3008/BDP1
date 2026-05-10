@@ -12,12 +12,22 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
- * Data access class for adoption registration and follow-up.
+ * Handles adoption registration and follow-up data.
+ *
+ * <p>Registering an adoption is more than one insert: it saves the application,
+ * the rating, the adoption record, optional photos, changes the pet status, and
+ * transfers pet control to the adopter.</p>
  */
 public class AdoptionRepository {
 
+    private final ApplicationAuditRepository auditRepository = new ApplicationAuditRepository();
+
+    /**
+     * Returns pets that can currently be adopted by the current user or by an admin.
+     */
     public List<CatalogOption> findAdoptablePets(Long currentPersonId, boolean admin) throws SQLException {
         List<Object> parameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
@@ -25,7 +35,7 @@ public class AdoptionRepository {
                 FROM pet p
                 LEFT JOIN petStatus ps
                     ON ps.id = p.idPetStatus
-                WHERE LOWER(NVL(ps.status, '')) NOT IN ('adopted', 'adoptado')
+                WHERE LOWER(NVL(ps.status, '')) IN ('for adoption', 'en adopcion', 'en adopción')
                 """);
 
         if (!admin) {
@@ -56,6 +66,9 @@ public class AdoptionRepository {
         }
     }
 
+    /**
+     * Returns recent adoption records visible to the current account.
+     */
     public List<AdoptionRecord> findRecentAdoptions(Long currentPersonId, boolean admin) throws SQLException {
         List<Object> parameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
@@ -112,6 +125,9 @@ public class AdoptionRepository {
         }
     }
 
+    /**
+     * Saves the adoption and updates pet ownership/status in a single transaction.
+     */
     public void registerAdoption(AdoptionFormData data, Long currentPersonId, boolean admin) throws SQLException {
         validateAdoption(data, currentPersonId, admin);
 
@@ -120,6 +136,7 @@ public class AdoptionRepository {
 
             try {
                 PersonSummary adopter = findAdopterByEmail(connection, data.getAdopterEmail());
+                ensurePetIsForAdoption(connection, data.getPetId());
                 if (!admin && !userControlsPet(connection, data.getPetId(), currentPersonId)) {
                     throw new IllegalArgumentException("Solo quien controla la mascota puede registrar su adopcion.");
                 }
@@ -133,11 +150,81 @@ public class AdoptionRepository {
                 insertAdoption(connection, adoptionId, applicationId, ratingId, data);
                 linkAdoptionPet(connection, adoptionId, data.getPetId());
                 linkAdoptionRescuer(connection, adoptionId, currentPersonId);
+                linkAdoptionRescuer(connection, adoptionId, adopter.personId());
                 updateAdopterRating(connection, adopter.personId(), ratingId, data.getAdopterNotes());
                 insertOptionalPhoto(connection, adoptionId, "Adoption", data.getAdoptionPhotoPath());
                 insertOptionalPhoto(connection, adoptionId, "Follow-up", data.getFollowUpPhotoPath());
                 updatePetToAdopted(connection, data.getPetId());
+                transferPetControlToAdopter(connection, data.getPetId(), adopter.personId());
+                auditRepository.log(
+                        connection,
+                        "Adopciones",
+                        "Registro",
+                        "pet:" + data.getPetId(),
+                        adopter.displayName()
+                );
 
+                connection.commit();
+            } catch (SQLException | RuntimeException e) {
+                connection.rollback();
+                throw e;
+            } finally {
+                connection.setAutoCommit(true);
+            }
+        }
+    }
+
+    /**
+     * Updates follow-up notes and optionally adds a new follow-up photo.
+     */
+    public void updateFollowUp(long adoptionId, String followUpNotes, String followUpPhotoPath, Long currentPersonId, boolean admin)
+            throws SQLException {
+        if (adoptionId <= 0) {
+            throw new IllegalArgumentException("Seleccione una adopcion de la tabla.");
+        }
+        requireValue(followUpNotes, "Digite las notas de seguimiento.");
+        if (!admin && currentPersonId == null) {
+            throw new IllegalArgumentException("Debe iniciar sesion para actualizar el seguimiento.");
+        }
+
+        try (Connection connection = ConexionBD.conectar()) {
+            connection.setAutoCommit(false);
+
+            try {
+                String sql;
+                if (admin) {
+                    sql = "UPDATE adoption SET followUpNotes = ? WHERE id = ?";
+                } else {
+                    sql = """
+                            UPDATE adoption
+                            SET followUpNotes = ?
+                            WHERE id = ?
+                              AND EXISTS (
+                                  SELECT 1
+                                  FROM adoptionxRescuer axr
+                                  WHERE axr.idAdoption = adoption.id
+                                    AND axr.idRescuer = ?
+                              )
+                            """;
+                }
+
+                try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                    statement.setString(1, fit(followUpNotes, 100));
+                    statement.setLong(2, adoptionId);
+                    if (!admin) {
+                        statement.setLong(3, currentPersonId);
+                    }
+
+                    int updatedRows = statement.executeUpdate();
+                    if (updatedRows == 0) {
+                        throw new IllegalArgumentException(
+                                "Solo una persona vinculada a la adopcion o un admin puede actualizar el seguimiento."
+                        );
+                    }
+                }
+
+                insertOptionalPhoto(connection, adoptionId, "Follow-up", followUpPhotoPath);
+                auditRepository.log(connection, "Adopciones", "Seguimiento", "id:" + adoptionId, followUpNotes);
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
                 connection.rollback();
@@ -219,6 +306,33 @@ public class AdoptionRepository {
         }
     }
 
+    private void ensurePetIsForAdoption(Connection connection, long petId) throws SQLException {
+        String sql = """
+                SELECT LOWER(NVL(ps.status, '')) AS statusName
+                FROM pet p
+                LEFT JOIN petStatus ps
+                    ON ps.id = p.idPetStatus
+                WHERE p.id = ?
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    throw new IllegalArgumentException("La mascota seleccionada no existe.");
+                }
+
+                String statusName = resultSet.getString("statusName");
+                if (!isForAdoptionStatus(statusName)) {
+                    throw new IllegalArgumentException(
+                            "Solo se puede registrar adopcion de mascotas que estan en adopcion."
+                    );
+                }
+            }
+        }
+    }
+
     private void insertApplication(Connection connection, long applicationId, AdoptionFormData data) throws SQLException {
         String sql = """
                 INSERT INTO adoptionApplication(id, yard, exerciseTime, answers, otherPets, housingType)
@@ -291,7 +405,13 @@ public class AdoptionRepository {
         }
 
         ensureRescuerProfile(connection, rescuerId);
-        String sql = "INSERT INTO adoptionxRescuer(idAdoption, idRescuer) VALUES (?, ?)";
+        String sql = """
+                MERGE INTO adoptionxRescuer target
+                USING (SELECT ? AS idAdoption, ? AS idRescuer FROM dual) source
+                ON (target.idAdoption = source.idAdoption AND target.idRescuer = source.idRescuer)
+                WHEN NOT MATCHED THEN
+                    INSERT (idAdoption, idRescuer) VALUES (source.idAdoption, source.idRescuer)
+                """;
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, adoptionId);
             statement.setLong(2, rescuerId);
@@ -345,6 +465,29 @@ public class AdoptionRepository {
         }
     }
 
+    private void transferPetControlToAdopter(Connection connection, long petId, long adopterPersonId) throws SQLException {
+        ensureRescuerProfile(connection, adopterPersonId);
+
+        try (PreparedStatement deleteStatement = connection.prepareStatement("DELETE FROM rescuerxPet WHERE idPet = ?")) {
+            deleteStatement.setLong(1, petId);
+            deleteStatement.executeUpdate();
+        }
+
+        String sql = """
+                MERGE INTO rescuerxPet target
+                USING (SELECT ? AS idRescuer, ? AS idPet FROM dual) source
+                ON (target.idRescuer = source.idRescuer AND target.idPet = source.idPet)
+                WHEN NOT MATCHED THEN
+                    INSERT (idRescuer, idPet) VALUES (source.idRescuer, source.idPet)
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, adopterPersonId);
+            statement.setLong(2, petId);
+            statement.executeUpdate();
+        }
+    }
+
     private Long findAdoptedStatusId(Connection connection) throws SQLException {
         String exactSql = """
                 SELECT id
@@ -375,6 +518,17 @@ public class AdoptionRepository {
             statement.setLong(1, personId);
             statement.executeUpdate();
         }
+    }
+
+    private boolean isForAdoptionStatus(String statusName) {
+        if (statusName == null) {
+            return false;
+        }
+
+        String normalizedStatus = statusName.toLowerCase(Locale.ROOT);
+        return normalizedStatus.equals("for adoption")
+                || normalizedStatus.equals("en adopcion")
+                || normalizedStatus.equals("en adopción");
     }
 
     private long nextSequenceValue(Connection connection, String sequenceName) throws SQLException {

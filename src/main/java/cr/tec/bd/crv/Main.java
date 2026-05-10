@@ -7,13 +7,17 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
- * JavaFX entry point for the desktop application.
+ * Starts the Bienestar Animal desktop application.
+ *
+ * <p>Think of this class as the front door of the program: JavaFX calls it first,
+ * it loads the first visual screen, applies the shared design file, and then
+ * shows the window to the user.</p>
  */
 public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        // The app starts at the account type selector, not directly at the main menu.
+        // The app starts at the login screen so every action can be tied to a user or admin account.
         FXMLLoader loader = new FXMLLoader(
                 Main.class.getResource("/view/login.fxml")
         );
@@ -36,6 +40,9 @@ public class Main extends Application {
         stage.show();
     }
 
+    /**
+     * Standard Java launcher. It hands control to JavaFX, which then calls start().
+     */
     public static void main(String[] args) {
         launch(args);
     }

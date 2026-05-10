@@ -13,20 +13,33 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Data access class for journal and audit-column review.
+ * Reads audit information for the admin audit screen.
+ *
+ * <p>The application prefers rows from the journal table because those rows use
+ * the logged-in app profile. If journal does not exist, it falls back to table
+ * audit columns when available.</p>
  */
 public class AuditRepository {
 
+    /**
+     * Returns recent audit rows filtered by module, user/email, or changed field.
+     */
     public List<AuditRecord> findAuditRecords(String moduleFilter, String userFilter, String fieldFilter)
             throws SQLException {
         try (Connection connection = ConexionBD.conectar()) {
             List<AuditRecord> records = new ArrayList<>();
-            addJournalRecords(connection, records);
-            addAuditTableRecords(connection, records, "PET", "Mascotas", "name");
-            addAuditTableRecords(connection, records, "ADOPTION", "Adopciones", "TO_CHAR(id)");
-            addAuditTableRecords(connection, records, "DONATION", "Donaciones", "TO_CHAR(amount)");
-            addAuditTableRecords(connection, records, "ASSOCIATION", "Asociaciones", "name");
-            addAuditTableRecords(connection, records, "PERSON", "Personas", "firstName || ' ' || firstLastName");
+
+            // Journal is the application audit source. If it exists but is empty, we show an empty list
+            // instead of falling back to table audit columns that only know the shared Oracle user.
+            if (hasTable(connection, "JOURNAL")) {
+                addJournalRecords(connection, records);
+            } else {
+                addAuditTableRecords(connection, records, "PET", "Mascotas", "name");
+                addAuditTableRecords(connection, records, "ADOPTION", "Adopciones", "TO_CHAR(id)");
+                addAuditTableRecords(connection, records, "DONATION", "Donaciones", "TO_CHAR(amount)");
+                addAuditTableRecords(connection, records, "ASSOCIATION", "Asociaciones", "name");
+                addAuditTableRecords(connection, records, "PERSON", "Personas", "firstName || ' ' || firstLastName");
+            }
 
             String module = normalized(moduleFilter);
             String user = normalized(userFilter);
@@ -48,19 +61,23 @@ public class AuditRepository {
         }
 
         String sql = """
-                SELECT id, fieldName, previousValue, currentValue, changedBy, changeDate
-                FROM journal
-                ORDER BY changeDate DESC NULLS LAST, id DESC
-                FETCH FIRST 150 ROWS ONLY
+                SELECT *
+                FROM (
+                    SELECT id, fieldName, previousValue, currentValue, changedBy, changeDate
+                    FROM journal
+                    ORDER BY changeDate DESC NULLS LAST, id DESC
+                )
+                WHERE ROWNUM <= 150
                 """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
+                String rawField = valueOrEmpty(resultSet.getString("fieldName"));
                 records.add(new AuditRecord(
                         resultSet.getLong("id"),
-                        "Journal",
-                        valueOrEmpty(resultSet.getString("fieldName")),
+                        moduleFromJournalField(rawField),
+                        fieldFromJournalField(rawField),
                         valueOrEmpty(resultSet.getString("previousValue")),
                         valueOrEmpty(resultSet.getString("currentValue")),
                         valueOrEmpty(resultSet.getString("changedBy")),
@@ -93,16 +110,19 @@ public class AuditRepository {
                 : "created_By";
 
         String sql = """
-                SELECT
-                    id,
-                    CAST(NULL AS VARCHAR2(25)) AS previousValue,
-                    %s AS currentValue,
-                    %s AS changedBy,
-                    %s AS changeDate
-                FROM %s
-                WHERE %s IS NOT NULL
-                ORDER BY %s DESC NULLS LAST, id DESC
-                FETCH FIRST 80 ROWS ONLY
+                SELECT *
+                FROM (
+                    SELECT
+                        id,
+                        CAST(NULL AS VARCHAR2(25)) AS previousValue,
+                        %s AS currentValue,
+                        %s AS changedBy,
+                        %s AS changeDate
+                    FROM %s
+                    WHERE %s IS NOT NULL
+                    ORDER BY %s DESC NULLS LAST, id DESC
+                )
+                WHERE ROWNUM <= 80
                 """.formatted(valueExpression, userExpression, dateExpression, tableName, dateExpression, dateExpression);
 
         try (PreparedStatement statement = connection.prepareStatement(sql);
@@ -156,5 +176,21 @@ public class AuditRepository {
 
     private String valueOrEmpty(String value) {
         return value == null ? "" : value;
+    }
+
+    private String moduleFromJournalField(String fieldName) {
+        int separatorIndex = fieldName.indexOf('.');
+        if (separatorIndex <= 0) {
+            return "Journal";
+        }
+        return fieldName.substring(0, separatorIndex);
+    }
+
+    private String fieldFromJournalField(String fieldName) {
+        int separatorIndex = fieldName.indexOf('.');
+        if (separatorIndex < 0 || separatorIndex >= fieldName.length() - 1) {
+            return fieldName;
+        }
+        return fieldName.substring(separatorIndex + 1);
     }
 }

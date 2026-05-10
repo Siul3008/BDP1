@@ -5,6 +5,8 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
@@ -91,14 +93,29 @@
                     </HBox>
                     <Label fx:id="lblMensajeCasaCuna" text="" wrapText="true" styleClass="message-label"/>
                 </VBox>
-                <VBox spacing="12.0" prefWidth="360" styleClass="card result-card">
-                    <Label text="Como usar esta pantalla" styleClass="section-title"/>
-                    <Label text="Marca todas las opciones que aplican. Puedes activar o quitar cada una con un clic."
+                <VBox spacing="12.0" prefWidth="620" styleClass="card result-card">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="Casas cuna activas" styleClass="section-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Actualizar" onAction="#recargarCasasCuna" styleClass="secondary-button">
+                            <tooltip>
+                                <Tooltip text="Recarga la lista de usuarios que aceptan alojamiento temporal."/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
+                    <Label text="Use estos contactos cuando una mascota en adopcion necesita alojamiento temporal."
                            wrapText="true"
                            styleClass="subtle-text"/>
-                    <Label text="Estas condiciones se guardan en las tablas de casa cuna y se pueden editar entrando de nuevo a este modulo."
-                           wrapText="true"
-                           styleClass="subtle-text"/>
+                    <TableView fx:id="tablaCasasCuna" prefHeight="430">
+                        <columns>
+                            <TableColumn fx:id="colCasaNombre" text="Casa cuna" prefWidth="135"/>
+                            <TableColumn fx:id="colCasaContacto" text="Contacto" prefWidth="170"/>
+                            <TableColumn fx:id="colCasaTipos" text="Tipos" prefWidth="120"/>
+                            <TableColumn fx:id="colCasaTamanos" text="Tamanos" prefWidth="100"/>
+                            <TableColumn fx:id="colCasaAlimento" text="Alimento" prefWidth="90"/>
+                            <TableColumn fx:id="colCasaNotas" text="Notas" prefWidth="180"/>
+                        </columns>
+                    </TableView>
                 </VBox>
             </HBox>
         </VBox>

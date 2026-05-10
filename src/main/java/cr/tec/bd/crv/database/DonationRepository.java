@@ -14,10 +14,19 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Data access class for donation registration and donation reports.
+ * Handles donation registration, search, and deletion.
+ *
+ * <p>Donations touch several tables: the donation itself, its currency/allocation
+ * data, the person who donated, and the association that receives it. The
+ * repository keeps those related inserts and deletes in one safe place.</p>
  */
 public class DonationRepository {
 
+    private final ApplicationAuditRepository auditRepository = new ApplicationAuditRepository();
+
+    /**
+     * Saves a donation made by the current user to an association.
+     */
     public void registerDonation(
             Long donorPersonId,
             Long associationId,
@@ -38,6 +47,7 @@ public class DonationRepository {
                 insertDonation(connection, donationId, currencyId, allocationId, donationDate, amount);
                 linkPersonDonation(connection, donorPersonId, donationId);
                 linkAssociationDonation(connection, associationId, donationId);
+                auditRepository.log(connection, "Donaciones", "Crear", "-", amount.toPlainString());
 
                 connection.commit();
             } catch (SQLException | RuntimeException e) {
@@ -49,11 +59,15 @@ public class DonationRepository {
         }
     }
 
+    /**
+     * Searches donation records using optional date, donor, association, and user filters.
+     */
     public List<DonationRecord> findDonations(
             LocalDate fromDate,
             LocalDate toDate,
             String donorText,
             Long associationId,
+            BigDecimal exactAmount,
             Long visiblePersonId
     ) throws SQLException {
         List<Object> parameters = new ArrayList<>();
@@ -112,6 +126,11 @@ public class DonationRepository {
             parameters.add(associationId);
         }
 
+        if (exactAmount != null) {
+            sql.append(" AND d.amount = ?\n");
+            parameters.add(exactAmount);
+        }
+
         sql.append(" ORDER BY d.donationDate DESC, d.id DESC");
 
         try (Connection connection = ConexionBD.conectar();
@@ -136,6 +155,9 @@ public class DonationRepository {
         }
     }
 
+    /**
+     * Deletes a donation and its related linking/allocation rows.
+     */
     public void deleteDonation(long donationId) throws SQLException {
         try (Connection connection = ConexionBD.conectar()) {
             connection.setAutoCommit(false);
@@ -150,6 +172,7 @@ public class DonationRepository {
                 if (allocationId != null) {
                     deleteById(connection, "donationAllLocation", allocationId);
                 }
+                auditRepository.log(connection, "Donaciones", "Eliminar", "id:" + donationId, "-");
 
                 connection.commit();
             } catch (SQLException | RuntimeException e) {

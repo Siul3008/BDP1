@@ -10,6 +10,7 @@ import cr.tec.bd.crv.util.NavigationUtil;
 import cr.tec.bd.crv.util.SessionContext;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.fxml.FXML;
@@ -24,7 +25,11 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Controller for the pet list screen.
+ * Controls the pet list screen.
+ *
+ * <p>This screen lets users review pets, focus on their own publications, edit
+ * pets they control, change allowed pet statuses, and optionally transfer a pet
+ * publication to an active foster home.</p>
  */
 public class ListaMascotasController {
 
@@ -60,6 +65,12 @@ public class ListaMascotasController {
     private ComboBox<CatalogOption> cbCasaCuna;
 
     @FXML
+    private Button btnTransferirControl;
+
+    @FXML
+    private CheckBox chkTransferirCasaCuna;
+
+    @FXML
     private CheckBox chkSoloMisMascotas;
 
     @FXML
@@ -76,9 +87,11 @@ public class ListaMascotasController {
 
     @FXML
     public void initialize() {
+        // The table and selectors must be ready before the first pet search runs.
         configureColumns();
         loadStatuses();
         loadFosterHomes();
+        configurarTransferenciaCasaCuna();
         loadPets();
     }
 
@@ -90,7 +103,21 @@ public class ListaMascotasController {
 
     @FXML
     public void abrirRegistro(ActionEvent event) throws IOException {
+        SessionContext.setEditingPetId(null);
         NavigationUtil.openWindow(event, "/view/registrar_mascota.fxml", "Registrar Mascota");
+    }
+
+    @FXML
+    public void editarMascotaSeleccionada(ActionEvent event) throws IOException {
+        // The selected id is stored temporarily so the registration form opens in edit mode.
+        Mascota selectedPet = tablaMascotas.getSelectionModel().getSelectedItem();
+        if (selectedPet == null) {
+            lblMensaje.setText("Seleccione una mascota de la tabla.");
+            return;
+        }
+
+        SessionContext.setEditingPetId((long) selectedPet.getId());
+        NavigationUtil.openWindow(event, "/view/registrar_mascota.fxml", "Editar Mascota");
     }
 
     @FXML
@@ -100,6 +127,7 @@ public class ListaMascotasController {
 
     @FXML
     public void cambiarEstadoMascota() {
+        // Status changes are checked again in the repository so users cannot bypass permissions.
         Mascota selectedPet = tablaMascotas.getSelectionModel().getSelectedItem();
         CatalogOption selectedStatus = cbNuevoEstado.getValue();
 
@@ -135,7 +163,24 @@ public class ListaMascotasController {
     }
 
     @FXML
+    public void configurarTransferenciaCasaCuna() {
+        // The foster home selector stays disabled unless the user clearly asks to transfer control.
+        boolean transferEnabled = chkTransferirCasaCuna != null && chkTransferirCasaCuna.isSelected();
+        cbCasaCuna.setDisable(!transferEnabled);
+        btnTransferirControl.setDisable(!transferEnabled);
+        if (!transferEnabled) {
+            cbCasaCuna.getSelectionModel().clearSelection();
+        }
+    }
+
+    @FXML
     public void pasarControlCasaCuna() {
+        // Transfer is separate from status changes: the user can change status without choosing a foster home.
+        if (chkTransferirCasaCuna == null || !chkTransferirCasaCuna.isSelected()) {
+            lblMensaje.setText("Active la opcion de transferencia solo si desea pasar el control a una casa cuna.");
+            return;
+        }
+
         Mascota selectedPet = tablaMascotas.getSelectionModel().getSelectedItem();
         CatalogOption selectedFosterHome = cbCasaCuna.getValue();
 
@@ -157,6 +202,8 @@ public class ListaMascotasController {
                     SessionContext.isAdmin()
             );
             chkSoloMisMascotas.setSelected(false);
+            chkTransferirCasaCuna.setSelected(false);
+            configurarTransferenciaCasaCuna();
             loadPets();
             lblMensaje.setText("Control transferido a la casa cuna seleccionada.");
         } catch (IllegalArgumentException e) {
@@ -193,6 +240,7 @@ public class ListaMascotasController {
 
     private void loadPets() {
         try {
+            // Normal users can filter to the pets they control; admins always have the full view.
             Long ownerFilter = chkSoloMisMascotas != null
                     && chkSoloMisMascotas.isSelected()
                     && !SessionContext.isAdmin()
@@ -208,6 +256,7 @@ public class ListaMascotasController {
     }
 
     private void updateStats(List<Mascota> pets) {
+        // These small counters give a quick summary of the rows currently visible in the table.
         long adoption = countByStatusText(pets, "adop");
         long lost = countByStatusText(pets, "lost") + countByStatusText(pets, "perd");
 

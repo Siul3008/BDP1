@@ -8,22 +8,37 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
- * Reads database catalogs used by form controls.
+ * Reads catalog values used by combo boxes and filters.
+ *
+ * <p>Catalog tables hold controlled options such as pet types, breeds, colors,
+ * currencies, provinces, and health-related values. Loading them from the
+ * database prevents users from typing values that do not exist in the schema.</p>
  */
 public class CatalogRepository {
 
+    /**
+     * Returns pet types such as dog, cat, bird, and other supported animal groups.
+     */
     public List<CatalogOption> findPetTypes() throws SQLException {
         return findSimpleOptions("SELECT id, name AS label FROM petType ORDER BY name");
     }
 
+    /**
+     * Returns every breed, regardless of pet type.
+     */
     public List<CatalogOption> findBreeds() throws SQLException {
         return findSimpleOptions("SELECT id, name AS label FROM breed ORDER BY name");
     }
 
+    /**
+     * Returns only breeds linked to the selected pet type when the schema supports it.
+     */
     public List<CatalogOption> findBreedsByPetType(long petTypeId) throws SQLException {
         try (Connection connection = ConexionBD.conectar()) {
             String petTypeName = findPetTypeName(connection, petTypeId);
@@ -94,6 +109,9 @@ public class CatalogRepository {
         }
     }
 
+    /**
+     * Returns pet statuses used for publication state changes.
+     */
     public List<CatalogOption> findPetStatuses() throws SQLException {
         return findSimpleOptions("SELECT id, status AS label FROM petStatus ORDER BY status");
     }
@@ -122,6 +140,22 @@ public class CatalogRepository {
         return findSimpleOptions("SELECT id, name AS label FROM trainingEase ORDER BY name");
     }
 
+    public List<CatalogOption> findDiseases() throws SQLException {
+        return findSimpleOptions("SELECT id, name AS label FROM disease ORDER BY name");
+    }
+
+    public List<CatalogOption> findTreatments() throws SQLException {
+        return findSimpleOptions("SELECT id, name AS label FROM treatment ORDER BY name");
+    }
+
+    public List<CatalogOption> findMedicines() throws SQLException {
+        return findSimpleOptions("SELECT id, name AS label FROM medicine ORDER BY name");
+    }
+
+    public List<CatalogOption> findVeterinarians() throws SQLException {
+        return findSimpleOptions("SELECT id, name AS label FROM veterinarian ORDER BY name");
+    }
+
     public List<CatalogOption> findProvinces() throws SQLException {
         return findSimpleOptions("SELECT id, name AS label FROM province ORDER BY name");
     }
@@ -132,6 +166,72 @@ public class CatalogRepository {
 
     public List<CatalogOption> findDistricts(long cantonId) throws SQLException {
         return findChildOptions("SELECT id, name AS label FROM district WHERE idCanton = ? ORDER BY name", cantonId);
+    }
+
+    /**
+     * Returns energy labels maintained as system parameters.
+     */
+    public List<String> findEnergyLevels() throws SQLException {
+        String sql = """
+                SELECT value
+                FROM sysParameter
+                WHERE LOWER(name) LIKE 'pet.energy.%'
+                ORDER BY name
+                """;
+
+        try (Connection connection = ConexionBD.conectar();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            List<String> levels = new ArrayList<>();
+            while (resultSet.next()) {
+                String value = resultSet.getString("value");
+                if (value != null && !value.trim().isEmpty()) {
+                    levels.add(value.trim());
+                }
+            }
+            return levels;
+        }
+    }
+
+    /**
+     * Returns system parameters by prefix, keeping the names so callers can map
+     * each value to the right label or prompt.
+     */
+    public Map<String, String> findSystemParametersByPrefix(String prefix) throws SQLException {
+        String sql = """
+                SELECT name, value
+                FROM sysParameter
+                WHERE LOWER(name) LIKE LOWER(?)
+                ORDER BY name
+                """;
+
+        try (Connection connection = ConexionBD.conectar();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, prefix + "%");
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                Map<String, String> values = new LinkedHashMap<>();
+                while (resultSet.next()) {
+                    values.put(resultSet.getString("name"), resultSet.getString("value"));
+                }
+                return values;
+            }
+        }
+    }
+
+    /**
+     * Finds the canton that owns a district. This lets edit forms rebuild the
+     * province/canton/district selector chain from the saved district id.
+     */
+    public Long findCantonIdByDistrict(long districtId) throws SQLException {
+        return findParentId("SELECT idCanton FROM district WHERE id = ?", districtId);
+    }
+
+    /**
+     * Finds the province that owns a canton.
+     */
+    public Long findProvinceIdByCanton(long cantonId) throws SQLException {
+        return findParentId("SELECT idProvince FROM canton WHERE id = ?", cantonId);
     }
 
     private List<CatalogOption> findSimpleOptions(String sql) throws SQLException {
@@ -149,6 +249,22 @@ public class CatalogRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 return readOptions(resultSet);
+            }
+        }
+    }
+
+    private Long findParentId(String sql, long childId) throws SQLException {
+        try (Connection connection = ConexionBD.conectar();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, childId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return null;
+                }
+
+                long value = resultSet.getLong(1);
+                return resultSet.wasNull() ? null : value;
             }
         }
     }

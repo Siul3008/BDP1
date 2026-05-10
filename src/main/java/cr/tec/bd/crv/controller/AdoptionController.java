@@ -1,5 +1,6 @@
 package cr.tec.bd.crv.controller;
 
+import cr.tec.bd.crv.database.CatalogRepository;
 import cr.tec.bd.crv.database.AdoptionRepository;
 import cr.tec.bd.crv.model.AdoptionFormData;
 import cr.tec.bd.crv.model.AdoptionRecord;
@@ -22,13 +23,19 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Handles adoption registration and adoption follow-up from the JavaFX screen.
+ * Controls adoption registration and follow-up.
+ *
+ * <p>The screen connects a pet that is currently available for adoption with an
+ * adopter account. After saving, the repository marks the pet as adopted and
+ * transfers control to the adopter so later updates belong to the right person.</p>
  */
 public class AdoptionController {
 
     private final AdoptionRepository adoptionRepository = new AdoptionRepository();
+    private final CatalogRepository catalogRepository = new CatalogRepository();
 
     @FXML
     private ComboBox<CatalogOption> cbMascotaAdopcion;
@@ -46,16 +53,31 @@ public class AdoptionController {
     private TextField txtPatio;
 
     @FXML
+    private Label lblPatio;
+
+    @FXML
     private TextField txtTipoVivienda;
+
+    @FXML
+    private Label lblTipoVivienda;
 
     @FXML
     private TextField txtEjercicio;
 
     @FXML
+    private Label lblEjercicio;
+
+    @FXML
     private TextField txtOtrasMascotas;
 
     @FXML
+    private Label lblOtrasMascotas;
+
+    @FXML
     private TextArea txtRespuestas;
+
+    @FXML
+    private Label lblRespuestas;
 
     @FXML
     private TextField txtFotoAdopcion;
@@ -95,9 +117,14 @@ public class AdoptionController {
 
     @FXML
     public void initialize() {
+        // The form starts ready to register today's adoption.
         configureColumns();
         cbCalificacion.setItems(FXCollections.observableArrayList("1", "2", "3", "4", "5"));
         dpFechaAdopcion.setValue(LocalDate.now());
+        tablaAdopciones.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, oldValue, selected) -> loadSelectedFollowUp(selected));
+        loadQuestionLabels();
         loadAdoptablePets();
         loadAdoptions();
     }
@@ -105,6 +132,7 @@ public class AdoptionController {
     @FXML
     public void registrarAdopcion() {
         try {
+            // The selected pet is converted into a small form object before touching the database.
             CatalogOption selectedPet = cbMascotaAdopcion.getValue();
             AdoptionFormData data = new AdoptionFormData(
                     selectedPet == null ? null : selectedPet.getId(),
@@ -163,6 +191,32 @@ public class AdoptionController {
     }
 
     @FXML
+    public void actualizarSeguimiento() {
+        AdoptionRecord selectedAdoption = tablaAdopciones.getSelectionModel().getSelectedItem();
+        if (selectedAdoption == null) {
+            lblMensajeAdopcion.setText("Seleccione una adopcion del historial.");
+            return;
+        }
+
+        try {
+            adoptionRepository.updateFollowUp(
+                    selectedAdoption.getId(),
+                    txtSeguimiento.getText(),
+                    txtFotoSeguimiento.getText(),
+                    SessionContext.getCurrentPersonId(),
+                    SessionContext.isAdmin()
+            );
+            lblMensajeAdopcion.setText("Seguimiento actualizado correctamente.");
+            txtFotoSeguimiento.clear();
+            loadAdoptions();
+        } catch (IllegalArgumentException e) {
+            lblMensajeAdopcion.setText(e.getMessage());
+        } catch (SQLException e) {
+            lblMensajeAdopcion.setText("No se pudo actualizar seguimiento: " + e.getMessage());
+        }
+    }
+
+    @FXML
     public void volverMenu(ActionEvent event) throws IOException {
         String menuPath = SessionContext.isAdmin() ? "/view/admin_menu.fxml" : "/view/menu.fxml";
         NavigationUtil.openWindow(event, menuPath, "BDP1 - Bienestar Animal");
@@ -176,8 +230,35 @@ public class AdoptionController {
         colSeguimiento.setCellValueFactory(new PropertyValueFactory<>("followUpNotes"));
     }
 
+    private void loadSelectedFollowUp(AdoptionRecord selectedAdoption) {
+        if (selectedAdoption == null) {
+            return;
+        }
+        txtSeguimiento.setText(selectedAdoption.getFollowUpNotes());
+    }
+
+    private void loadQuestionLabels() {
+        try {
+            Map<String, String> labels = catalogRepository.findSystemParametersByPrefix("adopt.");
+            setLabelIfPresent(lblPatio, labels.get("adopt.yard"));
+            setLabelIfPresent(lblTipoVivienda, labels.get("adopt.home"));
+            setLabelIfPresent(lblEjercicio, labels.get("adopt.exercise"));
+            setLabelIfPresent(lblOtrasMascotas, labels.get("adopt.pets"));
+            setLabelIfPresent(lblRespuestas, labels.get("adopt.answers"));
+        } catch (SQLException e) {
+            lblMensajeAdopcion.setText("No se pudieron cargar preguntas configurables: " + e.getMessage());
+        }
+    }
+
+    private void setLabelIfPresent(Label label, String value) {
+        if (label != null && value != null && !value.trim().isEmpty()) {
+            label.setText(value.trim());
+        }
+    }
+
     private void loadAdoptablePets() {
         try {
+            // Normal users only see pets they control; admins can register adoption for any eligible pet.
             List<CatalogOption> pets = adoptionRepository.findAdoptablePets(
                     SessionContext.getCurrentPersonId(),
                     SessionContext.isAdmin()
@@ -190,6 +271,7 @@ public class AdoptionController {
 
     private void loadAdoptions() {
         try {
+            // The table gives immediate confirmation of the latest saved adoptions.
             List<AdoptionRecord> adoptions = adoptionRepository.findRecentAdoptions(
                     SessionContext.getCurrentPersonId(),
                     SessionContext.isAdmin()

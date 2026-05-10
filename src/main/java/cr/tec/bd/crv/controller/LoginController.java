@@ -19,7 +19,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Handles account selection, login, registration, and database connection checks.
+ * Controls login and user registration.
+ *
+ * <p>This controller is reused by the login and registration FXML files. Some
+ * fields are only present in one screen, so helper methods check for null before
+ * clearing or reading optional controls.</p>
  */
 public class LoginController {
 
@@ -69,7 +73,7 @@ public class LoginController {
     @FXML
     private Label lblMensajeAdmin;
 
-    // Legacy navigation methods now return to the single login screen.
+    // Older buttons still call these methods, but the app now uses one shared login screen.
     @FXML
     public void abrirLoginUsuario(ActionEvent event) throws IOException {
         NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
@@ -90,7 +94,9 @@ public class LoginController {
         NavigationUtil.openWindow(event, "/view/login.fxml", "BDP1 - Bienestar Animal");
     }
 
-    // Quick connection test used during setup and demonstrations.
+    /**
+     * Tests whether the application can open an Oracle connection.
+     */
     @FXML
     public void probarConexion() {
         try (Connection connection = ConexionBD.conectar()) {
@@ -100,7 +106,9 @@ public class LoginController {
         }
     }
 
-    // A single login form routes the account by role after authentication.
+    /**
+     * Authenticates the account and opens the correct menu for its role.
+     */
     @FXML
     public void iniciarSesion(ActionEvent event) throws IOException {
         try {
@@ -133,13 +141,17 @@ public class LoginController {
         }
     }
 
-    // Kept for older FXML files while the project moves to a single login screen.
+    /**
+     * Compatibility method for older FXML files that still call the user login action.
+     */
     @FXML
     public void iniciarSesionUsuario(ActionEvent event) throws IOException {
         iniciarSesion(event);
     }
 
-    // Admin login routes to a restricted menu for system management tasks.
+    /**
+     * Compatibility method for older admin login screens.
+     */
     @FXML
     public void iniciarSesionAdmin(ActionEvent event) throws IOException {
         try {
@@ -161,7 +173,9 @@ public class LoginController {
         }
     }
 
-    // New user registration creates the person, adopter profile, contact data, and app account.
+    /**
+     * Registers a normal user account and starts a session immediately after saving.
+     */
     @FXML
     public void registrarUsuario(ActionEvent event) throws IOException {
         try {

@@ -51,7 +51,7 @@
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                         <Label text="Usuario" styleClass="field-label"/>
-                        <TextField fx:id="txtUsuarioBitacora" promptText="Usuario de base de datos"/>
+                        <TextField fx:id="txtUsuarioBitacora" promptText="Correo o perfil"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
                         <Label text="Campo" styleClass="field-label"/>
