@@ -63,6 +63,9 @@ public class ListaMascotasController {
     private TableColumn<Mascota, String> colEstado;
 
     @FXML
+    private TableColumn<Mascota, Integer> colEdad;
+
+    @FXML
     private ComboBox<CatalogOption> cbNuevoEstado;
 
     @FXML
@@ -236,6 +239,7 @@ public class ListaMascotasController {
         colRaza.setCellValueFactory(new PropertyValueFactory<>("raza"));
         colColor.setCellValueFactory(new PropertyValueFactory<>("color"));
         colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+        colEdad.setCellValueFactory(new PropertyValueFactory<>("edad"));
     }
 
     private void loadSelectedPetPhoto(Mascota selectedPet) {

@@ -27,6 +27,7 @@ public class PetFormData {
     private final String contactEmail;
     private final BigDecimal rewardAmount;
     private final LocalDate eventDate;
+    private final Integer ageYears;
     private final String photoBeforePath;
     private final String photoAfterPath;
     private final String description;
@@ -56,6 +57,7 @@ public class PetFormData {
             String contactEmail,
             BigDecimal rewardAmount,
             LocalDate eventDate,
+            Integer ageYears,
             String photoBeforePath,
             String photoAfterPath,
             String description,
@@ -84,6 +86,7 @@ public class PetFormData {
         this.contactEmail = contactEmail;
         this.rewardAmount = rewardAmount;
         this.eventDate = eventDate;
+        this.ageYears = ageYears;
         this.photoBeforePath = photoBeforePath;
         this.photoAfterPath = photoAfterPath;
         this.description = description;
@@ -159,6 +162,10 @@ public class PetFormData {
 
     public LocalDate getEventDate() {
         return eventDate;
+    }
+
+    public Integer getAgeYears() {
+        return ageYears;
     }
 
     public String getPhotoBeforePath() {

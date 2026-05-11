@@ -15,11 +15,12 @@ public class Mascota {
     private String raza;
     private String color;
     private String estado;
+    private Integer edad;
     private String lugar;
     private String fechaEvento;
 
     public Mascota(int id, String nombre, String tipo, String raza, String color, String estado) {
-        this(id, nombre, tipo, raza, color, estado, "", "");
+        this(id, nombre, tipo, raza, color, estado, null, "", "");
     }
 
     public Mascota(
@@ -29,6 +30,7 @@ public class Mascota {
             String raza,
             String color,
             String estado,
+            Integer edad,
             String lugar,
             String fechaEvento
     ) {
@@ -38,6 +40,7 @@ public class Mascota {
         this.raza = raza;
         this.color = color;
         this.estado = estado;
+        this.edad = edad;
         this.lugar = lugar;
         this.fechaEvento = fechaEvento;
     }
@@ -64,6 +67,10 @@ public class Mascota {
 
     public String getEstado() {
         return estado;
+    }
+
+    public Integer getEdad() {
+        return edad;
     }
 
     public String getLugar() {

@@ -27,6 +27,8 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 
 /**
@@ -78,6 +80,12 @@ public class RegistrarMascotaController {
 
     @FXML
     private DatePicker dpEvento;
+
+    @FXML
+    private DatePicker dpNacimiento;
+
+    @FXML
+    private TextField txtEdadCalculada;
 
     @FXML
     private TextField txtTelefonoContacto;
@@ -139,6 +147,7 @@ public class RegistrarMascotaController {
     @FXML
     public void initialize() {
         configureDependentSelectors();
+        configureAgeCalculator();
         loadCatalogs();
         editingPetId = SessionContext.consumeEditingPetId();
         if (editingPetId != null) {
@@ -209,6 +218,12 @@ public class RegistrarMascotaController {
         );
         cbEnergia.getSelectionModel().clearSelection();
         dpEvento.setValue(null);
+        if (dpNacimiento != null) {
+            dpNacimiento.setValue(null);
+        }
+        if (txtEdadCalculada != null) {
+            txtEdadCalculada.clear();
+        }
         clearImagePreviews();
         lblMensaje.setText("");
     }
@@ -323,6 +338,7 @@ public class RegistrarMascotaController {
                 valueOf(txtCorreoContacto),
                 parseAmount(valueOf(txtRecompensa)),
                 dpEvento.getValue(),
+                calculateAgeYears(),
                 valueOf(txtFotoAntes),
                 valueOf(txtFotoDespues),
                 valueOf(txtDescripcion),
@@ -354,6 +370,9 @@ public class RegistrarMascotaController {
             cbEnergia.setValue(data.getEnergyLevel());
             loadLocationForEditing(data.getDistrictId());
             dpEvento.setValue(data.getEventDate());
+            if (txtEdadCalculada != null && data.getAgeYears() != null) {
+                txtEdadCalculada.setText(String.valueOf(data.getAgeYears()));
+            }
             txtTelefonoContacto.setText(data.getContactPhone());
             txtCorreoContacto.setText(data.getContactEmail());
             selectById(cbEntrenamiento, data.getTrainingEaseId());
@@ -375,6 +394,17 @@ public class RegistrarMascotaController {
         } catch (SQLException e) {
             lblMensaje.setText("Could not load the pet for editing: " + e.getMessage());
         }
+    }
+
+    private void configureAgeCalculator() {
+        if (dpNacimiento == null || txtEdadCalculada == null) {
+            return;
+        }
+
+        dpNacimiento.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Integer age = calculateAgeYears();
+            txtEdadCalculada.setText(age == null ? "" : String.valueOf(age));
+        });
     }
 
     private void chooseImage(ActionEvent event, TextField targetField, ImageView preview) {
@@ -438,6 +468,19 @@ public class RegistrarMascotaController {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Reward amount must be numeric.");
         }
+    }
+
+    private Integer calculateAgeYears() {
+        if (dpNacimiento == null || dpNacimiento.getValue() == null) {
+            return null;
+        }
+
+        LocalDate birthDate = dpNacimiento.getValue();
+        LocalDate today = LocalDate.now();
+        if (birthDate.isAfter(today)) {
+            throw new IllegalArgumentException("Birth date cannot be in the future.");
+        }
+        return Period.between(birthDate, today).getYears();
     }
 
     private Long idOf(ComboBox<CatalogOption> comboBox) {

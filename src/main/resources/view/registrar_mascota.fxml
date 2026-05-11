@@ -100,34 +100,42 @@
                                     <DatePicker fx:id="dpEvento"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                    <Label text="Birth date" styleClass="field-label"/>
+                                    <DatePicker fx:id="dpNacimiento"/>
+                                </VBox>
+                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <Label text="Age (years)" styleClass="field-label"/>
+                                    <TextField fx:id="txtEdadCalculada" promptText="Calculated automatically" editable="false"/>
+                                </VBox>
+                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
                                     <Label text="Canton" styleClass="field-label"/>
                                     <ComboBox fx:id="cbCanton" promptText="Select canton"/>
                                 </VBox>
-                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                     <Label text="District" styleClass="field-label"/>
                                     <ComboBox fx:id="cbDistrito" promptText="Select district"/>
                                 </VBox>
-                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
                                     <Label text="Contact phone" styleClass="field-label"/>
                                     <TextField fx:id="txtTelefonoContacto" promptText="Primary number"/>
                                 </VBox>
-                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                                     <Label text="Contact email" styleClass="field-label"/>
                                     <TextField fx:id="txtCorreoContacto" promptText="email@example.com"/>
                                 </VBox>
-                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="4">
                                     <Label text="Contact veterinarian" styleClass="field-label"/>
                                     <ComboBox fx:id="cbVeterinario" promptText="Registered veterinarian"/>
                                 </VBox>
-                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                                     <Label text="Needs plenty of space" styleClass="field-label"/>
                                     <TextField fx:id="txtEspacio" promptText="Yes / No / Notes"/>
                                 </VBox>
-                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="4">
+                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="5">
                                     <Label text="Reward currency" styleClass="field-label"/>
                                     <ComboBox fx:id="cbMoneda" promptText="CRC o USD"/>
                                 </VBox>
-                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                                     <Label text="Reward amount" styleClass="field-label"/>
                                     <TextField fx:id="txtRecompensa" promptText="0.00"/>
                                 </VBox>

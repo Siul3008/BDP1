@@ -111,6 +111,7 @@ public class PetRepository {
                         p.needSpace,
                         p.energyLevel,
                         p.chip,
+                        p.age,
                         p.eventDate,
                         pp.photoPath AS beforePhotoPath,
                         afterPhoto.photoPath AS afterPhotoPath,
@@ -198,6 +199,7 @@ public class PetRepository {
                             resultSet.getString("contactEmail"),
                             resultSet.getBigDecimal("amount"),
                             eventDate == null ? null : eventDate.toLocalDate(),
+                            intOrNull(resultSet, "age"),
                             resultSet.getString("beforePhotoPath"),
                             resultSet.getString("afterPhotoPath"),
                             resultSet.getString("description"),
@@ -287,6 +289,7 @@ public class PetRepository {
                                 valueOrEmpty(resultSet.getString("breedName")),
                                 valueOrEmpty(resultSet.getString("color")),
                                 valueOrEmpty(resultSet.getString("statusName")),
+                                intOrNull(resultSet, "ageYears"),
                                 valueOrEmpty(resultSet.getString("locationName")),
                                 valueOrEmpty(resultSet.getString("eventDateText"))
                         ));
@@ -466,6 +469,7 @@ public class PetRepository {
                     b.name AS breedName,
                     co.name AS color,
                     ps.status AS statusName,
+                    p.age AS ageYears,
                     TRIM(
                         NVL(d.name, '') ||
                         CASE WHEN c.name IS NOT NULL THEN ', ' || c.name ELSE '' END ||
@@ -576,6 +580,9 @@ public class PetRepository {
         addColumn(columns, values, "idSize", data.getPetSizeId());
 
         addOptionalPetColumn(columns, values, petColumns, petColumnSizes, "CHIP", "chip", data.getChip(), warnings);
+        if (petColumns.contains("AGE")) {
+            addColumn(columns, values, "age", data.getAgeYears());
+        }
         if (petColumns.contains("EVENTDATE")) {
             addColumn(columns, values, "eventDate", data.getEventDate() == null ? null : Date.valueOf(data.getEventDate()));
         } else if (data.getEventDate() != null) {
@@ -630,6 +637,9 @@ public class PetRepository {
 
         if (petColumns.contains("EVENTDATE") && data.getEventDate() != null) {
             addAssignment(assignments, values, "eventDate", Date.valueOf(data.getEventDate()));
+        }
+        if (petColumns.contains("AGE")) {
+            addAssignment(assignments, values, "age", data.getAgeYears());
         }
 
         if (assignments.isEmpty()) {
@@ -1603,6 +1613,11 @@ public class PetRepository {
 
     private Long longOrNull(ResultSet resultSet, String columnName) throws SQLException {
         long value = resultSet.getLong(columnName);
+        return resultSet.wasNull() ? null : value;
+    }
+
+    private Integer intOrNull(ResultSet resultSet, String columnName) throws SQLException {
+        int value = resultSet.getInt(columnName);
         return resultSet.wasNull() ? null : value;
     }
 
