@@ -172,10 +172,22 @@
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
                                     <Label text="Before photo" styleClass="field-label"/>
                                     <TextField fx:id="txtFotoAntes" promptText="Image path or reference"/>
+                                    <Button text="Choose image" onAction="#seleccionarFotoAntes" styleClass="ghost-button"/>
+                                    <ImageView fx:id="imgFotoAntesPreview"
+                                               fitHeight="110"
+                                               fitWidth="210"
+                                               preserveRatio="true"
+                                               styleClass="photo-preview"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                     <Label text="After photo" styleClass="field-label"/>
                                     <TextField fx:id="txtFotoDespues" promptText="Image path or reference"/>
+                                    <Button text="Choose image" onAction="#seleccionarFotoDespues" styleClass="ghost-button"/>
+                                    <ImageView fx:id="imgFotoDespuesPreview"
+                                               fitHeight="110"
+                                               fitWidth="210"
+                                               preserveRatio="true"
+                                               styleClass="photo-preview"/>
                                 </VBox>
                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2">
                                     <Label text="Situation description" styleClass="field-label"/>

@@ -12,45 +12,42 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="cr.tec.bd.crv.controller.AdoptionController"
-            styleClass="screen">
-    <top>
-        <HBox alignment="CENTER_LEFT" minHeight="92" styleClass="top-bar adoption-header">
-            <padding>
-                <Insets top="18" right="24" bottom="10" left="24"/>
-            </padding>
-            <ImageView fitHeight="52" fitWidth="52" preserveRatio="true">
-                <image>
-                    <Image url="@/images/logo.png"/>
-                </image>
-            </ImageView>
-            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
-                <Label text="Adoptions" styleClass="brand-title"/>
-                <Label text="Adoption registration, request, and follow-up" wrapText="true" styleClass="brand-subtitle"/>
-            </VBox>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button">
-                <tooltip>
-                    <Tooltip text="Returns to the active account menu."/>
-                </tooltip>
-            </Button>
-        </HBox>
-    </top>
-    <center>
-        <VBox spacing="18.0" styleClass="adoption-content">
-            <padding>
-                <Insets top="22" right="24" bottom="24" left="24"/>
-            </padding>
-            <HBox spacing="18.0">
-                <VBox spacing="12.0" prefWidth="560" styleClass="card form-card">
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="cr.tec.bd.crv.controller.AdoptionController"
+      styleClass="screen">
+    <HBox alignment="CENTER_LEFT" minHeight="92" styleClass="top-bar adoption-header">
+        <padding>
+            <Insets top="18" right="24" bottom="10" left="24"/>
+        </padding>
+        <ImageView fitHeight="52" fitWidth="52" preserveRatio="true">
+            <image>
+                <Image url="@/images/logo.png"/>
+            </image>
+        </ImageView>
+        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+            <Label text="Adoptions" styleClass="brand-title"/>
+            <Label text="Adoption registration, request, and follow-up" wrapText="true" styleClass="brand-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Back to menu" onAction="#volverMenu" styleClass="ghost-button">
+            <tooltip>
+                <Tooltip text="Returns to the active account menu."/>
+            </tooltip>
+        </Button>
+    </HBox>
+    <VBox spacing="18.0" styleClass="adoption-content" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets top="22" right="24" bottom="24" left="24"/>
+        </padding>
+        <HBox spacing="18.0" VBox.vgrow="ALWAYS">
+            <VBox spacing="12.0" minWidth="420" prefWidth="470" styleClass="card form-card">
                     <Label text="Select a pet under your control and register the adopting user." wrapText="true" styleClass="subtle-text"/>
                     <GridPane hgap="14.0" vgap="14.0">
                         <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">
@@ -106,7 +103,7 @@
                             <TextField fx:id="txtFotoSeguimiento" promptText="Optional path or reference"/>
                         </VBox>
                     </GridPane>
-                    <HBox spacing="10.0">
+                    <FlowPane hgap="10.0" vgap="10.0">
                         <Button text="Register adoption" onAction="#registrarAdopcion" styleClass="primary-button">
                             <tooltip>
                                 <Tooltip text="Saves the adoption and changes the pet status to Adopted."/>
@@ -127,13 +124,13 @@
                                 <Tooltip text="Updates follow-up notes for the selected adoption."/>
                             </tooltip>
                         </Button>
-                    </HBox>
+                    </FlowPane>
                     <Label fx:id="lblMensajeAdopcion" text="" wrapText="true" styleClass="message-label"/>
                 </VBox>
-                <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="card result-card">
+                <VBox spacing="12.0" minWidth="430" HBox.hgrow="ALWAYS" styleClass="card result-card">
                     <Label text="Adoption history" styleClass="title-lg"/>
                     <Label fx:id="lblTotalAdopciones" text="0 record(s)" styleClass="section-title"/>
-                    <TableView fx:id="tablaAdopciones" prefHeight="520">
+                    <TableView fx:id="tablaAdopciones" prefHeight="520" VBox.vgrow="ALWAYS">
                         <columns>
                             <TableColumn fx:id="colAdoptante" text="Adopter" prefWidth="190"/>
                             <TableColumn fx:id="colMascota" text="Pet" prefWidth="150"/>
@@ -145,5 +142,4 @@
                 </VBox>
             </HBox>
         </VBox>
-    </center>
-</BorderPane>
+</VBox>

@@ -3,8 +3,11 @@ package cr.tec.bd.crv.database;
 import cr.tec.bd.crv.model.Mascota;
 import cr.tec.bd.crv.model.PetFormData;
 import cr.tec.bd.crv.model.PetSearchCriteria;
+import cr.tec.bd.crv.util.PhotoStorageUtil;
+import cr.tec.bd.crv.util.PhotoStorageUtil.StoredPhoto;
 
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
@@ -31,6 +34,8 @@ import java.util.StringJoiner;
 public class PetRepository {
 
     private final ApplicationAuditRepository auditRepository = new ApplicationAuditRepository();
+    public record PetPhotoPair(byte[] beforePhoto, byte[] afterPhoto) {
+    }
 
     /**
      * Saves a new pet publication and links it to the user who published it.
@@ -47,13 +52,15 @@ public class PetRepository {
                 Map<String, Integer> petColumnSizes = findColumnSizes(connection, "PET");
                 List<String> warnings = new ArrayList<>();
 
-                Long photoId = insertPetPhoto(connection, firstValue(data.getPhotoBeforePath(), data.getPhotoAfterPath()));
+                Long photoId = insertPetPhoto(connection, null, "BEFORE", data.getPhotoBeforePath());
                 long contactId = insertPetContact(connection);
                 insertOptionalPetContactEmail(connection, contactId, data.getContactEmail());
                 insertOptionalPetContactPhone(connection, contactId, data.getContactPhone());
 
                 long petId = nextSequenceValue(connection, "sPet");
                 insertPet(connection, petId, data, photoId, contactId, petColumns, petColumnSizes, warnings);
+                linkPhotoToPetIfPossible(connection, photoId, petId, "BEFORE");
+                insertPetPhoto(connection, petId, "AFTER", data.getPhotoAfterPath());
                 insertOptionalReward(connection, petId, data.getCurrencyId(), data.getRewardAmount());
 
                 if (publisherPersonId != null) {
@@ -105,7 +112,8 @@ public class PetRepository {
                         p.energyLevel,
                         p.chip,
                         p.eventDate,
-                        pp.photoPath,
+                        pp.photoPath AS beforePhotoPath,
+                        afterPhoto.photoPath AS afterPhotoPath,
                         rw.idCurrency,
                         rw.amount,
                         hs.illnessState,
@@ -150,6 +158,9 @@ public class PetRepository {
                     FROM pet p
                     LEFT JOIN petPhoto pp
                         ON pp.id = p.idPetPhoto
+                    LEFT JOIN petPhoto afterPhoto
+                        ON afterPhoto.idPet = p.id
+                       AND UPPER(NVL(afterPhoto.photoType, '')) = 'AFTER'
                     LEFT JOIN latestReward lr
                         ON lr.idPet = p.id
                     LEFT JOIN reward rw
@@ -187,8 +198,8 @@ public class PetRepository {
                             resultSet.getString("contactEmail"),
                             resultSet.getBigDecimal("amount"),
                             eventDate == null ? null : eventDate.toLocalDate(),
-                            resultSet.getString("photoPath"),
-                            null,
+                            resultSet.getString("beforePhotoPath"),
+                            resultSet.getString("afterPhotoPath"),
                             resultSet.getString("description"),
                             resultSet.getString("illnessState"),
                             resultSet.getString("healthDescription"),
@@ -224,7 +235,8 @@ public class PetRepository {
                 List<String> warnings = new ArrayList<>();
 
                 updatePetCore(connection, petId, data, petColumns, petColumnSizes, warnings);
-                updatePetPhoto(connection, petId, firstValue(data.getPhotoBeforePath(), data.getPhotoAfterPath()));
+                updatePetPhoto(connection, petId, "BEFORE", data.getPhotoBeforePath(), true);
+                updatePetPhoto(connection, petId, "AFTER", data.getPhotoAfterPath(), false);
                 updatePetContact(connection, petId, data.getContactEmail(), data.getContactPhone());
                 upsertReward(connection, petId, data.getCurrencyId(), data.getRewardAmount());
                 insertOptionalHealthAndVeterinarian(connection, petId, data);
@@ -280,6 +292,70 @@ public class PetRepository {
                         ));
                     }
                     return pets;
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the stored image bytes for a pet preview.
+     *
+     * <p>New schemas use petPhoto.photoData. Older rows may only have a path, so
+     * this method still tries that path as a fallback.</p>
+     */
+    public byte[] findPetPhotoBytes(long petId) throws SQLException {
+        return findPetPhotoBytes(petId, "BEFORE");
+    }
+
+    public PetPhotoPair findPetPhotoPair(long petId) throws SQLException {
+        return new PetPhotoPair(
+                findPetPhotoBytes(petId, "BEFORE"),
+                findPetPhotoBytes(petId, "AFTER")
+        );
+    }
+
+    private byte[] findPetPhotoBytes(long petId, String photoType) throws SQLException {
+        try (Connection connection = ConexionBD.conectar()) {
+            Set<String> photoColumns = findColumnNames(connection, "PETPHOTO");
+            boolean hasPhotoData = photoColumns.contains("PHOTODATA");
+            boolean hasTypedPhotos = photoColumns.contains("IDPET") && photoColumns.contains("PHOTOTYPE");
+            boolean afterPhoto = "AFTER".equalsIgnoreCase(photoType);
+            String sql;
+            if (afterPhoto && hasTypedPhotos) {
+                sql = hasPhotoData
+                        ? "SELECT photoData, photoPath FROM petPhoto WHERE idPet = ? AND UPPER(NVL(photoType, '')) = 'AFTER' ORDER BY id DESC"
+                        : "SELECT photoPath FROM petPhoto WHERE idPet = ? AND UPPER(NVL(photoType, '')) = 'AFTER' ORDER BY id DESC";
+            } else {
+                sql = hasPhotoData
+                        ? """
+                        SELECT pp.photoData, pp.photoPath
+                        FROM pet p
+                        LEFT JOIN petPhoto pp ON pp.id = p.idPetPhoto
+                        WHERE p.id = ?
+                        """
+                        : """
+                        SELECT pp.photoPath
+                        FROM pet p
+                        LEFT JOIN petPhoto pp ON pp.id = p.idPetPhoto
+                        WHERE p.id = ?
+                        """;
+            }
+
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setLong(1, petId);
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (!resultSet.next()) {
+                        return null;
+                    }
+
+                    if (hasPhotoData) {
+                        Blob blob = resultSet.getBlob("photoData");
+                        if (blob != null && blob.length() > 0) {
+                            return blob.getBytes(1, (int) blob.length());
+                        }
+                    }
+                    return PhotoStorageUtil.readBytesIfFileExists(resultSet.getString("photoPath"));
                 }
             }
         }
@@ -713,18 +789,47 @@ public class PetRepository {
         }
     }
 
-    private Long insertPetPhoto(Connection connection, String photoPath) throws SQLException {
+    private Long insertPetPhoto(Connection connection, Long petId, String photoType, String photoPath) throws SQLException {
         String normalizedPath = emptyToNull(photoPath);
         if (normalizedPath == null) {
             return null;
         }
 
-        long photoId = nextSequenceValue(connection, "sPetPhoto");
-        String sql = "INSERT INTO petPhoto(id, photoPath) VALUES (?, ?)";
+        Set<String> photoColumns = findColumnNames(connection, "PETPHOTO");
+        boolean storesBlob = photoColumns.contains("PHOTODATA");
+        StoredPhoto photo = PhotoStorageUtil.fromPath(normalizedPath, storesBlob);
 
+        long photoId = nextSequenceValue(connection, "sPetPhoto");
+        List<String> columns = new ArrayList<>();
+        List<Object> values = new ArrayList<>();
+
+        addColumn(columns, values, "id", photoId);
+        addColumn(columns, values, "photoPath", fit(photo.storedPath(), normalizedPath, 255));
+
+        if (photoColumns.contains("IDPET") && petId != null) {
+            addColumn(columns, values, "idPet", petId);
+        }
+        if (photoColumns.contains("PHOTOTYPE")) {
+            addColumn(columns, values, "photoType", fit(photoType, null, 20));
+        }
+        if (photoColumns.contains("FILENAME")) {
+            addColumn(columns, values, "fileName", fit(photo.fileName(), null, 255));
+        }
+        if (photoColumns.contains("MIMETYPE")) {
+            addColumn(columns, values, "mimeType", fit(photo.mimeType(), null, 80));
+        }
+        if (storesBlob && photo.data() != null) {
+            addColumn(columns, values, "photoData", photo.data());
+        }
+
+        StringJoiner placeholders = new StringJoiner(", ");
+        for (int index = 0; index < columns.size(); index++) {
+            placeholders.add("?");
+        }
+
+        String sql = "INSERT INTO petPhoto(" + String.join(", ", columns) + ") VALUES (" + placeholders + ")";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, photoId);
-            statement.setString(2, normalizedPath);
+            setParameters(statement, values);
             statement.executeUpdate();
             return photoId;
         }
@@ -800,23 +905,109 @@ public class PetRepository {
         }
     }
 
-    private void updatePetPhoto(Connection connection, long petId, String photoPath) throws SQLException {
+    private void updatePetPhoto(Connection connection, long petId, String photoType, String photoPath, boolean mainPhoto)
+            throws SQLException {
         String normalizedPath = emptyToNull(photoPath);
         if (normalizedPath == null) {
             return;
         }
 
-        Long photoId = findPetLinkedId(connection, petId, "idPetPhoto");
+        Set<String> photoColumns = findColumnNames(connection, "PETPHOTO");
+        boolean storesBlob = photoColumns.contains("PHOTODATA");
+        Long photoId = findTypedPhotoId(connection, petId, photoType);
+        if (photoId == null && mainPhoto) {
+            photoId = findPetLinkedId(connection, petId, "idPetPhoto");
+        }
         if (photoId == null) {
-            Long newPhotoId = insertPetPhoto(connection, normalizedPath);
-            updatePetLinkedId(connection, petId, "idPetPhoto", newPhotoId);
+            Long newPhotoId = insertPetPhoto(connection, petId, photoType, normalizedPath);
+            if (mainPhoto && newPhotoId != null) {
+                updatePetLinkedId(connection, petId, "idPetPhoto", newPhotoId);
+            }
             return;
         }
 
-        try (PreparedStatement statement = connection.prepareStatement("UPDATE petPhoto SET photoPath = ? WHERE id = ?")) {
-            statement.setString(1, normalizedPath);
-            statement.setLong(2, photoId);
+        StoredPhoto photo = PhotoStorageUtil.fromPath(normalizedPath, false);
+        if (storesBlob && photo.data() == null) {
+            return;
+        }
+
+        List<String> assignments = new ArrayList<>();
+        List<Object> values = new ArrayList<>();
+        addAssignment(assignments, values, "photoPath", fit(photo.storedPath(), normalizedPath, 255));
+
+        if (photoColumns.contains("IDPET")) {
+            addAssignment(assignments, values, "idPet", petId);
+        }
+        if (photoColumns.contains("PHOTOTYPE")) {
+            addAssignment(assignments, values, "photoType", fit(photoType, null, 20));
+        }
+        if (photoColumns.contains("FILENAME")) {
+            addAssignment(assignments, values, "fileName", fit(photo.fileName(), null, 255));
+        }
+        if (photoColumns.contains("MIMETYPE")) {
+            addAssignment(assignments, values, "mimeType", fit(photo.mimeType(), null, 80));
+        }
+        if (storesBlob && photo.data() != null) {
+            addAssignment(assignments, values, "photoData", photo.data());
+        }
+
+        values.add(photoId);
+        String sql = "UPDATE petPhoto SET " + String.join(", ", assignments) + " WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            setParameters(statement, values);
             statement.executeUpdate();
+        }
+    }
+
+    private void linkPhotoToPetIfPossible(Connection connection, Long photoId, long petId, String photoType) throws SQLException {
+        if (photoId == null) {
+            return;
+        }
+
+        Set<String> photoColumns = findColumnNames(connection, "PETPHOTO");
+        List<String> assignments = new ArrayList<>();
+        List<Object> values = new ArrayList<>();
+        if (photoColumns.contains("IDPET")) {
+            addAssignment(assignments, values, "idPet", petId);
+        }
+        if (photoColumns.contains("PHOTOTYPE")) {
+            addAssignment(assignments, values, "photoType", fit(photoType, null, 20));
+        }
+        if (assignments.isEmpty()) {
+            return;
+        }
+
+        values.add(photoId);
+        String sql = "UPDATE petPhoto SET " + String.join(", ", assignments) + " WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            setParameters(statement, values);
+            statement.executeUpdate();
+        }
+    }
+
+    private Long findTypedPhotoId(Connection connection, long petId, String photoType) throws SQLException {
+        Set<String> photoColumns = findColumnNames(connection, "PETPHOTO");
+        if (!photoColumns.contains("IDPET") || !photoColumns.contains("PHOTOTYPE")) {
+            return null;
+        }
+
+        String sql = """
+                SELECT id
+                FROM petPhoto
+                WHERE idPet = ?
+                  AND UPPER(NVL(photoType, '')) = UPPER(?)
+                ORDER BY id DESC
+                """;
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+            statement.setString(2, photoType);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return null;
+                }
+                return resultSet.getLong("id");
+            }
         }
     }
 
@@ -1378,6 +1569,8 @@ public class PetRepository {
                 statement.setDate(index + 1, date);
             } else if (value instanceof BigDecimal decimal) {
                 statement.setBigDecimal(index + 1, decimal);
+            } else if (value instanceof byte[] bytes) {
+                statement.setBytes(index + 1, bytes);
             } else {
                 statement.setObject(index + 1, value);
             }

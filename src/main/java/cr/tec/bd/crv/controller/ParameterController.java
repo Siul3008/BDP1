@@ -29,6 +29,8 @@ import java.sql.SQLException;
  */
 public class ParameterController {
 
+    private static final String MATCH_JOB_FREQUENCY = "matchJobfreq";
+
     private final ParameterRepository parameterRepository = new ParameterRepository();
     private final CatalogRepository catalogRepository = new CatalogRepository();
 
@@ -123,8 +125,15 @@ public class ParameterController {
             }
 
             lblMessage.setText("Parameter saved successfully.");
+            if (ParameterRepository.SYSTEM_PARAMETERS.equals(category)
+                    && MATCH_JOB_FREQUENCY.equalsIgnoreCase(txtName.getText().trim())) {
+                lblMessage.setText("Parameter saved successfully. Match job schedule updated.");
+            }
             selectedId = null;
             clearFields();
+            if (ParameterRepository.PET_TYPES.equals(category) || ParameterRepository.BREEDS.equals(category)) {
+                loadPetTypes();
+            }
             loadRecords();
         } catch (IllegalArgumentException e) {
             lblMessage.setText(e.getMessage());
@@ -144,6 +153,9 @@ public class ParameterController {
     @FXML
     public void loadRecords() {
         try {
+            if (ParameterRepository.BREEDS.equals(cbCategory.getValue())) {
+                loadPetTypes();
+            }
             var records = parameterRepository.findRecords(cbCategory.getValue());
             tableParameters.setItems(FXCollections.observableArrayList(records));
             lblSummary.setText(records.size() + " record(s)");
@@ -176,10 +188,22 @@ public class ParameterController {
         boxExtra.setManaged(currency || systemParameter);
         boxDescription.setVisible(systemParameter);
         boxDescription.setManaged(systemParameter);
+        if (breed) {
+            loadPetTypes();
+        }
 
         lblName.setText(systemParameter ? "Parameter name" : "Name");
-        lblExtra.setText(currency ? "Acronimo" : "Value");
-        colExtra.setText(breed ? "Type" : currency ? "Acronimo" : systemParameter ? "Value" : "Detail");
+        lblExtra.setText(currency ? "Acronym" : "Value");
+        colExtra.setText(breed ? "Type" : currency ? "Acronym" : systemParameter ? "Value" : "Detail");
+
+        if (systemParameter) {
+            txtName.setPromptText("Example: matchJobfreq");
+            txtExtra.setPromptText("Value in hours or configured value");
+            txtDescription.setPromptText("Parameter description");
+        } else {
+            txtName.setPromptText("Record name");
+            txtExtra.setPromptText("Additional value");
+        }
     }
 
     private void loadSelectedRecord(ParameterRecord record) {
@@ -187,7 +211,7 @@ public class ParameterController {
         selectedId = record.getId();
         txtName.setText(record.getName());
         txtExtra.setText(record.getExtra());
-        txtDescription.clear();
+        txtDescription.setText(record.getDescription());
         if (ParameterRepository.BREEDS.equals(cbCategory.getValue())) {
             selectPetTypeByLabel(record.getExtra());
         }

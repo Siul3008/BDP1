@@ -2,6 +2,7 @@ package cr.tec.bd.crv.controller;
 
 import cr.tec.bd.crv.database.CatalogRepository;
 import cr.tec.bd.crv.database.PetRepository;
+import cr.tec.bd.crv.database.PetRepository.PetPhotoPair;
 import cr.tec.bd.crv.model.CatalogOption;
 import cr.tec.bd.crv.model.Mascota;
 import cr.tec.bd.crv.model.PetSearchCriteria;
@@ -17,7 +18,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -64,8 +68,20 @@ public class BuscarMascotaController {
     private Label lblResultado;
 
     @FXML
+    private ImageView imgPetBeforePreview;
+
+    @FXML
+    private ImageView imgPetAfterPreview;
+
+    @FXML
+    private Label lblPhotoStatus;
+
+    @FXML
     public void initialize() {
         configureColumns();
+        tablaResultados.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, oldValue, selectedPet) -> loadSelectedPetPhoto(selectedPet));
         loadStatuses();
     }
 
@@ -88,6 +104,8 @@ public class BuscarMascotaController {
         dpDesde.setValue(null);
         dpHasta.setValue(null);
         tablaResultados.getItems().clear();
+        clearPhotoPreviews();
+        lblPhotoStatus.setText("Select a result to preview its stored photos.");
         lblResultado.setText("");
     }
 
@@ -112,6 +130,41 @@ public class BuscarMascotaController {
         colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
         colLugar.setCellValueFactory(new PropertyValueFactory<>("lugar"));
         colFecha.setCellValueFactory(new PropertyValueFactory<>("fechaEvento"));
+    }
+
+    private void loadSelectedPetPhoto(Mascota selectedPet) {
+        clearPhotoPreviews();
+        if (selectedPet == null) {
+            lblPhotoStatus.setText("Select a result to preview its stored photos.");
+            return;
+        }
+
+        try {
+            PetPhotoPair photos = petRepository.findPetPhotoPair(selectedPet.getId());
+            boolean beforeLoaded = loadPhoto(imgPetBeforePreview, photos.beforePhoto());
+            boolean afterLoaded = loadPhoto(imgPetAfterPreview, photos.afterPhoto());
+            if (!beforeLoaded && !afterLoaded) {
+                lblPhotoStatus.setText("This pet does not have stored photos yet.");
+                return;
+            }
+            lblPhotoStatus.setText(selectedPet.getNombre());
+        } catch (SQLException e) {
+            lblPhotoStatus.setText("Could not load the photos: " + e.getMessage());
+        }
+    }
+
+    private boolean loadPhoto(ImageView preview, byte[] imageBytes) {
+        if (imageBytes == null || imageBytes.length == 0) {
+            preview.setImage(null);
+            return false;
+        }
+        preview.setImage(new Image(new ByteArrayInputStream(imageBytes)));
+        return true;
+    }
+
+    private void clearPhotoPreviews() {
+        imgPetBeforePreview.setImage(null);
+        imgPetAfterPreview.setImage(null);
     }
 
     private void loadStatuses() {

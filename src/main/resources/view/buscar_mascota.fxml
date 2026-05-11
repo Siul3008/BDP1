@@ -83,9 +83,24 @@
                     </TableView>
                 </VBox>
                 <VBox spacing="12.0" prefWidth="280" styleClass="card side-summary">
-                    <Label text="Usage tips" styleClass="section-title"/>
+                    <Label text="Selected pet photos" styleClass="section-title"/>
+                    <Label text="Before" styleClass="field-label"/>
+                    <ImageView fx:id="imgPetBeforePreview"
+                               fitHeight="120"
+                               fitWidth="240"
+                               preserveRatio="true"
+                               styleClass="photo-preview"/>
+                    <Label text="After" styleClass="field-label"/>
+                    <ImageView fx:id="imgPetAfterPreview"
+                               fitHeight="120"
+                               fitWidth="240"
+                               preserveRatio="true"
+                               styleClass="photo-preview"/>
+                    <Label fx:id="lblPhotoStatus"
+                           text="Select a result to preview its stored photos."
+                           wrapText="true"
+                           styleClass="subtle-text"/>
                     <Label text="Use name, breed, color, chip, province, canton, or district to search." wrapText="true" styleClass="subtle-text"/>
-                    <Label text="Results are sorted by newest date when the date is available." wrapText="true" styleClass="subtle-text"/>
                 </VBox>
             </HBox>
         </VBox>

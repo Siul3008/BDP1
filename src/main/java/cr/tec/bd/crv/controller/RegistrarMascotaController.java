@@ -9,15 +9,23 @@ import cr.tec.bd.crv.util.SessionContext;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -117,6 +125,12 @@ public class RegistrarMascotaController {
     private TextField txtFotoDespues;
 
     @FXML
+    private ImageView imgFotoAntesPreview;
+
+    @FXML
+    private ImageView imgFotoDespuesPreview;
+
+    @FXML
     private TextArea txtDescripcion;
 
     @FXML
@@ -195,7 +209,18 @@ public class RegistrarMascotaController {
         );
         cbEnergia.getSelectionModel().clearSelection();
         dpEvento.setValue(null);
+        clearImagePreviews();
         lblMensaje.setText("");
+    }
+
+    @FXML
+    public void seleccionarFotoAntes(ActionEvent event) {
+        chooseImage(event, txtFotoAntes, imgFotoAntesPreview);
+    }
+
+    @FXML
+    public void seleccionarFotoDespues(ActionEvent event) {
+        chooseImage(event, txtFotoDespues, imgFotoDespuesPreview);
     }
 
     @FXML
@@ -345,10 +370,62 @@ public class RegistrarMascotaController {
             txtFotoAntes.setText(data.getPhotoBeforePath());
             txtFotoDespues.setText(data.getPhotoAfterPath());
             txtDescripcion.setText(data.getDescription());
+            loadStoredPhotoPreview(petId);
             lblMensaje.setText("Edit mode: update the data and press Save.");
         } catch (SQLException e) {
             lblMensaje.setText("Could not load the pet for editing: " + e.getMessage());
         }
+    }
+
+    private void chooseImage(ActionEvent event, TextField targetField, ImageView preview) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose pet image");
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Image files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp")
+        );
+
+        File selectedFile = chooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
+        if (selectedFile == null) {
+            return;
+        }
+
+        targetField.setText(selectedFile.getAbsolutePath());
+        loadImagePreview(selectedFile.toPath(), preview);
+    }
+
+    private void loadStoredPhotoPreview(long petId) {
+        try {
+            byte[] imageBytes = petRepository.findPetPhotoBytes(petId);
+            if (imageBytes != null && imageBytes.length > 0) {
+                imgFotoAntesPreview.setImage(new Image(new ByteArrayInputStream(imageBytes)));
+                return;
+            }
+            loadImagePreviewIfPathExists(txtFotoAntes.getText(), imgFotoAntesPreview);
+        } catch (SQLException e) {
+            lblMensaje.setText("Could not load the stored image preview: " + e.getMessage());
+        }
+    }
+
+    private void loadImagePreviewIfPathExists(String pathText, ImageView preview) {
+        if (pathText == null || pathText.trim().isEmpty()) {
+            preview.setImage(null);
+            return;
+        }
+
+        Path path = Path.of(pathText.trim());
+        if (Files.isRegularFile(path)) {
+            loadImagePreview(path, preview);
+        }
+    }
+
+    private void loadImagePreview(Path path, ImageView preview) {
+        Image image = new Image(path.toUri().toString(), 210, 110, true, true);
+        preview.setImage(image.isError() ? null : image);
+    }
+
+    private void clearImagePreviews() {
+        imgFotoAntesPreview.setImage(null);
+        imgFotoDespuesPreview.setImage(null);
     }
 
     private BigDecimal parseAmount(String amount) {

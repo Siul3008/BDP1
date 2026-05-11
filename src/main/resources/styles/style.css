@@ -493,3 +493,7 @@
     -fx-text-fill: #56319b;
     -fx-font-size: 13px;
 }
+
+.photo-preview {
+    -fx-effect: dropshadow(gaussian, rgba(86, 49, 155, 0.14), 10, 0.15, 0, 2);
+}

@@ -2,6 +2,7 @@ package cr.tec.bd.crv.database;
 
 import cr.tec.bd.crv.model.ParameterRecord;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,18 +18,20 @@ import java.util.Map;
  * one place to add or edit those values without writing SQL by hand.</p>
  */
 public class ParameterRepository {
+    private static final String MATCH_JOB_FREQUENCY = "matchJobfreq";
+
 
     public static final String PET_TYPES = "Pet types";
-    public static final String BREEDS = "Razas";
+    public static final String BREEDS = "Breeds";
     public static final String PET_STATUSES = "Pet statuses";
-    public static final String COLORS = "Colores";
+    public static final String COLORS = "Colors";
     public static final String PET_SIZES = "Sizes";
-    public static final String TRAINING_EASES = "Facilidad de entrenamiento";
+    public static final String TRAINING_EASES = "Training ease";
     public static final String DISEASES = "Diseases";
     public static final String TREATMENTS = "Treatments";
     public static final String MEDICINES = "Medicines";
     public static final String VETERINARIANS = "Veterinarians";
-    public static final String CURRENCIES = "Monedas";
+    public static final String CURRENCIES = "Currencies";
     public static final String FOOD_DONATION = "Food donation";
     public static final String SYSTEM_PARAMETERS = "System parameters";
 
@@ -74,7 +77,7 @@ public class ParameterRepository {
     public List<ParameterRecord> findRecords(String category) throws SQLException {
         if (BREEDS.equals(category)) {
             return queryRecords("""
-                    SELECT b.id, b.name, NVL(pt.name, 'Sin tipo') AS extra
+                    SELECT b.id, b.name, NVL(pt.name, 'No type') AS extra
                     FROM breed b
                     LEFT JOIN petType pt
                         ON pt.id = b.idPetType
@@ -87,7 +90,7 @@ public class ParameterRepository {
         }
 
         if (SYSTEM_PARAMETERS.equals(category)) {
-            return queryRecords("SELECT id, name, value AS extra FROM sysParameter ORDER BY name");
+            return queryRecords("SELECT id, name, value AS extra, description FROM sysParameter ORDER BY name");
         }
 
         SimpleCatalog catalog = simpleCatalogs.get(category);
@@ -137,7 +140,7 @@ public class ParameterRepository {
      */
     public void saveBreed(Long id, String name, Long petTypeId) throws SQLException {
         requireValue(name, "Enter the breed name.");
-        validateLength(name, 25, "La raza no puede superar 25 caracteres.");
+        validateLength(name, 25, "Breed name cannot exceed 25 characters.");
         if (petTypeId == null) {
             throw new IllegalArgumentException("Select the pet type for the breed.");
         }
@@ -172,7 +175,7 @@ public class ParameterRepository {
         requireValue(name, "Enter the currency name.");
         requireValue(acronym, "Enter the acronym.");
         validateLength(name, 25, "Currency name cannot exceed 25 characters.");
-        validateLength(acronym, 3, "El acronimo no puede superar 3 caracteres.");
+        validateLength(acronym, 3, "Acronym cannot exceed 3 characters.");
 
         try (Connection connection = ConexionBD.conectar()) {
             if (id == null) {
@@ -205,7 +208,11 @@ public class ParameterRepository {
         requireValue(value, "Enter the value.");
         validateLength(name, 20, "Parameter name cannot exceed 20 characters.");
         validateLength(description, 50, "Description cannot exceed 50 characters.");
-        validateLength(value, 255, "El valor no puede superar 255 caracteres.");
+        validateLength(value, 255, "Value cannot exceed 255 characters.");
+        validateSystemParameterValue(name, value);
+
+        String normalizedName = name.trim();
+        String normalizedValue = value.trim();
 
         try (Connection connection = ConexionBD.conectar()) {
             if (id == null) {
@@ -213,11 +220,12 @@ public class ParameterRepository {
                         "INSERT INTO sysParameter(id, name, description, value) VALUES (?, ?, ?, ?)"
                 )) {
                     statement.setLong(1, nextSequenceValue(connection, "sSysParameter"));
-                    statement.setString(2, name.trim());
+                    statement.setString(2, normalizedName);
                     statement.setString(3, emptyToNull(description));
-                    statement.setString(4, value.trim());
+                    statement.setString(4, normalizedValue);
                     statement.executeUpdate();
                 }
+                updateMatchSchedulerIfNeeded(connection, normalizedName);
                 auditRepository.log(connection, "Parameters", "System", "-", name);
                 return;
             }
@@ -225,12 +233,13 @@ public class ParameterRepository {
             try (PreparedStatement statement = connection.prepareStatement(
                     "UPDATE sysParameter SET name = ?, description = ?, value = ? WHERE id = ?"
             )) {
-                statement.setString(1, name.trim());
+                statement.setString(1, normalizedName);
                 statement.setString(2, emptyToNull(description));
-                statement.setString(3, value.trim());
+                statement.setString(3, normalizedValue);
                 statement.setLong(4, id);
                 statement.executeUpdate();
             }
+            updateMatchSchedulerIfNeeded(connection, normalizedName);
             auditRepository.log(connection, "Parameters", "System", "id:" + id, name);
         }
     }
@@ -244,10 +253,36 @@ public class ParameterRepository {
                 records.add(new ParameterRecord(
                         resultSet.getLong("id"),
                         valueOrEmpty(resultSet.getString("name")),
-                        valueOrEmpty(resultSet.getString("extra"))
+                        valueOrEmpty(resultSet.getString("extra")),
+                        safeGet(resultSet, "description")
                 ));
             }
             return records;
+        }
+    }
+
+    private void validateSystemParameterValue(String name, String value) {
+        if (!MATCH_JOB_FREQUENCY.equalsIgnoreCase(name.trim())) {
+            return;
+        }
+
+        try {
+            int hours = Integer.parseInt(value.trim());
+            if (hours <= 0) {
+                throw new IllegalArgumentException("Match job frequency must be a whole number greater than 0.");
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Match job frequency must be a whole number of hours.");
+        }
+    }
+
+    private void updateMatchSchedulerIfNeeded(Connection connection, String parameterName) throws SQLException {
+        if (!MATCH_JOB_FREQUENCY.equalsIgnoreCase(parameterName)) {
+            return;
+        }
+
+        try (CallableStatement statement = connection.prepareCall("{ call updateJobFreq }")) {
+            statement.execute();
         }
     }
 
@@ -281,6 +316,14 @@ public class ParameterRepository {
 
     private String valueOrEmpty(String value) {
         return value == null ? "" : value;
+    }
+
+    private String safeGet(ResultSet resultSet, String columnName) throws SQLException {
+        try {
+            return valueOrEmpty(resultSet.getString(columnName));
+        } catch (SQLException e) {
+            return "";
+        }
     }
 
     private record SimpleCatalog(String tableName, String sequenceName, String nameColumn, int maxLength) {
