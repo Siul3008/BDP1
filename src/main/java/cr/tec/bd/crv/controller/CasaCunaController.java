@@ -95,7 +95,7 @@ public class CasaCunaController {
                     txtNotasCasaCuna.getText()
             );
             lblEstadoCasaCuna.setText("Foster home is active.");
-            lblMensajeCasaCuna.setText("Condiciones guardadas correctamente.");
+            lblMensajeCasaCuna.setText("Foster home conditions saved successfully.");
             loadDirectory();
         } catch (IllegalArgumentException e) {
             lblMensajeCasaCuna.setText(e.getMessage());
